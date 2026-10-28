@@ -1,0 +1,215 @@
+$ python tools/drain.py
+client: half a request sent
+client: SIGTERM sent to the app
+client: the request finished: HTTP/1.0 200 OK
+client: the app exited with 0
+app output:
+{"listening": 8081}
+{"stopping": "SIGTERM"}
+{"method": "GET", "path": "/books/bk-1001", "status": 200}
+{"stopped": "cleanly"}
+$ docker build -q -t book-shop:1.1.0 .
+sha256:74861866576b28de1f0a6e6ba8e86487db1a6a0cef783fdd06c804908331cd95
+$ python tools/push_image.py book-shop:1.1.0
+book-shop:1.1.0 -> sha256:db5676428a9f6d1311499fab23d7796c1c4f3f37e4e50398b133cc
+caa5cb62d1
+$ cd infra
+$ terraform plan -out=tfplan
+aws_route53_zone.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND]
+aws_ecs_cluster.shop: Refreshing state... [id=arn:aws:ecs:eu-west-2:444455556666
+:cluster/book-shop]
+aws_vpc.shop: Refreshing state... [id=vpc-e3500a5c4abdcac35]
+aws_ecr_repository.app: Refreshing state... [id=book-shop]
+aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
+ly]
+aws_acm_certificate.shop: Refreshing state... [id=arn:aws:acm:eu-west-2:44445555
+6666:certificate/8bd90642-d1d1-452e-890f-400b3727c4e7]
+data.aws_iam_policy_document.app_trust: Reading...
+data.aws_iam_policy_document.app_trust: Read complete after 0s [id=1077804475]
+aws_eip.nat: Refreshing state... [id=eipalloc-6ff6a2527581beced]
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
+aws_cloudwatch_log_group.app: Refreshing state... [id=/book-shop/app]
+aws_route_table.public: Refreshing state... [id=rtb-e5c7633cefa18a098]
+aws_route_table.private: Refreshing state... [id=rtb-b3c9465183df1b91c]
+aws_lb_target_group.app: Refreshing state... [id=arn:aws:elasticloadbalancing:eu
+-west-2:444455556666:targetgroup/book-shop-app/a13717916e126457]
+aws_internet_gateway.shop: Refreshing state... [id=igw-9bb99313e3559d59f]
+aws_security_group.this["alb"]: Refreshing state... [id=sg-1292ef779761e6b9e]
+aws_security_group.this["app"]: Refreshing state... [id=sg-0ea1f02f93c435340]
+aws_security_group.this["db"]: Refreshing state... [id=sg-98bc7ab1c20bfa122]
+aws_route53_record.validation["book-shop.example.com"]: Refreshing state... [id=
+2ZK1ZCR6K7HTYSHM5XMFND__d930b28be6c5927595552b219965053e.book-shop.example.com._
+CNAME]
+aws_iam_role.execution: Refreshing state... [id=BookShopExecution]
+aws_iam_role.app: Refreshing state... [id=BookShopApp]
+data.aws_iam_policy_document.app: Reading...
+data.aws_iam_policy_document.app: Read complete after 0s [id=2842283945]
+data.aws_iam_policy_document.catalog: Reading...
+data.aws_iam_policy_document.catalog: Read complete after 0s [id=3396613952]
+data.aws_iam_policy_document.execution: Reading...
+data.aws_iam_policy_document.execution: Read complete after 0s [id=3229690975]
+aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a394010c40419]
+aws_subnet.this["app-c"]: Refreshing state... [id=subnet-e56d56ed1dbd82035]
+aws_subnet.this["app-b"]: Refreshing state... [id=subnet-f7e3a7a4ba6f7ed13]
+aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c8b428e052e]
+aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
+aws_subnet.this["data-a"]: Refreshing state... [id=subnet-c7a720642ba246ff7]
+aws_subnet.this["data-c"]: Refreshing state... [id=subnet-60f987a7b700f6f9f]
+aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce869754647c8473]
+aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b62140a09169ec7ff]
+aws_vpc_endpoint.s3: Refreshing state... [id=vpce-b3f3a79917dfc3a98]
+aws_route.public_internet: Refreshing state... [id=r-rtb-e5c7633cefa18a098108028
+9494]
+aws_vpc_security_group_egress_rule.app_out: Refreshing state... [id=sgr-615841b9
+17e0c5c82]
+aws_vpc_security_group_egress_rule.alb_app: Refreshing state... [id=sgr-72f34ea4
+1ac2722c1]
+aws_vpc_security_group_ingress_rule.this["http"]: Refreshing state... [id=sgr-53
+a8fe45fdb109b8c]
+aws_vpc_security_group_ingress_rule.this["app_alb"]: Refreshing state... [id=sgr
+-61ea7866148cdc96f]
+aws_vpc_security_group_ingress_rule.this["https"]: Refreshing state... [id=sgr-2
+eba2a5dc5ea961db]
+aws_vpc_security_group_ingress_rule.this["db_app"]: Refreshing state... [id=sgr-
+6e8abec5ee98759ac]
+aws_acm_certificate_validation.shop: Refreshing state... [id=2026-11-02 09:30:00
+ +0000 UTC]
+aws_ecs_task_definition.app: Refreshing state... [id=book-shop]
+aws_iam_role_policy.app: Refreshing state... [id=BookShopApp:book-shop-app]
+aws_s3_bucket_policy.catalog: Refreshing state... [id=book-shop-catalog-44445555
+6666]
+aws_iam_role_policy.execution: Refreshing state... [id=BookShopExecution:pull-an
+d-log]
+aws_nat_gateway.a: Refreshing state... [id=nat-0e556a59c79dfb70c]
+aws_lb.shop: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-west-2:4444
+55556666:loadbalancer/app/book-shop/3fb1738b10ff2017]
+aws_network_acl.data: Refreshing state... [id=acl-c0fda9619b350bd6d]
+aws_route_table_association.this["data-c"]: Refreshing state... [id=rtbassoc-43e
+4ec2fc8562cf05]
+aws_route_table_association.this["app-c"]: Refreshing state... [id=rtbassoc-396f
+f0e232233df43]
+aws_route_table_association.this["data-b"]: Refreshing state... [id=rtbassoc-047
+18beae952daaf1]
+aws_route_table_association.this["public-b"]: Refreshing state... [id=rtbassoc-6
+c78e88ccbd487489]
+aws_route_table_association.this["data-a"]: Refreshing state... [id=rtbassoc-905
+28cedb357e43a3]
+aws_route_table_association.this["public-a"]: Refreshing state... [id=rtbassoc-c
+5db509e02f0fff92]
+aws_route_table_association.this["public-c"]: Refreshing state... [id=rtbassoc-9
+df09e3cd1e2023e5]
+aws_route_table_association.this["app-a"]: Refreshing state... [id=rtbassoc-63af
+24dc5926c42f9]
+aws_route_table_association.this["app-b"]: Refreshing state... [id=rtbassoc-bc17
+97f9fcb119fd7]
+aws_route.private_out: Refreshing state... [id=r-rtb-b3c9465183df1b91c1080289494
+]
+aws_route53_record.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND_book-sho
+p.example.com_A]
+aws_lb_listener.https: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-w
+est-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/c602f22870b50359]
+aws_lb_listener.http: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-we
+st-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b69bb98]
+aws_ecs_service.app: Refreshing state... [id=arn:aws:ecs:eu-west-2:444455556666:
+service/book-shop/book-shop]
+aws_appautoscaling_target.app: Refreshing state... [id=service/book-shop/book-sh
+op]
+aws_appautoscaling_policy.cpu: Refreshing state... [id=cpu-60]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+-/+ destroy and then create replacement
+
+Terraform will perform the following actions:
+
+  # aws_appautoscaling_target.app will be updated in-place
+  ~ resource "aws_appautoscaling_target" "app" {
+        id                 = "service/book-shop/book-shop"
+        tags               = {}
+      ~ tags_all           = {
+          + "app"        = "book-shop"
+          + "env"        = "dev"
+          + "managed-by" = "terraform"
+        }
+        # (8 unchanged attributes hidden)
+    }
+
+  # aws_ecs_service.app will be updated in-place
+  ~ resource "aws_ecs_service" "app" {
+        id                                 = "arn:aws:ecs:eu-west-2:444455556666
+:service/book-shop/book-shop"
+        name                               = "book-shop"
+        tags                               = {}
+      ~ task_definition                    = "arn:aws:ecs:eu-west-2:444455556666
+:task-definition/book-shop:1" -> (known after apply)
+        # (17 unchanged attributes hidden)
+
+        # (3 unchanged blocks hidden)
+    }
+
+  # aws_ecs_task_definition.app must be replaced
+-/+ resource "aws_ecs_task_definition" "app" {
+      ~ arn                      = "arn:aws:ecs:eu-west-2:444455556666:task-defi
+nition/book-shop:1" -> (known after apply)
+      ~ arn_without_revision     = "arn:aws:ecs:eu-west-2:444455556666:task-defi
+nition/book-shop" -> (known after apply)
+      ~ container_definitions    = jsonencode(
+          ~ [
+              ~ {
+                  ~ image            = "444455556666.dkr.ecr.eu-west-2.amazonaws
+.com/book-shop:1.0.0" -> "444455556666.dkr.ecr.eu-west-2.amazonaws.com/book-shop
+:1.1.0"
+                  - mountPoints      = []
+                    name             = "app"
+                  + stopTimeout      = 30
+                  - volumesFrom      = []
+                    # (4 unchanged attributes hidden)
+                },
+            ] # forces replacement
+        )
+      ~ enable_fault_injection   = false -> (known after apply)
+      ~ id                       = "book-shop" -> (known after apply)
+      ~ revision                 = 1 -> (known after apply)
+      - tags                     = {} -> null
+        # (13 unchanged attributes hidden)
+
+        # (1 unchanged block hidden)
+    }
+
+Plan: 1 to add, 2 to change, 1 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+$ terraform apply tfplan
+aws_ecs_task_definition.app: Destroying... [id=book-shop]
+aws_ecs_task_definition.app: Destruction complete after 0s
+aws_ecs_task_definition.app: Creating...
+aws_ecs_task_definition.app: Creation complete after 0s [id=book-shop]
+aws_ecs_service.app: Modifying... [id=arn:aws:ecs:eu-west-2:444455556666:service
+/book-shop/book-shop]
+aws_ecs_service.app: Modifications complete after 0s [id=arn:aws:ecs:eu-west-2:4
+44455556666:service/book-shop/book-shop]
+aws_appautoscaling_target.app: Modifying... [id=service/book-shop/book-shop]
+aws_appautoscaling_target.app: Modifications complete after 0s [id=service/book-
+shop/book-shop]
+
+Apply complete! Resources: 1 added, 2 changed, 1 destroyed.
+
+Outputs:
+
+app_role_arn = "arn:aws:iam::444455556666:role/BookShopApp"
+lb_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:loadbalancer/app/b
+ook-shop/3fb1738b10ff2017"
+repository_url = "444455556666.dkr.ecr.eu-west-2.amazonaws.com/book-shop"
+target_group_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:targetgr
+oup/book-shop-app/a13717916e126457"
+vpc_id = "vpc-e3500a5c4abdcac35"
+zone_id = "2ZK1ZCR6K7HTYSHM5XMFND"
+$ aws ecs describe-services --cluster book-shop --services book-shop \
+>   --query 'services[0].taskDefinition'
+"arn:aws:ecs:eu-west-2:444455556666:task-definition/book-shop:2"

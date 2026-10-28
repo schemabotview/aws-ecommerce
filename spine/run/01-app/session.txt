@@ -1,0 +1,15 @@
+$ python -m book_shop.web > app.log 2>&1 & APP=$!
+$ sleep 1
+$ curl -s 127.0.0.1:8080/health
+{"status": "ok"}
+$ curl -s 127.0.0.1:8080/books/bk-1001
+{"id": "bk-1001", "title": "Night Trains of Europe", "author": "Ana Lima", "pric
+e": 12.99, "currency": "GBP", "stock": 40}
+$ curl -s -w ' %{http_code}\n' 127.0.0.1:8080/books/bk-9999
+{"error": "no such book"} 404
+$ kill $APP
+$ cat app.log
+{"listening": 8080}
+{"method": "GET", "path": "/health", "status": 200}
+{"method": "GET", "path": "/books/bk-1001", "status": 200}
+{"method": "GET", "path": "/books/bk-9999", "status": 404}

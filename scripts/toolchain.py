@@ -110,6 +110,50 @@ def terraform() -> tuple[Path, Path]:
     return root / 'bin', rc
 
 
+RELAY = ('172.17.0.1', 3128)  # Docker's bridge gateway: where a build step finds the way out
+
+
+def docker() -> str:
+    """A Docker daemon a learner's machine would have, made to work behind this machine's proxy —
+    none of it on screen. Docker Hub rate-limits this machine's shared address, so the daemon pulls
+    Docker Hub's official images through Google's mirror of it (`registry-mirrors`): a Dockerfile
+    names `python:3.13-slim@sha256:…` as anyone's does, and gets the same bytes. A build step's
+    container cannot reach the host's loopback proxy, so a relay on the bridge gateway forwards to
+    it; the machine's Docker config names the relay as the HTTPS proxy. Returns that proxy URL."""
+    import json, os, socket, time
+    config = Path('/etc/docker/daemon.json')
+    want = {'registry-mirrors': ['https://mirror.gcr.io']}
+    running = subprocess.run(['docker', 'info'], capture_output=True).returncode == 0
+    if not config.exists() or json.loads(config.read_text() or '{}') != want:
+        config.parent.mkdir(exist_ok=True)
+        config.write_text(json.dumps(want) + '\n')
+        if running:  # restart it, so it reads the mirror
+            pid = Path('/var/run/docker.pid')
+            if pid.exists():
+                os.kill(int(pid.read_text()), 15)
+                time.sleep(4)
+            running = False
+    if not running:
+        subprocess.Popen(['dockerd'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        for _ in range(60):
+            if subprocess.run(['docker', 'info'], capture_output=True).returncode == 0:
+                break
+            time.sleep(0.5)
+        else:
+            raise SystemExit('dockerd did not start')
+    upstream = os.environ.get('HTTPS_PROXY') or os.environ.get('https_proxy')
+    if upstream:
+        try:
+            socket.create_connection(RELAY, timeout=0.5).close()
+        except OSError:
+            host, port = upstream.split('://')[-1].rsplit('@')[-1].rstrip('/').split(':')
+            subprocess.Popen([sys.executable, str(REPO / 'scripts' / 'relay.py'), *map(str, RELAY), host, port],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+            time.sleep(0.5)
+        return f'http://{RELAY[0]}:{RELAY[1]}'
+    return ''
+
+
 @contextlib.contextmanager
 def exclusive():
     """One replay at a time on this machine: Terraform's plugin cache is not safe for concurrent

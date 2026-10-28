@@ -42,6 +42,9 @@ When a pinned moto release has one, delete it here: the matrix is the test.
   org-not-in-use  CreatePolicy before the organization exists: AWS answers 400
                   AWSOrganizationsNotInUseException; moto crashed (500), which the provider retries 25
                   times with back-off — a "hang" of minutes, one run in five (the walk order decides).
+  ecr-digest      An image's digest is the sha256 of its manifest's bytes, as AWS (and docker) compute
+                  it; moto hashed the concatenated layer digests, so ECR named a different digest
+                  from the one the build printed.
 
 And two things that are not fixes but the REPLAY's own machinery, said here so nobody mistakes them
 for AWS behaviour:
@@ -647,6 +650,17 @@ def _org_not_in_use():
             raise AWSOrganizationsNotInUseException
         return original(self, **kwargs)
     OrganizationsBackend.create_policy = create_policy
+
+
+# ── ecr-digest ───────────────────────────────────────────────────────────────────────────────────
+
+@patch('ecr-digest')
+def _ecr_digest():
+    from moto.ecr.models import Image
+
+    def create_digest(self) -> None:
+        self._image_digest = 'sha256:' + hashlib.sha256(self.image_manifest.encode()).hexdigest()
+    Image._create_digest = create_digest
 
 
 # ── developer-key ────────────────────────────────────────────────────────────────────────────────

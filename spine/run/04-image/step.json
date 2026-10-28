@@ -1,0 +1,1 @@
+{"from": "run/02-tests", "changes": ["Dockerfile", ".dockerignore", "requirements.txt", "infra/ecr.tf", "tools/push_image.py"], "env": true, "venv": true, "docker": true, "volatile": true}

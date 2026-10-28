@@ -1,0 +1,1 @@
+{"from": "run/07-scaling", "changes": ["book_shop/web.py", "tools/drain.py", "pyproject.toml", "infra/task.tf"], "env": true, "venv": true, "docker": true, "volatile": true}

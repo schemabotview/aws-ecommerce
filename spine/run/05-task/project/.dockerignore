@@ -1,0 +1,5 @@
+# Only what the image needs goes to the builder: not the venv, state or tests.
+*
+!book_shop/
+!requirements.txt
+**/__pycache__

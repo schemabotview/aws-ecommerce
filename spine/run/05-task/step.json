@@ -1,0 +1,1 @@
+{"from": "run/04-image", "changes": ["infra/task.tf"], "env": true}

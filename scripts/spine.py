@@ -78,6 +78,7 @@ step.json (other keys, all optional):
   {"columns": 100}              the pane's width: 80 in an IDE terminal (default), more in a map side pane
   {"enforce_iam": true}         from this step on, the emulator authorises every request against IAM
   {"volatile": true}            every digit masked in the comparison (timings the frame never quotes)
+  {"docker": true}              a Docker daemon, as a learner has one (toolchain.docker: the mirror, the relay)
 """
 import difflib
 import gzip
@@ -235,7 +236,8 @@ def base_env(home: Path, config: dict) -> dict:
         'PATH': f"{toolchain.awscli()}:{tf_bin}:{venv / 'bin'}:/usr/bin:/bin",
         'PIP_DISABLE_PIP_VERSION_CHECK': '1', 'AWS_PAGER': '', 'AWS_CLI_AUTO_PROMPT': 'off',
         # The emulator answers any host name: the Go SDK's virtual-hosted names reach it this way.
-        'HTTP_PROXY': f'http://127.0.0.1:{PORT}', 'http_proxy': f'http://127.0.0.1:{PORT}', 'NO_PROXY': '', 'no_proxy': '',
+        # 127.0.0.1 is not proxied: the app a section runs locally listens there.
+        'HTTP_PROXY': f'http://127.0.0.1:{PORT}', 'http_proxy': f'http://127.0.0.1:{PORT}', 'NO_PROXY': '127.0.0.1', 'no_proxy': '127.0.0.1',
         # Terraform: the local registry, no update check, no colour, one resource at a time. NOT
         # TF_IN_AUTOMATION — it rewords Terraform's hints, and a learner's terminal does not set it.
         **REGISTRY,
@@ -472,6 +474,11 @@ class Machine:
                 (site / '_spine_base.pth').write_text(str(next(self.venv.glob('lib/python3*/site-packages'))) + '\n')
             env['PATH'] = f"{venv / 'bin'}:{env['PATH']}"
             env['VIRTUAL_ENV'] = str(venv)
+        if config.get('docker'):  # the daemon, and the way out for a build step (toolchain.docker)
+            proxy = toolchain.docker()
+            (self.home / '.docker').mkdir(exist_ok=True)
+            (self.home / '.docker' / 'config.json').write_text(json.dumps(
+                {'proxies': {'default': {'httpsProxy': proxy, 'noProxy': 'localhost,127.0.0.1'}}} if proxy else {}) + '\n')
         prelude = 'source env.sh >/dev/null 2>&1\n' if config.get('env') else ''
         for cmd in config.get('setup', []):
             subprocess.run(['bash', '-c', 'unset FAKETIME_SHARED\n' + prelude + cmd], cwd=self.project, env={**env, **clock}, check=True, capture_output=True)

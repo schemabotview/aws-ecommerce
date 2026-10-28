@@ -1,0 +1,1 @@
+{"from": "network/10-endpoint", "changes": ["pyproject.toml", "book_shop", ".gitignore"], "env": true, "venv": true}
