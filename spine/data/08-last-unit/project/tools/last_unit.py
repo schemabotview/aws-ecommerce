@@ -1,13 +1,16 @@
 """Two shoppers, one copy left:  python -m tools.last_unit
 
-c-17 and c-18 both have bk-1002 in their carts and there is one copy. Both
-check out at the same moment; a barrier releases the two threads together.
+c-18 makes their cart the same as c-17's: 3 x bk-1001, 1 x bk-1002, of which
+one copy is left. Both check out at the same moment; a barrier releases the
+two threads together. Which one wins is up to the race, not to this script.
 """
 import threading
 
 import boto3
 
-from book_shop import stock
+from book_shop import cart, stock
+
+cart.add("c-18", "bk-1001", 3)
 
 table = boto3.resource("dynamodb").Table(stock.STOCK)
 table.put_item(Item={"book": "bk-1001", "stock": 38})

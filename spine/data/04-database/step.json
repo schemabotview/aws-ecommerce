@@ -1,1 +1,1 @@
-{"from": "data/03-uploads", "changes": ["infra/database.tf"], "env": true, "columns": 100}
+{"from": "data/03-uploads", "changes": ["infra/database.tf"], "env": true}

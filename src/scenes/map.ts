@@ -47,6 +47,8 @@ export const BUILT: Record<string, string[]> = {
   network: ['catalog', 'state', 'budget', 'iam', 'vpc', ...SUBNETS, 'igw', 'nat-a', 'alb', 'dns', 'cert', 's3-endpoint'],
   run: ['catalog', 'state', 'budget', 'iam', 'vpc', ...SUBNETS, 'igw', 'nat-a', 'alb', 'dns', 'cert', 's3-endpoint',
     'ecr', 'watch', 'task-a', 'task-b', 'task-c'],
+  data: ['catalog', 'state', 'budget', 'iam', 'vpc', ...SUBNETS, 'igw', 'nat-a', 'alb', 'dns', 'cert', 's3-endpoint',
+    'ecr', 'watch', 'task-a', 'task-b', 'task-c', 'photos', 'db-a', 'db-b', 'secrets', 'carts'],
 }
 export { SUBNETS }
 

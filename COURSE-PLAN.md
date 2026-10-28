@@ -1,6 +1,6 @@
 # Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–6 (see `CLAUDE.md`, Status).
+**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–7 (see `CLAUDE.md`, Status).
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
@@ -224,15 +224,15 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | ◆ full scene: choosing where data lives | concept | the decision tree: object / block / file; relational / key-value / cache — each shop need at a leaf |
-| 2 | The catalog bucket | versioning, lifecycle, HTTPS-only policy | bucket → key → versions; lifecycle moves |
-| 3 | Uploads without credentials | presigned PUT for a review photo | browser → app (sign) → S3 (PUT), numbered steps |
-| 4 | An orders database | RDS PostgreSQL, Multi-AZ instance, data subnets | map: primary in 2a, standby in 2b, sync replication |
-| 5 | Placing an order | `db/migrations`; `orders.py` (real PostgreSQL 16) | one transaction: BEGIN → rows → CHECK fails → ROLLBACK |
-| 6 | Credentials from Secrets Manager | managed master secret, app reads it | app → role → secret → database; nothing in the image |
-| 7 | Carts in DynamoDB | `cart.py`, partition + sort key | partition key → partitions → item collection |
-| 8 | The last unit in stock | conditional write, transaction | two buyers, one item: one write wins, one `ConditionalCheckFailed` |
-| 9 | A cache for book pages | ElastiCache (`planned`: moto's replication groups are too thin), cache-aside (lab) | read path / write path; the stale window on a timeline |
+| 1 | ◆ full scene: choosing where data lives | concept | files (S3 / EBS / EFS) or records (RDS / DynamoDB / ElastiCache); each shop need at its leaf |
+| 2 | The catalog bucket | versioning, old versions expire after 30 days, HttpsOnly Deny; a price change makes a second version | one key, two versions (read from the listing), the older one expiring |
+| 3 | Uploads without credentials | `uploads.tf` (private, CORS), `uploads.py` signs a PUT URL (300 s); curl, with no credentials, uploads r-77.jpg | browser → app (signs) → browser PUTs → S3 checks; what the URL allows |
+| 4 | An orders database (map frame) | `database.tf`: RDS PostgreSQL 16.9, Multi-AZ instance, password managed by RDS; zones read back (2a / 2b) | map: Orders DB + Standby; primary → standby, synchronous |
+| 5 | Placing an order | `db/migrations/001_orders.sql` (stock CHECK ≥ 0), `orders.py`: one transaction, in real PostgreSQL 16; the out-of-stock order writes nothing | BEGIN → rows → CHECK fails → ROLLBACK; stock 38, not 37 |
+| 6 | Credentials from Secrets Manager | `orders.connect()` reads the RDS-managed secret; the role reads that one secret (user shop, 28 characters) and is refused the payments key | code → role → secret → database |
+| 7 | Carts in DynamoDB | `tables.tf` carts (customer + book, on demand, TTL), `cart.py` | the table as item collections (read from the scan); key → partition → Query |
+| 8 | The last unit in stock | stock table; checkout as one TransactWriteItems with conditions; two identical carts race for one copy | two buyers → transaction → one committed, one cancelled (the winner read from the run) |
+| 9 | ◆ full scene: a cache for book pages | lab: ElastiCache (Valkey) planned, not applied; cache-aside simulated | read path / write path; the stale window: TTL only 10–59 s, delete on write none |
 
 **8. `decouple` · Decouple the checkout · 9**
 
