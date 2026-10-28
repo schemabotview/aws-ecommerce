@@ -1,0 +1,1 @@
+{"from": "decouple/02-queue", "changes": ["infra/queues.tf", "tools/consume.py"], "env": true, "venv": true, "postgres": true}

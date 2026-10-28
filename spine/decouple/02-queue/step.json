@@ -1,0 +1,1 @@
+{"from": "data/08-last-unit", "changes": ["infra/queues.tf", "infra/iam.tf", "book_shop/checkout.py", "tools/checkout.py", "tools/consume.py"], "env": true, "venv": true, "postgres": true}

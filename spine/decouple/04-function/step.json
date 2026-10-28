@@ -1,0 +1,1 @@
+{"from": "decouple/03-dead-letters", "changes": ["functions/__init__.py", "functions/fulfil/__init__.py", "functions/fulfil/handler.py", "infra/function.tf", "tools/poll.py"], "env": true, "venv": true, "postgres": true}

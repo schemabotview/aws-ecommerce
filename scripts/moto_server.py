@@ -78,9 +78,15 @@ for AWS behaviour:
   rds-secret      The secret RDS manages for a master user holds THAT user (moto: always "admin",
                   password "P@55w0rd!"), with a generated password; its name's id comes from the
                   seeded random stream (moto used uuid4, so it changed on every recording).
+  no-poller       An SQS queue with an enabled Lambda event source mapping: moto received and invoked
+                  INSIDE SendMessage, running the function in a Docker container (on AWS a poller does
+                  this, apart from the sender). The machine runs no Lambda: the mapping is recorded,
+                  messages stay in the queue, and `tools/poll.py` plays the poller, on screen as such
+                  (§8.4). Machinery, not a fix: AWS does run the function.
   checkpoints     /moto-api/spine-save and /spine-load write and read everything the emulator holds,
                   so scripts/spine.py can resume the chain after any step (see `save`).
 """
+import collections
 import hashlib
 import io
 import os
@@ -88,6 +94,7 @@ import pickle
 import json
 import re
 import threading
+import weakref
 import traceback
 from collections import Counter
 import sys
@@ -266,8 +273,10 @@ class ContentSeed:
 # ── checkpoints ──────────────────────────────────────────────────────────────────────────────────
 
 class _Pickler(pickle.Pickler):
-    """What in a backend cannot travel as it is: a lock (it travels as a new, free lock), and
-    `cryptography`'s keys and certificates (ACM's), which travel as PEM and are loaded back."""
+    """What in a backend cannot travel as it is: a lock (it travels as a new, free lock),
+    `cryptography`'s keys and certificates (ACM's), which travel as PEM and are loaded back, and a
+    WeakValueDictionary (Lambda's), which travels as a dict of what it held, and a defaultdict whose
+    factory is a lambda returning an empty dict, list or set, which travels with that type."""
 
     def reducer_override(self, obj):
         from cryptography import x509
@@ -282,6 +291,12 @@ class _Pickler(pickle.Pickler):
             return _public_key, (obj.public_bytes(ser.Encoding.PEM, ser.PublicFormat.SubjectPublicKeyInfo),)
         if isinstance(obj, x509.Certificate):
             return _certificate, (obj.public_bytes(ser.Encoding.PEM),)
+        if isinstance(obj, weakref.WeakValueDictionary):  # Lambda's index of functions by ARN
+            return _weak_values, (dict(obj),)
+        if isinstance(obj, collections.defaultdict) and getattr(obj.default_factory, '__name__', '') == '<lambda>':
+            empty = obj.default_factory()  # `defaultdict(lambda: {})` (Lambda's aliases): an empty builtin
+            if type(empty) in (dict, list, set) and not empty:
+                return _defaults, (type(empty), dict(obj))
         return NotImplemented
 
 
@@ -302,6 +317,16 @@ def _public_key(pem: bytes):
 def _certificate(pem: bytes):
     from cryptography.x509 import load_pem_x509_certificate
     return load_pem_x509_certificate(pem)
+
+
+def _defaults(factory, items: dict):
+    return collections.defaultdict(factory, items)
+
+
+def _weak_values(items: dict):
+    found = weakref.WeakValueDictionary()
+    found.update(items)
+    return found
 
 
 def _new_lock(lock):
@@ -781,6 +806,22 @@ def _rds_secret():
         return f'rds!{self.resource.resource_type}-{mock_random.uuid4()}'
     MasterUserSecret._generate_secret_string = secret_string
     MasterUserSecret._generate_secret_name = secret_name
+
+
+# ── no-poller ────────────────────────────────────────────────────────────────────────────────────
+
+@patch('no-poller')
+def _no_poller():
+    from moto.sqs.models import Queue
+    original = Queue.add_message
+
+    def add_message(self, message):
+        mappings, self.lambda_event_source_mappings = self.lambda_event_source_mappings, {}
+        try:
+            return original(self, message)
+        finally:
+            self.lambda_event_source_mappings = mappings
+    Queue.add_message = add_message
 
 
 # ── developer-key ────────────────────────────────────────────────────────────────────────────────

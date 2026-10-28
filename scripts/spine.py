@@ -79,8 +79,10 @@ step.json (other keys, all optional):
   {"enforce_iam": true}         from this step on, the emulator authorises every request against IAM
   {"volatile": true}            every digit masked in the comparison (timings the frame never quotes)
   {"docker": true}              a Docker daemon, as a learner has one (toolchain.docker: the mirror, the relay)
+  A typed `sleep N` moves the frozen clock N seconds on, at once (a visibility timeout ending, §8.2).
   {"postgres": true}            the local PostgreSQL 16 (toolchain.postgres); database book_shop is kept in state/
 """
+import datetime
 import difflib
 import gzip
 import hashlib
@@ -457,12 +459,14 @@ class Machine:
         """The machine as it was after `step`, from its recorded state."""
         shutil.rmtree(self.home)
         subprocess.run(['tar', '-C', str(self.root), '-xzf', str(step / 'state' / 'home.tar.gz')], check=True)
-        drop_database()
         if (step / 'state' / 'postgres.sql').exists():
-            toolchain.postgres()
+            toolchain.postgres()  # first: a database left by an earlier session is dropped only if the cluster runs
+            drop_database()
             subprocess.run(['createdb', DATABASE], check=True)
             subprocess.run(['psql', '-q', '-v', 'ON_ERROR_STOP=1', '-d', DATABASE, '-f', str(step / 'state' / 'postgres.sql')],
                            check=True, capture_output=True)
+        else:
+            drop_database()
         raw = self.root / 'emulator.pickle'
         with gzip.open(step / 'state' / 'emulator.pickle.gz', 'rb') as f, open(raw, 'wb') as out:
             shutil.copyfileobj(f, out)
@@ -536,6 +540,14 @@ class Machine:
             typed = '\n'.join([f'$ {first}', *(f'> {m}' for m in more)])
             if any(len(t) == columns for t in typed.split('\n')):
                 raise SystemExit(f'{step}: a typed line exactly {columns} wide reads as wrapped — reword it:\n{typed}')
+            if wait := re.fullmatch(r'sleep (\d+)', cmd):
+                # The clock is frozen, so waiting changes nothing: a typed `sleep N` moves the shared
+                # clock N seconds on instead (the emulator sees it at once) and prints, as sleep does,
+                # nothing. A visibility timeout then ends because its time has passed (§8.2).
+                now = datetime.datetime.strptime(self.clock.read_text().strip(), '%Y-%m-%d %H:%M:%S')
+                self.clock.write_text(f'{now + datetime.timedelta(seconds=int(wait[1])):%Y-%m-%d %H:%M:%S}')
+                blocks.append(typed)
+                continue
             script = f'cd {cwd!s}\n{{ {cmd}\n}} 2>&1\necho "{MARK}$?:$PWD"\n'
             if state.exists():
                 script = state.read_text() + '\n' + script
