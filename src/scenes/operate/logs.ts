@@ -24,7 +24,7 @@ export const operateLogs: SceneModel = ideFrame({
     ['2026-11-01T18:20', '2026-11-01T18:30']],
   side: [
     {
-      type: 'group', id: 'path', title: 'From a log line to a number', tone: 'source', children: [
+      type: 'group', id: 'path', title: 'From a log line to a number', tone: 'source', dir: 'row', children: [
         { type: 'item', id: 'app', icon: 'fargate', title: 'the app', sub: '{"status": 503, …}', stack: true },
         { type: 'item', id: 'group', icon: 'cloudwatch', title: '/book-shop/app', sub: 'every line, 30 days', stack: true },
         { type: 'item', id: 'filter', icon: 'filter', title: 'metric filters', sub: 'status >= 500', stack: true },
@@ -36,7 +36,14 @@ export const operateLogs: SceneModel = ideFrame({
       x: { labels: sums.map((m) => m[1]), label: '1 November' }, y: { min: 0, max: 300, step: 100, label: 'errors' },
       series: [{ kind: 'bar', points: sums.map((m, i) => [i, Number(m[2])]), tone: 'consume' }],
     },
-    { type: 'note', id: 'emulated', tone: 'consume', text: `Emulated: the filters are stored, not run. tools/count_errors.py applied the same rules to the events and published the counts (worst minute ${worst[0]}: ${worst[1]} of ${worst[2]}).` },
+    {
+      type: 'table', id: 'counts', title: 'Last night, counted', tone: 'ingest', columns: ['', 'count'], rows: [
+        ['requests', total],
+        ['errors (status >= 500)', errors],
+        [`worst minute, ${worst[0]}`, `${worst[1]} of ${worst[2]} failed`],
+      ],
+    },
+    { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the filters are stored, not run. tools/count_errors.py applied the same rules to the events and published the counts.' },
   ],
   edges: [
     { from: 'app', to: 'group' },

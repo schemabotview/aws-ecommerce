@@ -21,7 +21,7 @@ export const operateAlarms: SceneModel = ideFrame({
   editor: { file: 'infra/alerts.tf', code, show: [[lineOf(code, 'locals {'), lineOf(code, 'alarm_actions')]],
     highlight: [lineOf(code, 'fast = {'), lineOf(code, 'slow = {'), lineOf(code, 'alarm_actions')] },
   session,
-  keep: [['$ aws cloudwatch describe-alarms', 'book-shop-burn-fast'], '$ python -m tools.burn', ['18:20', '18:30'], 'the hour:'],
+  keep: [['$ aws cloudwatch describe-alarms', 'book-shop-burn-slow'], '$ python -m tools.burn', ['18:20', '18:30'], 'the hour:'],
   side: [
     {
       type: 'group', id: 'path', title: 'From a burning budget to a person', tone: 'source', dir: 'row', children: [
@@ -31,11 +31,11 @@ export const operateAlarms: SceneModel = ideFrame({
       ],
     },
     {
-      type: 'plot', id: 'burn-plot', compact: true, title: 'Last night\'s burn rate, 5 minutes at a time',
-      x: { labels: rows.map((m) => m[1]), label: '1 November' }, y: { min: 0, max: 30, step: 10, label: 'burn (×)' },
+      type: 'plot', id: 'burn-plot', compact: true, title: 'Last night\'s burn rate (dashed: the fast alarm, 14.4×)',
+      x: { labels: rows.map((m) => m[1].slice(3)), label: 'minutes after 18:00, 1 November' }, y: { min: 0, max: 30, step: 10, label: 'burn (×)' },
       series: [
         { kind: 'bar', points: rows.map((m, i) => [i, Number(m[4])]), tone: 'consume' },
-        { kind: 'segment', from: [-0.5, 14.4], to: [rows.length - 0.5, 14.4], label: 'fast 14.4×' },
+        { kind: 'segment', from: [-0.5, 14.4], to: [rows.length - 0.5, 14.4] },
       ],
     },
     {

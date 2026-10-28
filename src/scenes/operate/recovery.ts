@@ -5,17 +5,17 @@ import type { SceneModel } from '@graphlearning/graphl-flow'
 // whitepaper's own orders of magnitude, not measurements. The shop's choice is the first, with §11.7's
 // copy in another ACCOUNT (not yet another Region), and the frame says what moving right would add.
 // source: https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html
-const strategy = (id: string, title: string, sub: string, tone?: 'ingest' | 'serve' | 'consume' | 'store') =>
-  ({ type: 'group' as const, id, title, tone, children: [{ type: 'item' as const, id: `${id}-what`, icon: 'region', title: sub, stack: true }] })
+const strategy = (id: string, icon: string, title: string, sub: string, tone?: 'ingest' | 'serve' | 'consume' | 'store') =>
+  ({ type: 'group' as const, id, title, tone, children: [{ type: 'item' as const, id: `${id}-what`, icon, title: sub, stack: true }] })
 
 export const operateRecovery: SceneModel = {
   nodes: [
     {
       type: 'group', id: 'ladder', bare: true, dir: 'row', children: [
-        strategy('backup', 'Backup and restore', 'backups only; rebuild when needed', 'ingest'),
-        strategy('pilot', 'Pilot light', 'data copied live; servers off', 'serve'),
-        strategy('warm', 'Warm standby', 'a small copy, always running', 'store'),
-        strategy('active', 'Active / active', 'two full shops, both serving', 'consume'),
+        strategy('backup', 'backup', 'Backup and restore', 'backups only; rebuild when needed', 'ingest'),
+        strategy('pilot', 'rds', 'Pilot light', 'data copied live; servers off', 'serve'),
+        strategy('warm', 'fargate', 'Warm standby', 'a small copy, always running', 'store'),
+        strategy('active', 'globe', 'Active / active', 'two full shops, both serving', 'consume'),
       ],
     },
     {

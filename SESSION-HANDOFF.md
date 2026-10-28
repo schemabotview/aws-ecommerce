@@ -30,23 +30,17 @@ add tools that fetch binaries; pip packages from `spine/requirements.txt` are th
 
 ## Done and pushed
 
-Courses 3–10 complete (scenes, narration, recorded spine, checks green, shots looked at): 67 sections
-render cleanly. Course 9: deliver/06–07 re-recorded after `sqs-keep-policy`; 07's subscription and
-queue policy are `create_before_destroy` and the subscription `depends_on` the policy. Course 10: the
-lake (Parquet with a FIXED schema), Glue with partition projection, Athena recorded + DuckDB run
-(`files read: 1/30`), Kinesis (596 / 404), the lag lab. pyarrow and duckdb pinned in
-`spine/requirements.txt`.
+Courses 3–11 complete (scenes, narration, recorded spine, checks green, shots looked at): 76 sections
+render cleanly. See CLAUDE.md for the facts and the patches each course needed.
 
-## Course 11 `operate` — in progress
+## Course 12 `evolve` — in progress
 
-Spine `operate/02-logs` … `08-incident` written (02–04 recorded). New machine patches:
-`kinesis-tags`, `token-issue-time` (§11.8 revokes sessions issued before 21:15 — check the
-transcript: the leaked session refused, the fresh one allowed). The emulator does NOT run metric
-filters, evaluate alarms, or record CloudTrail events (`lookup-events` is not implemented): the
-tools `count_errors.py` and `burn.py` do what CloudWatch would, and say so. §11.1 and §11.9 are
-concept scenes. Scenes, narration and docs for Course 11 still to write.
+Recorded: `evolve/02-cdn` (CloudFront in front of the ALB: pages cached ≤ 5 min, checkout never),
+labs `02-latency` (CDN model), `03-knee` (queue simulation), `04-bill` (HYPOTHETICAL rates). Still to
+write: `05-costs` (cost allocation tags + a spend anomaly from a made-up month), `06-adr`
+(docs/adr/001-order-platform.md + a scoring tool), the six scenes, narration, docs.
 
-## Courses 12, 1, 2 — not started
+## Courses 1, 2 — not started
 
 ## Machine changes made this session (all committed)
 

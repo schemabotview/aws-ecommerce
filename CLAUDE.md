@@ -18,10 +18,11 @@ Engine `@graphlearning/graphl-flow` ^0.6.0, shell `@graphlearning/shell` ^1.0.4.
 
 Authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections), Course 4 `secure`
 (8), Course 5 `network` (10), Course 6 `run` (9), Course 7 `data` (9), Course 8 `decouple` (9) and
-Course 9 `deliver` (8) and Course 10 `report` (6), one chain: `start/02` → … → `secure/07` →
-`network/02` → … → `run/08` → `data/02` → … → `data/08` → `decouple/02` → … → `decouple/08` →
-`deliver/02` → … → `deliver/07` → `report/02` → … → `report/05` (`deliver/08` and `report/05-lag`
-are labs). No narration audio yet.
+Course 9 `deliver` (8), Course 10 `report` (6) and Course 11 `operate` (9), one chain:
+`start/02` → … → `secure/07` → `network/02` → … → `run/08` → `data/02` → … → `data/08` →
+`decouple/02` → … → `decouple/08` → `deliver/02` → … → `deliver/07` → `report/02` → … →
+`report/05` → `operate/02` → … → `operate/08` (`deliver/08`, `report/05-lag` and Course 12's
+`evolve/*` except `02-cdn` are labs). No narration audio yet.
 
 **graphl-flow 0.6.0 is on graphl-flow's `main` but not yet on npm** (AWS icons, `dashed` groups,
 `muted` items, `hcl`, folded terminals). Until it is published: build it (`npm pack` there), install that tarball into `node_modules` here without saving, and do not commit
@@ -91,6 +92,12 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   `sqs-keep-policy` (SetQueueAttributes changes only the attributes it names; moto cleared the
   queue's Policy, so sam's console click in §9.6 removed the topic's permission to send); sessions of
   OrganizationAccountAccessRole are not evaluated, like the developer key.
+- Courses 10–11's patches: `kinesis-tags` and `backup-tags` (tags sent on create, and Backup's
+  ListTags without a trailing slash — both showed as a perpetual diff), `aws-managed` (an AWS-managed
+  IAM policy exists when first named), `token-issue-time` (role sessions are evaluated with
+  aws:TokenIssueTime; DateLessThan/DateGreaterThan). The emulator does NOT run metric filters,
+  evaluate alarms, record CloudTrail events, run Athena queries, inspect WAF requests or take
+  backups: the tools that stand in say so, and so does every frame.
 - **A fresh machine's plugin cache is filled from the verified provider zip** (`toolchain.terraform()`):
   a restored working copy's `.terraform/providers` links into the cache, and an empty cache made every
   Terraform command in a restored step fail ("Required plugins are not installed") while the step
@@ -189,6 +196,13 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 | catalog | Glue database `book_shop_lake`, table `order_history` (EXTERNAL, Parquet, partition key `dt`, projection `date` yyyy-MM-dd from 2026-09-01) |
 | Athena | workgroup `book-shop-reports` (results `athena-results/`, 1 GiB scan cutoff); the emulator records queries, never runs them; DuckDB runs `reports/yesterday.sql` over a copy (`lake/`): top bk-2018 199 copies 5,104.35 GBP, files read 1/30 |
 | clicks | Kinesis `book-shop-clicks`, 2 shards, 24 h; 1,000 made-up clicks from 50 sessions (seed 10): 596 / 404, none split; lag model: 600 clicks/s per consumer, peak 1,600/s at 18:30, 2 shards up to 400 s behind, 4 shards none |
+| evening | MADE UP, seeded 11: 1 November 18:00–18:59, 200 requests a minute, payments down 18:20–18:34 → 12,000 requests, 396 errors, worst 18:22 (33 of 200); metrics `BookShop/Requests`, `BookShop/Errors5xx` |
+| SLO | 99.5% of requests over 30 days; alarms `book-shop-burn-fast` (0.072, 5 min, 14.4×) and `book-shop-burn-slow` (0.03, 1 h, 6×) → SNS `book-shop-alerts` → alex@book-shop.example.com; last night: fast ALARM 18:20, 18:25, 18:30; the hour 3.3%, 6.6× |
+| trail | `book-shop-audit`, multi-Region, global events, log file validation → `book-shop-trail-444455556666` |
+| key | KMS `alias/book-shop-data` (rotation, 30-day deletion window; the account administers, BookShopApp uses); lake SSE-KMS with a bucket key; envelope: 256-bit data key, 67 bytes of data, 96 bytes of encrypted key |
+| WAF | web ACL `book-shop` (REGIONAL) on the ALB: `aws-common` (AWSManagedRulesCommonRuleSet, priority 0), `per-address` (1,000 / 5 min per IP, block, priority 1) |
+| backup | vault `book-shop` (our key); plan `book-shop-nightly` (cron 0 3 * * ? *, 35 d) + copy to `arn:aws:backup:eu-west-2:777788889999:backup-vault:book-shop-copies` (90 d); selection DB, carts, stock; role BookShopBackup (AWSBackupServiceRolePolicyForBackup) |
+| incident | 2 November 21:14 (step clock): leaked BookShopApp session `task-1`; inline `AWSRevokeOlderSessions` Deny * if aws:TokenIssueTime < 21:15; applied 21:16 |
 
 Extend this table; never change a value a frame already quotes.
 

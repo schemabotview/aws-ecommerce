@@ -1,6 +1,6 @@
 # Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–10 (see `CLAUDE.md`, Status).
+**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–11 (see `CLAUDE.md`, Status).
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
@@ -276,15 +276,15 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | ◆ full scene: one slow evening | concept + lab | the same incident as a metric, a log line and a trace, joined |
-| 2 | Logs and metrics | log group, retention, metric filter | app → log group → filter → metric |
-| 3 | Objectives and alarms | an SLO, a burn-rate alarm → SNS | error budget burning at 20× and 100×, a plot |
-| 4 | Who changed what | CloudTrail trail | API call → trail → bucket; one event read |
-| 5 | Keys and encryption | KMS key, key policy | ◆ side pane: envelope encryption, data key under a KMS key |
-| 6 | Protecting the edge | WAF web ACL on the ALB | layers: WAF → ALB → SG → app, what each stops |
-| 7 | Backups that restore | AWS Backup plan, a copy to another account | plan → vault → copy; the restore drill on a timeline |
-| 8 | An incident | revoke sessions for a leaked role | detect → contain → eradicate → recover, timestamped |
-| 9 | ◆ full scene: disaster recovery | concept | backup & restore / pilot light / warm standby / active-active on a cost × RTO chart |
+| 1 | ◆ full scene: one slow evening | concept + §11.3's real rates | the same incident as a metric (5-minute error rate), a log line (the app's format), a trace (an example, labelled), joined |
+| 2 | Logs and metrics | `infra/observe.tf`: metric filters Requests and Errors5xx on `/book-shop/app`; `tools/evening.py` writes a MADE-UP evening (seeded, 12,000 requests, payments down 18:20–18:34); filters stored, not run: `tools/count_errors.py` applies them and publishes the counts | app → log group → filter → metric; 10-minute sums |
+| 3 | Objectives and alarms | `infra/alerts.tf`: SLO 99.5%, burn-rate alarms fast (14.4×, 5 min) and slow (6×, 1 h) on errors ÷ requests → SNS `book-shop-alerts` → email; alarms stored, not evaluated: `tools/burn.py` | burn rate per 5 minutes against 14.4× |
+| 4 | Who changed what | `infra/trail.tf`: trail `book-shop-audit` (multi-Region, log file validation) → its own bucket; no events recorded by the emulator: one record in the documented shape (labelled) | call → trail → bucket; one record |
+| 5 | Keys and encryption | `infra/keys.tf`: KMS `alias/book-shop-data` (rotation, key policy), lake SSE-KMS; `tools/envelope.py`: GenerateDataKey, AES-GCM, Decrypt (real in the emulator) | envelope encryption: write and read |
+| 6 | Protecting the edge | `infra/waf.tf`: web ACL `book-shop` (AWS common rules, 1,000 per 5 min per address) on the ALB; rules read back | WAF → ALB → SG → app, what each stops |
+| 7 | Backups that restore | `infra/backup.tf`: vault (our key), nightly 03:00 kept 35 d, copy to the audit account's vault (90 d), selection DB + carts + stock, role BookShopBackup | selection → vault → copy; the restore drill's steps |
+| 8 | An incident | `infra/incident.tf` at 21:14: a leaked BookShopApp session lists the catalog; Deny for tokens issued before 21:15; the leaked session refused, a fresh one allowed (real IAM evaluation) | detect → contain → eradicate → recover; the timeline |
+| 9 | ◆ full scene: disaster recovery | concept | backup & restore / pilot light / warm standby / active-active, by recovery time and what runs in a second Region |
 
 **12. `evolve` · Measure, tune and evolve · 6**
 

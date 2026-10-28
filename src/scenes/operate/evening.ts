@@ -9,13 +9,21 @@ import burn from '../../../spine/operate/03-alarms/session.txt?raw'
 // source: https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/implement-observability.html
 const rows = burn.split('\n').map((l) => l.match(/^(\d\d:\d\d)\s+(\d+)\s+([\d.]+)%/)).filter((m) => m !== null)
 
+// The end of a 5-minute window that starts at `hh:mm`.
+const windowEnd = (start?: string) => {
+  if (!start) return '?'
+  const [h, m] = start.split(':').map(Number)
+  const end = h * 60 + m + 5
+  return `${Math.floor(end / 60)}:${String(end % 60).padStart(2, '0')}`
+}
+
 export const operateEvening: SceneModel = {
   nodes: [
     {
       type: 'group', id: 'three', bare: true, dir: 'row', children: [
         {
           type: 'plot', id: 'metric', compact: true, title: 'A metric: when, and how much',
-          x: { labels: rows.map((m) => m[1]), label: '1 November' }, y: { min: 0, max: 16, step: 4, label: 'errors, %' },
+          x: { labels: rows.map((m) => m[1].slice(3)), label: 'minutes after 18:00, 1 November' }, y: { min: 0, max: 16, step: 4, label: 'errors, %' },
           series: [{ kind: 'bar', points: rows.map((m, i) => [i, Number(m[3])]), tone: 'consume' }],
         },
         {
@@ -39,7 +47,7 @@ export const operateEvening: SceneModel = {
     },
     {
       type: 'table', id: 'joined', title: 'Joined by time, they answer three questions', tone: 'source', columns: ['', 'answers', 'this evening'], rows: [
-        ['the metric', 'is something wrong, since when?', `errors from ${rows.find((m) => +m[2] > 0)?.[1] ?? '?'} to ${[...rows].reverse().find((m) => +m[2] > 0)?.[1] ?? '?'}`],
+        ['the metric', 'is something wrong, since when?', `errors from ${rows.find((m) => +m[2] > 0)?.[1] ?? '?'} to ${windowEnd([...rows].reverse().find((m) => +m[2] > 0)?.[1])}`],
         ['the log line', 'which requests failed?', 'POST /checkout, 503'],
         ['the trace', 'where did the time go?', 'the payments API, 3 s timeout'],
       ],
