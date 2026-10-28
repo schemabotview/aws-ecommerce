@@ -1,9 +1,14 @@
 # How many tasks: between 3 (one per Availability Zone) and 12, chosen by a
 # target-tracking policy that keeps the service's average CPU near 60%.
 
+locals {
+  cluster    = aws_ecs_cluster.shop.name
+  service_id = "service/${local.cluster}/${aws_ecs_service.app.name}"
+}
+
 resource "aws_appautoscaling_target" "app" {
   service_namespace  = "ecs"
-  resource_id        = "service/${aws_ecs_cluster.shop.name}/${aws_ecs_service.app.name}"
+  resource_id        = local.service_id
   scalable_dimension = "ecs:service:DesiredCount"
   min_capacity       = 3
   max_capacity       = 12

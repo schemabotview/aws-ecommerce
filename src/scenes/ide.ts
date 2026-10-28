@@ -93,7 +93,7 @@ export function langOf(file: string): Code['lang'] {
   if (file.endsWith('.tf')) return 'hcl'
   if (file.endsWith('.py')) return 'python'
   if (file.endsWith('.json')) return 'js'
-  if (file.endsWith('.sh') || file === 'aws-config' || file.endsWith('.gitignore')) return 'shell'
+  if (file.endsWith('.sh') || file === 'aws-config' || file.endsWith('.gitignore') || file === 'Dockerfile' || file === '.dockerignore') return 'shell'
   return 'text'
 }
 

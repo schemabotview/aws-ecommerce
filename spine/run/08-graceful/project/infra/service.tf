@@ -14,11 +14,12 @@ resource "aws_ecs_service" "app" {
 
   # In the app subnets, behind sg app: only the load balancer reaches them.
   network_configuration {
-    subnets         = [for name in ["app-a", "app-b", "app-c"] : aws_subnet.this[name].id]
+    subnets = [for az in ["a", "b", "c"] : aws_subnet.this["app-${az}"].id]
     security_groups = [aws_security_group.this["app"].id]
   }
 
-  # Every task registers in the target group; health checks decide who gets traffic.
+  # Every task registers in the target group; health checks decide who gets
+  # traffic.
   load_balancer {
     target_group_arn = aws_lb_target_group.app.arn
     container_name   = "app"

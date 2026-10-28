@@ -476,6 +476,12 @@ class Machine:
             env['VIRTUAL_ENV'] = str(venv)
         if config.get('docker'):  # the daemon, and the way out for a build step (toolchain.docker)
             proxy = toolchain.docker()
+            # The daemon outlives a recording: what an earlier RECORDING left (a container named shop,
+            # cached layers, the shop's images) is not on the learner's machine. Only base images stay.
+            for cleanup in ('docker ps -aq | xargs -r docker rm -f',
+                            "docker images --format '{{.Repository}}:{{.Tag}}' | grep '^book-shop:' | xargs -r docker rmi -f",
+                            'docker builder prune -af'):
+                subprocess.run(['bash', '-c', cleanup], capture_output=True)
             (self.home / '.docker').mkdir(exist_ok=True)
             (self.home / '.docker' / 'config.json').write_text(json.dumps(
                 {'proxies': {'default': {'httpsProxy': proxy, 'noProxy': 'localhost,127.0.0.1'}}} if proxy else {}) + '\n')

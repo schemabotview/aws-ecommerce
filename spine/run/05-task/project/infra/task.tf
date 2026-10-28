@@ -56,7 +56,9 @@ resource "aws_ecs_task_definition" "app" {
     image        = "${aws_ecr_repository.app.repository_url}:1.0.0"
     essential    = true
     portMappings = [{ containerPort = 8080 }]
-    environment  = [{ name = "CATALOG_BUCKET", value = aws_s3_bucket.catalog.id }]
+    environment = [
+      { name = "CATALOG_BUCKET", value = aws_s3_bucket.catalog.id },
+    ]
     logConfiguration = {
       logDriver = "awslogs"
       options = {

@@ -11,7 +11,7 @@ from book_shop.web import Shop
 
 @pytest.fixture
 def url(aws):
-    server = ThreadingHTTPServer(("127.0.0.1", 0), Shop)  # port 0: any free port
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Shop)  # 0: any free port
     threading.Thread(target=server.serve_forever, daemon=True).start()
     yield f"http://127.0.0.1:{server.server_port}"
     server.shutdown()

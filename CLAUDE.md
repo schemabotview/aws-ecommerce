@@ -17,8 +17,8 @@ Engine `@graphlearning/graphl-flow` ^0.6.0, shell `@graphlearning/shell` ^1.0.4.
 ## Status
 
 Authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections), Course 4 `secure`
-(8 sections) and Course 5 `network` (10 sections), one chain: `start/02` → … → `secure/07` →
-`network/02` → … No narration audio yet.
+(8), Course 5 `network` (10) and Course 6 `run` (9), one chain: `start/02` → … → `secure/07` →
+`network/02` → … → `run/08`. No narration audio yet.
 
 **graphl-flow 0.6.0 is not on npm yet** (branch `claude/pensive-johnson-ixdglh` of graphl-flow: AWS
 icons, `dashed` groups, `muted` items, `hcl`, folded terminals). Until it is published: build it
@@ -92,6 +92,14 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   moto_server.py — the replay's machinery, not a fix). So the app's role sessions are really refused
   and allowed; alex is not held to a trust policy (§4.3 says so). moto evaluates identity policies
   only: resource policies, conditions, SCPs and other accounts are doc-cited, and the frame says so.
+- **Docker** (`"docker": true` in step.json; `toolchain.docker()`): the daemon pulls Docker Hub's
+  official images through `mirror.gcr.io` (Docker Hub rate-limits this machine), and a relay on the
+  bridge gateway (`scripts/relay.py`) lets a build step reach the proxy — none of it on screen. Before
+  a Docker step the replay removes containers, the shop's images and the build cache: what an
+  earlier RECORDING left is not on the learner's machine. Images live in the daemon, not in `state/`,
+  so a section that needs an image builds it itself (§6.4 builds and pushes; §6.8 builds 1.1.0).
+- Each typed command is its own shell process: `$!` and a background job do not survive to the next
+  line — `cmd & APP=$!` on one line. A quoted string cannot span typed lines either.
 - A recorded state pickles every moto backend in one go; what cannot travel (locks, `cryptography`
   keys and certificates) has a reducer in `_Pickler`. A new service that will not pickle fails the
   save with its traceback.
@@ -126,6 +134,9 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 | accounts | development **444455556666** (the course builds here until Course 9), production **111122223333**, audit **777788889999** (role `Auditor`), management **123456789012** |
 | organization | root → OU Security (audit), OU Workloads (SCP `LondonOnly`: deny outside eu-west-2 except iam/organizations/sts) → OU Prod (prod), OU Dev (dev) |
 | app role | **BookShopApp**, trusted by `ecs-tasks.amazonaws.com`; inline policy `book-shop-app`: ReadBooks (s3:GetObject `books/*`), ListBooks (s3:ListBucket on the bucket); session `task-1` via `tools/as-app.sh` |
+| app | `book_shop` (standard library HTTP + boto3), port 8080, `/health`, `/books/<id>`; image `book-shop` 1.0.0 → 1.1.0 (graceful SIGTERM), python:3.13-slim pinned by digest, `requirements.txt` locked; ECR `book-shop` (immutable tags) |
+| ECS | cluster `book-shop`, service `book-shop` (Fargate, desired 3, app subnets, sg app, target group book-shop-app), task definition `book-shop` 0.5 vCPU / 1 GiB X86_64, execution role BookShopExecution, task role BookShopApp, log group `/book-shop/app` (30 d), stopTimeout 30; scaling 3–12 at 60% CPU, cooldowns 60/300 |
+| peak model | one task = 100 req/s at full CPU, 2 min to start, alarm after 3 min above target; 120 → 420 req/s 17:45–18:00: CPU peaks 87%, settles at 7 tasks |
 | catalog | `books/bk-1001.json`: "Night Trains of Europe", Ana Lima, 12.99 GBP, stock 40; bucket policy AuditorReads (GetObject, ListBucket for the Auditor role) |
 | people | **alex** (developer), **sam** (teammate); Identity Center session `book-shop`, portal `https://book-shop-example.awsapps.com/start`; roles BookShopDeveloper (dev), BookShopReadOnly (prod) |
 | buckets | `book-shop-catalog-444455556666`; state `book-shop-tfstate-444455556666`, key `book-shop/terraform.tfstate`, `use_lockfile` |

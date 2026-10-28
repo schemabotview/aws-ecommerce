@@ -57,7 +57,9 @@ resource "aws_ecs_task_definition" "app" {
     essential    = true
     portMappings = [{ containerPort = 8080 }]
     stopTimeout  = 30 # seconds from SIGTERM to SIGKILL
-    environment  = [{ name = "CATALOG_BUCKET", value = aws_s3_bucket.catalog.id }]
+    environment = [
+      { name = "CATALOG_BUCKET", value = aws_s3_bucket.catalog.id },
+    ]
     logConfiguration = {
       logDriver = "awslogs"
       options = {

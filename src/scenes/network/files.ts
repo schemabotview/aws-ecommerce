@@ -5,7 +5,7 @@ import { SECURE_FILES } from '../secure/files'
 // The project through Course 5: what each step adds to what Course 4 left. Mirrors the spine's
 // `changes` (spine/network/*/step.json); check-render would not notice a drift here, so keep both.
 const BASE = SECURE_FILES
-const ADDS: Record<number, string[]> = {
+export const ADDS: Record<number, string[]> = {
   2: ['infra/network.tf'],
   3: ['infra/routes.tf', 'tools/which_route.py'],
   5: ['infra/nat.tf'],

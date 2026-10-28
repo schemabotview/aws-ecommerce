@@ -1,4 +1,4 @@
-"""Book pages, read from the catalog bucket: one JSON object per book, books/<id>.json."""
+"""Book pages from the catalog bucket: one JSON object each, books/<id>.json."""
 import json
 import os
 

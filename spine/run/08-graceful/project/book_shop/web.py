@@ -42,11 +42,12 @@ class Shop(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    server = ThreadingHTTPServer(("", int(os.environ.get("PORT", "8080"))), Shop)
-    server.daemon_threads = False  # so server_close() waits for requests in flight
+    port = int(os.environ.get("PORT", "8080"))
+    server = ThreadingHTTPServer(("", port), Shop)
+    server.daemon_threads = False  # server_close() waits for requests in flight
 
     # ECS stops a task with SIGTERM, then SIGKILL 30 s later. On SIGTERM: stop
-    # accepting, finish what is in flight, exit. Without this, Python dies at once.
+    # accepting, finish what is in flight, exit. By default Python dies at once.
     def stop(signum, frame):
         print(json.dumps({"stopping": signal.Signals(signum).name}), flush=True)
         threading.Thread(target=server.shutdown).start()

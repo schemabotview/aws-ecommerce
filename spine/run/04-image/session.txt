@@ -1,90 +1,90 @@
 $ cd infra
 $ terraform plan -out=tfplan
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
+aws_eip.nat: Refreshing state... [id=eipalloc-6ff6a2527581beced]
+aws_acm_certificate.shop: Refreshing state... [id=arn:aws:acm:eu-west-2:44445555
+6666:certificate/8bd90642-d1d1-452e-890f-400b3727c4e7]
+aws_route53_zone.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND]
+aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
+ly]
 data.aws_iam_policy_document.app_trust: Reading...
 data.aws_iam_policy_document.app_trust: Read complete after 0s [id=1077804475]
 aws_vpc.shop: Refreshing state... [id=vpc-e3500a5c4abdcac35]
-aws_acm_certificate.shop: Refreshing state... [id=arn:aws:acm:eu-west-2:44445555
-6666:certificate/8bd90642-d1d1-452e-890f-400b3727c4e7]
-aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
-ly]
-aws_route53_zone.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND]
-aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
-aws_eip.nat: Refreshing state... [id=eipalloc-6ff6a2527581beced]
-aws_iam_role.app: Refreshing state... [id=BookShopApp]
-aws_route_table.public: Refreshing state... [id=rtb-e5c7633cefa18a098]
-aws_lb_target_group.app: Refreshing state... [id=arn:aws:elasticloadbalancing:eu
--west-2:444455556666:targetgroup/book-shop-app/a13717916e126457]
-aws_internet_gateway.shop: Refreshing state... [id=igw-9bb99313e3559d59f]
-aws_security_group.this["app"]: Refreshing state... [id=sg-0ea1f02f93c435340]
-aws_security_group.this["alb"]: Refreshing state... [id=sg-1292ef779761e6b9e]
-aws_security_group.this["db"]: Refreshing state... [id=sg-98bc7ab1c20bfa122]
-aws_route_table.private: Refreshing state... [id=rtb-b3c9465183df1b91c]
+data.aws_iam_policy_document.catalog: Reading...
+data.aws_iam_policy_document.catalog: Read complete after 0s [id=3396613952]
+data.aws_iam_policy_document.app: Reading...
+data.aws_iam_policy_document.app: Read complete after 0s [id=2842283945]
 aws_route53_record.validation["book-shop.example.com"]: Refreshing state... [id=
 2ZK1ZCR6K7HTYSHM5XMFND__d930b28be6c5927595552b219965053e.book-shop.example.com._
 CNAME]
-data.aws_iam_policy_document.app: Reading...
-data.aws_iam_policy_document.app: Read complete after 0s [id=2842283945]
-data.aws_iam_policy_document.catalog: Reading...
-data.aws_iam_policy_document.catalog: Read complete after 0s [id=3396613952]
+aws_iam_role.app: Refreshing state... [id=BookShopApp]
+aws_route_table.private: Refreshing state... [id=rtb-b3c9465183df1b91c]
+aws_lb_target_group.app: Refreshing state... [id=arn:aws:elasticloadbalancing:eu
+-west-2:444455556666:targetgroup/book-shop-app/a13717916e126457]
+aws_internet_gateway.shop: Refreshing state... [id=igw-9bb99313e3559d59f]
+aws_route_table.public: Refreshing state... [id=rtb-e5c7633cefa18a098]
+aws_security_group.this["app"]: Refreshing state... [id=sg-0ea1f02f93c435340]
+aws_security_group.this["alb"]: Refreshing state... [id=sg-1292ef779761e6b9e]
+aws_security_group.this["db"]: Refreshing state... [id=sg-98bc7ab1c20bfa122]
+aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
+aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c8b428e052e]
 aws_subnet.this["app-c"]: Refreshing state... [id=subnet-e56d56ed1dbd82035]
 aws_subnet.this["app-b"]: Refreshing state... [id=subnet-f7e3a7a4ba6f7ed13]
 aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a394010c40419]
-aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b62140a09169ec7ff]
-aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce869754647c8473]
-aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c8b428e052e]
 aws_subnet.this["data-a"]: Refreshing state... [id=subnet-c7a720642ba246ff7]
 aws_subnet.this["data-c"]: Refreshing state... [id=subnet-60f987a7b700f6f9f]
-aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
-aws_route.public_internet: Refreshing state... [id=r-rtb-e5c7633cefa18a098108028
-9494]
-aws_vpc_security_group_egress_rule.app_out: Refreshing state... [id=sgr-615841b9
-17e0c5c82]
-aws_vpc_security_group_ingress_rule.this["db_app"]: Refreshing state... [id=sgr-
-6e8abec5ee98759ac]
-aws_vpc_security_group_egress_rule.alb_app: Refreshing state... [id=sgr-72f34ea4
-1ac2722c1]
-aws_vpc_security_group_ingress_rule.this["app_alb"]: Refreshing state... [id=sgr
--61ea7866148cdc96f]
-aws_vpc_security_group_ingress_rule.this["https"]: Refreshing state... [id=sgr-2
-eba2a5dc5ea961db]
-aws_vpc_security_group_ingress_rule.this["http"]: Refreshing state... [id=sgr-53
-a8fe45fdb109b8c]
-aws_vpc_endpoint.s3: Refreshing state... [id=vpce-b3f3a79917dfc3a98]
+aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce869754647c8473]
+aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b62140a09169ec7ff]
+aws_s3_bucket_policy.catalog: Refreshing state... [id=book-shop-catalog-44445555
+6666]
 aws_acm_certificate_validation.shop: Refreshing state... [id=2026-11-02 09:30:00
  +0000 UTC]
 aws_iam_role_policy.app: Refreshing state... [id=BookShopApp:book-shop-app]
-aws_s3_bucket_policy.catalog: Refreshing state... [id=book-shop-catalog-44445555
-6666]
-aws_network_acl.data: Refreshing state... [id=acl-c0fda9619b350bd6d]
-aws_nat_gateway.a: Refreshing state... [id=nat-0e556a59c79dfb70c]
+aws_vpc_endpoint.s3: Refreshing state... [id=vpce-b3f3a79917dfc3a98]
+aws_route.public_internet: Refreshing state... [id=r-rtb-e5c7633cefa18a098108028
+9494]
+aws_vpc_security_group_egress_rule.alb_app: Refreshing state... [id=sgr-72f34ea4
+1ac2722c1]
+aws_vpc_security_group_egress_rule.app_out: Refreshing state... [id=sgr-615841b9
+17e0c5c82]
+aws_vpc_security_group_ingress_rule.this["app_alb"]: Refreshing state... [id=sgr
+-61ea7866148cdc96f]
+aws_vpc_security_group_ingress_rule.this["db_app"]: Refreshing state... [id=sgr-
+6e8abec5ee98759ac]
+aws_vpc_security_group_ingress_rule.this["http"]: Refreshing state... [id=sgr-53
+a8fe45fdb109b8c]
+aws_vpc_security_group_ingress_rule.this["https"]: Refreshing state... [id=sgr-2
+eba2a5dc5ea961db]
 aws_lb.shop: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-west-2:4444
 55556666:loadbalancer/app/book-shop/3fb1738b10ff2017]
-aws_route_table_association.this["data-a"]: Refreshing state... [id=rtbassoc-905
-28cedb357e43a3]
-aws_route_table_association.this["data-b"]: Refreshing state... [id=rtbassoc-047
-18beae952daaf1]
+aws_network_acl.data: Refreshing state... [id=acl-c0fda9619b350bd6d]
+aws_nat_gateway.a: Refreshing state... [id=nat-0e556a59c79dfb70c]
 aws_route_table_association.this["app-b"]: Refreshing state... [id=rtbassoc-bc17
 97f9fcb119fd7]
-aws_route_table_association.this["data-c"]: Refreshing state... [id=rtbassoc-43e
-4ec2fc8562cf05]
-aws_route_table_association.this["public-c"]: Refreshing state... [id=rtbassoc-9
-df09e3cd1e2023e5]
-aws_route_table_association.this["public-b"]: Refreshing state... [id=rtbassoc-6
-c78e88ccbd487489]
 aws_route_table_association.this["public-a"]: Refreshing state... [id=rtbassoc-c
 5db509e02f0fff92]
-aws_route_table_association.this["app-c"]: Refreshing state... [id=rtbassoc-396f
-f0e232233df43]
 aws_route_table_association.this["app-a"]: Refreshing state... [id=rtbassoc-63af
 24dc5926c42f9]
-aws_route.private_out: Refreshing state... [id=r-rtb-b3c9465183df1b91c1080289494
-]
-aws_lb_listener.http: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-we
-st-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b69bb98]
-aws_lb_listener.https: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-w
-est-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/c602f22870b50359]
+aws_route_table_association.this["public-b"]: Refreshing state... [id=rtbassoc-6
+c78e88ccbd487489]
+aws_route_table_association.this["data-a"]: Refreshing state... [id=rtbassoc-905
+28cedb357e43a3]
+aws_route_table_association.this["public-c"]: Refreshing state... [id=rtbassoc-9
+df09e3cd1e2023e5]
+aws_route_table_association.this["data-b"]: Refreshing state... [id=rtbassoc-047
+18beae952daaf1]
+aws_route_table_association.this["data-c"]: Refreshing state... [id=rtbassoc-43e
+4ec2fc8562cf05]
+aws_route_table_association.this["app-c"]: Refreshing state... [id=rtbassoc-396f
+f0e232233df43]
 aws_route53_record.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND_book-sho
 p.example.com_A]
+aws_lb_listener.https: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-w
+est-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/c602f22870b50359]
+aws_lb_listener.http: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-we
+st-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b69bb98]
+aws_route.private_out: Refreshing state... [id=r-rtb-b3c9465183df1b91c1080289494
+]
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
@@ -144,7 +144,7 @@ $ docker build -t book-shop:1.0.0 .
 #0 building with "default" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile
-#1 transferring dockerfile: 680B done
+#1 transferring dockerfile: 736B done
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/python:3.13-slim@sha256:2d4473
@@ -156,69 +156,93 @@ $ docker build -t book-shop:1.0.0 .
 #3 DONE 0.0s
 
 #4 [internal] load build context
-#4 transferring context: 2.72kB done
+#4 transferring context: 2.75kB done
 #4 DONE 0.0s
 
 #5 [1/5] FROM docker.io/library/python:3.13-slim@sha256:2d44738ebf4ce5f63b9d9ea8
 71e9c7cfdc0426f7b0c97cac915fd88ded1d86bb
 #5 resolve docker.io/library/python:3.13-slim@sha256:2d44738ebf4ce5f63b9d9ea871e
 9c7cfdc0426f7b0c97cac915fd88ded1d86bb 0.0s done
-#5 DONE 0.0s
+#5 DONE 0.1s
+
+#5 [1/5] FROM docker.io/library/python:3.13-slim@sha256:2d44738ebf4ce5f63b9d9ea8
+71e9c7cfdc0426f7b0c97cac915fd88ded1d86bb
+#5 extracting sha256:6fc242d221a673263eabd14a9ad9584d3177c96e5cb504c891497338e2f
+912f5
+#5 extracting sha256:6fc242d221a673263eabd14a9ad9584d3177c96e5cb504c891497338e2f
+912f5 1.2s done
+#5 DONE 1.2s
+
+#5 [1/5] FROM docker.io/library/python:3.13-slim@sha256:2d44738ebf4ce5f63b9d9ea8
+71e9c7cfdc0426f7b0c97cac915fd88ded1d86bb
+#5 extracting sha256:789960dca7c613e9d8872d4790f2ec423b8fe17f52989c6225982f28696
+e7315 0.1s done
+#5 extracting sha256:7d824d9f832184c4084576664b622717cb0eb579b504f2079d3b4ac3645
+4761f
+#5 extracting sha256:7d824d9f832184c4084576664b622717cb0eb579b504f2079d3b4ac3645
+4761f 0.5s done
+#5 DONE 1.8s
+
+#5 [1/5] FROM docker.io/library/python:3.13-slim@sha256:2d44738ebf4ce5f63b9d9ea8
+71e9c7cfdc0426f7b0c97cac915fd88ded1d86bb
+#5 extracting sha256:6f058ad03f0cab30c01926ad20e38348fe53783080f5309e4bfc4d2709c
+5fbaf done
+#5 DONE 1.9s
 
 #6 [2/5] WORKDIR /app
-#6 CACHED
+#6 DONE 0.3s
 
 #7 [3/5] COPY requirements.txt .
 #7 DONE 0.0s
 
 #8 [4/5] RUN pip install --no-cache-dir --progress-bar off -r requirements.txt
-#8 2.621 Collecting boto3==1.43.117 (from -r requirements.txt (line 3))
-#8 2.963   Downloading boto3-1.43.117-py3-none-any.whl.metadata (6.6 kB)
-#8 3.237 Collecting botocore==1.43.117 (from -r requirements.txt (line 4))
-#8 3.282   Downloading botocore-1.43.117-py3-none-any.whl.metadata (5.6 kB)
-#8 3.332 Collecting jmespath==1.1.0 (from -r requirements.txt (line 5))
-#8 3.373   Downloading jmespath-1.1.0-py3-none-any.whl.metadata (7.6 kB)
-#8 3.421 Collecting python-dateutil==2.9.0.post0 (from -r requirements.txt (line
+#8 2.546 Collecting boto3==1.43.117 (from -r requirements.txt (line 3))
+#8 2.905   Downloading boto3-1.43.117-py3-none-any.whl.metadata (6.6 kB)
+#8 3.226 Collecting botocore==1.43.117 (from -r requirements.txt (line 4))
+#8 3.270   Downloading botocore-1.43.117-py3-none-any.whl.metadata (5.6 kB)
+#8 3.323 Collecting jmespath==1.1.0 (from -r requirements.txt (line 5))
+#8 3.366   Downloading jmespath-1.1.0-py3-none-any.whl.metadata (7.6 kB)
+#8 3.416 Collecting python-dateutil==2.9.0.post0 (from -r requirements.txt (line
  6))
-#8 3.465   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata
+#8 3.462   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata
  (8.4 kB)
-#8 3.518 Collecting s3transfer==0.19.3 (from -r requirements.txt (line 7))
-#8 3.561   Downloading s3transfer-0.19.3-py3-none-any.whl.metadata (1.7 kB)
-#8 3.609 Collecting six==1.17.0 (from -r requirements.txt (line 8))
-#8 3.651   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
-#8 3.705 Collecting urllib3==2.8.0 (from -r requirements.txt (line 9))
-#8 3.747   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
-#8 3.832 Downloading boto3-1.43.117-py3-none-any.whl (140 kB)
-#8 3.951 Downloading botocore-1.43.117-py3-none-any.whl (16.1 MB)
-#8 4.589 Downloading jmespath-1.1.0-py3-none-any.whl (20 kB)
-#8 4.632 Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
-#8 4.696 Downloading s3transfer-0.19.3-py3-none-any.whl (90 kB)
-#8 4.742 Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
-#8 4.795 Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
-#8 4.964 Installing collected packages: urllib3, six, jmespath, python-dateutil,
+#8 3.526 Collecting s3transfer==0.19.3 (from -r requirements.txt (line 7))
+#8 3.572   Downloading s3transfer-0.19.3-py3-none-any.whl.metadata (1.7 kB)
+#8 3.649 Collecting six==1.17.0 (from -r requirements.txt (line 8))
+#8 3.696   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+#8 3.758 Collecting urllib3==2.8.0 (from -r requirements.txt (line 9))
+#8 3.805   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+#8 3.893 Downloading boto3-1.43.117-py3-none-any.whl (140 kB)
+#8 4.001 Downloading botocore-1.43.117-py3-none-any.whl (16.1 MB)
+#8 4.720 Downloading jmespath-1.1.0-py3-none-any.whl (20 kB)
+#8 4.763 Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+#8 4.807 Downloading s3transfer-0.19.3-py3-none-any.whl (90 kB)
+#8 4.852 Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+#8 4.896 Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+#8 5.069 Installing collected packages: urllib3, six, jmespath, python-dateutil,
  botocore, s3transfer, boto3
-#8 5.871 Successfully installed boto3-1.43.117 botocore-1.43.117 jmespath-1.1.0 
+#8 5.982 Successfully installed boto3-1.43.117 botocore-1.43.117 jmespath-1.1.0 
 python-dateutil-2.9.0.post0 s3transfer-0.19.3 six-1.17.0 urllib3-2.8.0
-#8 DONE 6.2s
+#8 DONE 6.3s
 
 #9 [5/5] COPY book_shop/ book_shop/
 #9 DONE 0.1s
 
 #10 exporting to image
 #10 exporting layers
-#10 exporting layers 2.0s done
-#10 exporting manifest sha256:8cfffbcdc2f34ea174fb2784fb6e8a99b18ca57a5d2d7567c9
-e4d3446a7534fe done
-#10 exporting config sha256:725cf1d362fbc68d5e01cd45d5e02b499fffdc68aca9772c35e8
-57a1d3b8be81 done
-#10 exporting attestation manifest sha256:3aa9aa93aa05181dd472fa167b406428588021
-7a81c03d45fee97a8b11f73987 done
-#10 exporting manifest list sha256:f137ce1e249a96e935c2369cc9128fc1566a2261489a5
-d15b8ab011cfcd9b72d done
+#10 exporting layers 1.9s done
+#10 exporting manifest sha256:bbe538ae7f5ce0221bbecbaaf9427408da72d9817e6287cd83
+0c27d565d16437 done
+#10 exporting config sha256:fb8bb37a58914c8e5abf1144ddb0ac9a69c67e6bc37dd1270684
+302ca7b8bf11 done
+#10 exporting attestation manifest sha256:c2b67dc68db4a0696f2efdc5f070fc77bdef29
+eee4ad42bb3bd7928c229457b1 done
+#10 exporting manifest list sha256:a5e3826a879e87331818c7c43b7fcd105aa77b6a2693a
+03930195576dc609e40 done
 #10 naming to docker.io/library/book-shop:1.0.0 done
 #10 unpacking to docker.io/library/book-shop:1.0.0
-#10 unpacking to docker.io/library/book-shop:1.0.0 0.8s done
-#10 DONE 2.9s
+#10 unpacking to docker.io/library/book-shop:1.0.0 0.7s done
+#10 DONE 2.7s
 $ docker history book-shop:1.0.0 --format '{{.Size}}\t{{.CreatedBy}}'
 0B	CMD ["python" "-m" "book_shop.web"]
 0B	EXPOSE [8080/tcp]
@@ -241,22 +265,18 @@ $ docker history book-shop:1.0.0 --format '{{.Size}}\t{{.CreatedBy}}'
 $ docker run -d --name shop --network host -e AWS_ENDPOINT_URL \
 >   -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION \
 >   book-shop:1.0.0
-docker: Error response from daemon: Conflict. The container name "/shop" is alre
-ady in use by container "2e0dd23676ee9808ded6944fb1658131381545ee5fb2dbcd4028b4f
-f06189ddd". You have to remove (or rename) that container to be able to reuse th
-at name.
-
-Run 'docker run --help' for more information
+84fc7ccea9dfc832299e43c1fc3dba3276d12aae28d3d15fe00dd78d977e6567
 $ sleep 2
 $ curl -s 127.0.0.1:8080/books/bk-1001
+{"id": "bk-1001", "title": "Night Trains of Europe", "author": "Ana Lima", "pric
+e": 12.99, "currency": "GBP", "stock": 40}
 $ docker stop shop
 shop
 $ docker logs shop
 {"listening": 8080}
 {"method": "GET", "path": "/books/bk-1001", "status": 200}
 $ python tools/push_image.py book-shop:1.0.0
-book-shop:1.0.0 -> sha256:8cfffbcdc2f34ea174fb2784fb6e8a99b18ca57a5d2d7567c9e4d3
-446a7534fe
+sha256:bbe538ae7f5ce0221bbecbaaf9427408da72d9817e6287cd830c27d565d16437
 $ aws ecr describe-images --repository-name book-shop \
 >   --query 'imageDetails[].[imageTags[0], imageDigest]' --output text
-1.0.0	sha256:8cfffbcdc2f34ea174fb2784fb6e8a99b18ca57a5d2d7567c9e4d3446a7534fe
+1.0.0	sha256:bbe538ae7f5ce0221bbecbaaf9427408da72d9817e6287cd830c27d565d16437

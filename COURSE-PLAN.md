@@ -1,6 +1,6 @@
 # Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3, 4 and 5 (see `CLAUDE.md`, Status).
+**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–6 (see `CLAUDE.md`, Status).
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
@@ -210,15 +210,15 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | The app, locally | `book_shop/web.py`, `catalog.py`: `GET /books/bk-1001` from the emulated bucket | request → handler → S3 → response |
-| 2 | Tests that do not need AWS | `tests/` with `mock_aws` | test → app → boto3 → in-process mock |
-| 3 | ◆ full scene: choosing compute | concept | EC2 / ECS on Fargate / Lambda / EKS: who runs what, on the shared-responsibility stack |
-| 4 | An image | `Dockerfile` | image layers → container; what the image freezes |
-| 5 | A registry and a task definition | ECR repo, task definition, two roles | task definition → execution role (pull, logs) / task role (the app's) |
-| 6 | A service on Fargate | ECS cluster + service behind the ALB | map: tasks in three app subnets, ALB → targets |
-| 7 | Scaling | target tracking; lab: the evening peak | the control loop: metric → alarm → desired count → tasks |
-| 8 | Stateless and graceful | carts off local disk; SIGTERM handling | a scale-in: draining → SIGTERM → in-flight finish → stop, as a timeline |
-| 9 | ◆ full scene: the same app on EC2 | `aws_launch_template` + ASG (plan) | ASG + launch template beside the Fargate service; what moves to you |
+| 1 | The app, locally | `book_shop/web.py`, `catalog.py` (standard library + boto3): `GET /health`, `GET /books/bk-1001` from the emulated bucket, a 404 | request → handler → catalog → S3; three requests, three answers |
+| 2 | Tests that do not need AWS | `tests/` under moto's `mock_aws`, no endpoint and fake keys: 5 pass | test → app → boto3 → in-process mock (emulator unreachable); emulator vs mock |
+| 3 | ◆ full scene: choosing compute | concept | EC2 / ECS on Fargate / Lambda / EKS: five layers, you or AWS; fits when |
+| 4 | An image, and a registry for it | `Dockerfile` (base pinned by digest), `requirements.txt` (every package locked), `ecr.tf`; real `docker build`, `docker run` against the emulator; the manifest registered in ECR (emulated: no layers) | the image's layers, read from `docker history` → container / ECR; what the image freezes |
+| 5 | A task definition and its two roles | `task.tf`: log group, execution role BookShopExecution, task role BookShopApp, revision 1 | task definition → execution role (pull, logs) / task role (read books); which role, when |
+| 6 | A service on Fargate (map frame) | `service.tf`: cluster + service, desired 3, behind the target group; the emulator runs no tasks (running 0, said) | map: three app tasks; service → tasks → target group |
+| 7 | Scaling | `scaling.tf`: 3–12 tasks, target 60% CPU, cooldowns 60/300; lab `peak.py` (a model) | the loop: CPU → alarm (3 min) → desired; CPU and tasks through the evening, plotted from the lab |
+| 8 | Stateless and graceful | SIGTERM handling in `web.py`; `tools/drain.py`: a request caught halfway still gets 200, exit 0; 1.1.0 built, pushed, revision 2 | removing a task: drain → SIGTERM → SIGKILL after 30 s |
+| 9 | ◆ full scene: the same app on EC2 | lab: `ec2/main.tf` (AMI from SSM, launch template, ASG) planned, not applied | Fargate service beside ASG + template + AMI; what moves to you |
 
 **7. `data` · Keep its data · 9**
 

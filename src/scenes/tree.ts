@@ -14,11 +14,14 @@ export interface TreeOptions {
   made?: Record<string, string | undefined>
   /** Folders drawn closed (their children not listed). */
   closed?: string[]
+  /** Folders drawn open but TRIMMED: only their open and new files (and sub-folders holding one),
+   *  then a muted `… N more files` — a long infra/ that would push the explorer past its pane. */
+  trim?: string[]
 }
 
 type Node = { children: Map<string, Node>; file: boolean }
 
-export function projectTree(paths: string[], { active, fresh = [], made = {}, closed = [] }: TreeOptions): TreeEntry[] {
+export function projectTree(paths: string[], { active, fresh = [], made = {}, closed = [], trim = [] }: TreeOptions): TreeEntry[] {
   const root: Node = { children: new Map(), file: false }
   for (const path of [...paths, ...Object.keys(made)]) {
     let at = root
@@ -28,8 +31,13 @@ export function projectTree(paths: string[], { active, fresh = [], made = {}, cl
       at = at.children.get(part)!
     })
   }
-  const walk = (node: Node, prefix: string): TreeEntry[] =>
-    [...node.children.entries()]
+  const shown = (path: string) => path === active || fresh.includes(path)
+    || [active, ...fresh].some((p) => p?.startsWith(path + '/'))
+  const walk = (node: Node, prefix: string): TreeEntry[] => {
+    const entries = [...node.children.entries()]
+    const trimmed = trim.includes(prefix.replace(/\/$/, ''))
+    const kept = trimmed ? entries.filter(([name]) => shown(prefix + name)) : entries
+    const out: TreeEntry[] = kept
       .sort(([a, x], [b, y]) => Number(x.file) - Number(y.file) || a.localeCompare(b))
       .map(([name, child]) => {
         const path = prefix + name
@@ -40,5 +48,8 @@ export function projectTree(paths: string[], { active, fresh = [], made = {}, cl
         const open = !closed.includes(path) && !isMade
         return { name, state, note, folder: true, children: open ? walk(child, path + '/') : undefined }
       })
+    if (trimmed && entries.length > kept.length) out.push({ name: `… ${entries.length - kept.length} more files`, state: 'muted' })
+    return out
+  }
   return walk(root, '')
 }

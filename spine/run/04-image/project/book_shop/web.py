@@ -40,7 +40,8 @@ class Shop(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    server = ThreadingHTTPServer(("", int(os.environ.get("PORT", "8080"))), Shop)
+    port = int(os.environ.get("PORT", "8080"))
+    server = ThreadingHTTPServer(("", port), Shop)
     print(json.dumps({"listening": server.server_port}), flush=True)
     server.serve_forever()
 
