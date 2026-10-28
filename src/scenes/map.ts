@@ -53,6 +53,7 @@ export const BUILT: Record<string, string[]> = {
 BUILT.decouple = [...BUILT.data, 'queue', 'topic', 'bus', 'fulfil', 'payment']
 // Course 9 adds production (a second account, drawn by no part) and the pipeline: the dev map is unchanged.
 BUILT.deliver = [...BUILT.decouple]
+BUILT.report = [...BUILT.deliver, 'lake', 'glue', 'athena', 'clicks']
 export { SUBNETS }
 
 function item(part: Part, state: State): Item {

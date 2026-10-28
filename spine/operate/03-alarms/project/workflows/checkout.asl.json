@@ -1,0 +1,46 @@
+{
+  "Comment": "Checkout: reserve the stock, take the payment, ship. If the payment is not taken, give the stock back.",
+  "StartAt": "ReserveStock",
+  "States": {
+    "ReserveStock": {
+      "Type": "Task",
+      "Resource": "${reserve}",
+      "Next": "ChargePayment"
+    },
+    "ChargePayment": {
+      "Type": "Task",
+      "Resource": "${charge}",
+      "Retry": [
+        {
+          "ErrorEquals": ["PaymentTimeout"],
+          "IntervalSeconds": 2,
+          "BackoffRate": 2.0,
+          "MaxAttempts": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "ReleaseStock"
+        }
+      ],
+      "Next": "ShipOrder"
+    },
+    "ShipOrder": {
+      "Type": "Task",
+      "Resource": "${ship}",
+      "End": true
+    },
+    "ReleaseStock": {
+      "Type": "Task",
+      "Resource": "${release}",
+      "Next": "OrderFailed"
+    },
+    "OrderFailed": {
+      "Type": "Fail",
+      "Error": "OrderFailed",
+      "Cause": "The payment was not taken; the stock was given back."
+    }
+  }
+}

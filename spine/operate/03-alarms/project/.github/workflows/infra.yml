@@ -1,0 +1,80 @@
+# The shop's delivery pipeline for its infrastructure. A pull request is
+# checked and planned against dev; a merge to main applies dev, then prod,
+# after a reviewer approves the `production` environment. No stored keys:
+# each job asks GitHub for an OIDC token and trades it for a role (§9.4).
+name: infrastructure
+
+on:
+  pull_request:
+    paths: ["infra/**"]
+  push:
+    branches: [main]
+    paths: ["infra/**"]
+
+permissions:
+  id-token: write # may ask GitHub for an OIDC token
+  contents: read
+
+env:
+  AWS_REGION: eu-west-2
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.17.0
+      - run: terraform fmt -check -recursive
+        working-directory: infra
+      - run: terraform init -backend=false && terraform validate
+        working-directory: infra
+
+  plan-dev:
+    if: github.event_name == 'pull_request'
+    needs: check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.17.0
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::444455556666:role/BookShopPipeline
+          aws-region: ${{ env.AWS_REGION }}
+      - run: terraform init && terraform plan -lock=false
+        working-directory: infra
+
+  apply-dev:
+    if: github.ref == 'refs/heads/main'
+    needs: check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.17.0
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::444455556666:role/BookShopPipeline
+          aws-region: ${{ env.AWS_REGION }}
+      - run: terraform init && terraform apply -auto-approve
+        working-directory: infra
+
+  apply-prod:
+    needs: apply-dev
+    environment: production # waits for a reviewer's approval
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.17.0
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::111122223333:role/BookShopPipeline
+          aws-region: ${{ env.AWS_REGION }}
+      - run: terraform init && terraform apply -auto-approve
+        working-directory: infra/envs/prod

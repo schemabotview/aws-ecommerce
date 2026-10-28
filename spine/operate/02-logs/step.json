@@ -1,0 +1,1 @@
+{"from": "report/05-clicks", "changes": ["infra/observe.tf", "tools/evening.py", "tools/count_errors.py"], "env": true, "venv": true, "postgres": true}

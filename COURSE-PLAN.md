@@ -1,6 +1,6 @@
 # Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–9 (see `CLAUDE.md`, Status).
+**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–10 (see `CLAUDE.md`, Status).
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
@@ -265,12 +265,12 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | ◆ full scene: state against history | concept | orders database (now) → export → lake (history) → catalog → query |
-| 2 | Exporting orders to a lake | `jobs/`, the lake bucket, Parquet | partitioned layout: `dt=` folders → files |
-| 3 | A catalog for the lake | Glue database and table | table → partitions → files |
-| 4 | Querying it | Athena workgroup; the query run in DuckDB (labelled) | the query pruning partitions: what is read, what is skipped |
-| 5 | A stream of clicks | Kinesis stream, two shards | producers → key → shard → consumer; lag on a plot |
-| 6 | ◆ full scene: lake, warehouse or cluster | concept | Athena / Redshift / EMR placed by data size and query shape |
+| 1 | ◆ full scene: state against history | concept | orders DB (now) → export → lake (history) → catalog → query; which question goes where |
+| 2 | Exporting orders to a lake | `infra/lake.tf` (private bucket); migration 002 (`placed`); `jobs/seed_september.py` (30,000 MADE-UP orders, seeded 12, said on screen); `jobs/export_orders.py`: one Parquet file per day, fixed schema, zstd, `order_history/dt=<day>/` | db → job → the bucket's `dt=` layout; the month's numbers |
+| 3 | A catalog for the lake | `infra/catalog.tf`: Glue database `book_shop_lake`, table `order_history` (partition key `dt`, partition projection); columns read back | filter → table → projected folder; catalog types against the files' |
+| 4 | Querying it | `infra/athena.tf` (workgroup `book-shop-reports`, 1 GiB scan cutoff); `reports/yesterday.sql` handed to Athena (recorded, not run) and run by DuckDB over a copy (`tools/sales.py`): top five books on 30 September, files read 1/30 | 30 day folders, 29 skipped; the answer |
+| 5 | A stream of clicks | `infra/clicks.tf`: Kinesis `book-shop-clicks`, 2 shards, 24 h; `tools/clicks.py`: 1,000 made-up clicks keyed by session, 596 / 404 by shard, none split; lab `05-lag` (a model): lag with 2 against 4 shards | pages → key → shards → consumer; lag on a plot |
+| 6 | ◆ full scene: lake, warehouse or cluster | concept | one lake → Athena / Redshift / EMR; which fits the shop |
 
 **11. `operate` · Operate it · 9**
 

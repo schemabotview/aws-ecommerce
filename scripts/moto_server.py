@@ -72,6 +72,11 @@ for AWS behaviour:
                   it stands in for is HTTPS on AWS (the CLI, the SDKs and Terraform use the HTTPS
                   regional endpoints). Together: §7.2's HttpsOnly Deny no longer refuses everyone; a
                   plain-HTTP request's denial is AWS's documentation here, not a run.
+  token-issue-time  A role session's identity policies are evaluated with aws:TokenIssueTime (the
+                  moment STS issued it, on the frozen clock), and DateLessThan / DateGreaterThan
+                  compare dates as AWS does; moto passed no condition values for identity policies
+                  and took an unknown operator as matched, so §11.8's "revoke older sessions" Deny
+                  would have refused the NEW session too.
   latest-version  The replay's clock is frozen, so two versions of an object carry one instant, and
                   moto's ListObjectVersions — newest first, by time — kept them oldest first and
                   called the older one IsLatest. Equal times now break toward the later write, as on
@@ -84,6 +89,9 @@ for AWS behaviour:
   rds-secret      The secret RDS manages for a master user holds THAT user (moto: always "admin",
                   password "P@55w0rd!"), with a generated password; its name's id comes from the
                   seeded random stream (moto used uuid4, so it changed on every recording).
+  kinesis-tags    CreateStream with Tags (provider 6.x tags on create, as CreateStream accepts them
+                  on AWS): moto dropped them, so every plan after §10.5 "added" the default tags
+                  to the click stream again.
   sqs-keep-policy SetQueueAttributes changes only the attributes it names, as on AWS; moto set the
                   queue's Policy to none whenever Policy was not among them (§9.6's console click
                   removed the topic's permission to send).
@@ -407,6 +415,21 @@ def _s3_create_tags():
                 self.backend.put_bucket_tagging(bucket_name, {t['Key']: t.get('Value', '') for t in tags})
         return result
     S3Response._bucket_response_put = put
+
+
+# ── kinesis-tags ─────────────────────────────────────────────────────────────────────────────────
+
+@patch('kinesis-tags')
+def _kinesis_tags():
+    from moto.kinesis.responses import KinesisResponse
+    original = KinesisResponse.create_stream
+
+    def create_stream(self):
+        result = original(self)
+        if tags := self._get_param('Tags'):
+            self.kinesis_backend.add_tags_to_stream(None, self._get_param('StreamName'), tags)
+        return result
+    KinesisResponse.create_stream = create_stream
 
 
 # ── sqs-redrive ──────────────────────────────────────────────────────────────────────────────────
@@ -752,6 +775,55 @@ def _conditions():
         return IAMPolicy(self.policy.decode()).is_action_permitted(
             action, resource, incoming_condition_values={'aws:SecureTransport': 'true'})
     FakeBucket.get_permission = get_permission
+
+
+# ── token-issue-time ─────────────────────────────────────────────────────────────────────────────
+
+@patch('token-issue-time')
+def _token_issue_time():
+    from moto.core.utils import utcnow
+    from moto.iam import access_control, policy_conditions
+    from moto.iam.access_control import IAMPolicy, PermissionResult
+    from moto.sts.models import AssumedRole
+    init = AssumedRole.__init__
+
+    def assumed(self, *args, **kwargs):
+        init(self, *args, **kwargs)
+        self.issued = utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    AssumedRole.__init__ = assumed
+
+    def dates(compare):
+        def operation(expected, actual: str) -> bool:
+            values = [expected] if isinstance(expected, str) else expected
+            when = datetime.fromisoformat(actual.replace('Z', '+00:00'))
+            return any(compare(when, datetime.fromisoformat(v.replace('Z', '+00:00'))) for v in values)
+        return operation
+    policy_conditions.CONDITION_OPERATIONS['DateLessThan'] = dates(lambda a, b: a < b)
+    policy_conditions.CONDITION_OPERATIONS['DateGreaterThan'] = dates(lambda a, b: a > b)
+
+    original = access_control.IAMRequestBase.check_action_permitted
+
+    def check_action_permitted(self, resource):
+        key, issued = self._access_key, None
+        if isinstance(key, access_control.AssumedRoleAccessKey):
+            for role in access_control.sts_backends[key.account_id][key.partition].assumed_roles:
+                if role.access_key_id == key._access_key_id:
+                    issued = getattr(role, 'issued', None)
+        if issued is None or self._action == 'sts:GetCallerIdentity':
+            return original(self, resource)
+        # moto's own loop, with the session's issue time as the request's condition value
+        permitted = False
+        for policy in key.collect_policies():
+            result = IAMPolicy(policy).is_action_permitted(
+                self._action, resource, incoming_condition_values={'aws:TokenIssueTime': issued})
+            if result == PermissionResult.DENIED:
+                self._raise_access_denied()
+            permitted = permitted or result == PermissionResult.PERMITTED
+        if self._is_assuming_role_operation(resource):
+            permitted = permitted and self._check_role_trust_relationship(resource)
+        if not permitted:
+            self._raise_access_denied()
+    access_control.IAMRequestBase.check_action_permitted = check_action_permitted
 
 
 # ── latest-version ───────────────────────────────────────────────────────────────────────────────

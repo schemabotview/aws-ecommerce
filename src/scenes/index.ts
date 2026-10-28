@@ -6,12 +6,13 @@ import { runScenes } from './run'
 import { dataScenes } from './data'
 import { decoupleScenes } from './decouple'
 import { deliverScenes } from './deliver'
+import { reportScenes } from './report'
 
 // Scene registry. Sections reference scenes by id; a graphl-flow scene carries no id of its own, so
 // the id is the key here. Scenes are grouped by course (one folder each, mirroring src/content);
 // ids are globally unique, and a duplicate THROWS rather than letting one course's scene shadow
 // another's.
-const GROUPS: Record<string, SceneModel>[] = [startScenes, secureScenes, networkScenes, runScenes, dataScenes, decoupleScenes, deliverScenes]
+const GROUPS: Record<string, SceneModel>[] = [startScenes, secureScenes, networkScenes, runScenes, dataScenes, decoupleScenes, deliverScenes, reportScenes]
 
 export const SCENES: Record<string, SceneModel> = {}
 for (const group of GROUPS)

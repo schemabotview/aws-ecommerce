@@ -1,0 +1,1 @@
+{"from": "deliver/07-replace", "changes": ["infra/lake.tf", "db/migrations/002_placed.sql", "jobs", "pyproject.toml"], "env": true, "venv": true, "postgres": true, "endpoint": "s3"}

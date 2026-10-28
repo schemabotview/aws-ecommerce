@@ -4,3 +4,5 @@ botocore==1.43.117
 libfaketime==3.0.1
 pytest==9.1.1
 psycopg[binary]==3.3.6
+pyarrow==26.0.0
+duckdb==1.5.6

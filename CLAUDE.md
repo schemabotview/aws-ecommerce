@@ -18,9 +18,10 @@ Engine `@graphlearning/graphl-flow` ^0.6.0, shell `@graphlearning/shell` ^1.0.4.
 
 Authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections), Course 4 `secure`
 (8), Course 5 `network` (10), Course 6 `run` (9), Course 7 `data` (9), Course 8 `decouple` (9) and
-Course 9 `deliver` (8), one chain: `start/02` → … → `secure/07` → `network/02` → … → `run/08` →
-`data/02` → … → `data/08` → `decouple/02` → … → `decouple/08` → `deliver/02` → … → `deliver/07`
-(`deliver/08` is a lab). No narration audio yet.
+Course 9 `deliver` (8) and Course 10 `report` (6), one chain: `start/02` → … → `secure/07` →
+`network/02` → … → `run/08` → `data/02` → … → `data/08` → `decouple/02` → … → `decouple/08` →
+`deliver/02` → … → `deliver/07` → `report/02` → … → `report/05` (`deliver/08` and `report/05-lag`
+are labs). No narration audio yet.
 
 **graphl-flow 0.6.0 is on graphl-flow's `main` but not yet on npm** (AWS icons, `dashed` groups,
 `muted` items, `hcl`, folded terminals). Until it is published: build it (`npm pack` there), install that tarball into `node_modules` here without saving, and do not commit
@@ -183,6 +184,11 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 | drift | sam (off screen): fulfilment visibility 30 → 60 s, `book-shop-returns` made by hand (4 d); the plan puts 30 back and imports returns (max size 1 MiB → 256 KiB) |
 | replacement | `book-shop-loyalty` → `book-shop-points`: queue, queue policy and subscription `create_before_destroy`, the subscription `depends_on` the policy; orders DB `prevent_destroy` (`plan -replace` refused) |
 | release model | 1.2.0 fails 2% of requests, alarm after 2 min, 420 req/s: failed requests all at once 1008, rolling (1 task of 7 a minute) 216, canary (10%) 101 — a model, labelled |
+| lake | bucket `book-shop-lake-444455556666` (private); `order_history/dt=<day>/orders.parquet`, schema order_id int32, customer, book, quantity int32, price decimal(8,2), placed timestamp UTC, zstd; orders get `placed` (migration 002) |
+| September | MADE UP, seeded 12: 30,000 orders (1,000 a day, 400 customers, books bk-2001 … bk-2020, 1–3 lines), 2,048,716.45 GBP, 60,179 order lines, 30 files, 588 KiB |
+| catalog | Glue database `book_shop_lake`, table `order_history` (EXTERNAL, Parquet, partition key `dt`, projection `date` yyyy-MM-dd from 2026-09-01) |
+| Athena | workgroup `book-shop-reports` (results `athena-results/`, 1 GiB scan cutoff); the emulator records queries, never runs them; DuckDB runs `reports/yesterday.sql` over a copy (`lake/`): top bk-2018 199 copies 5,104.35 GBP, files read 1/30 |
+| clicks | Kinesis `book-shop-clicks`, 2 shards, 24 h; 1,000 made-up clicks from 50 sessions (seed 10): 596 / 404, none split; lag model: 600 clicks/s per consumer, peak 1,600/s at 18:30, 2 shards up to 400 s behind, 4 shards none |
 
 Extend this table; never change a value a frame already quotes.
 

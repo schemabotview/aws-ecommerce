@@ -1,0 +1,1 @@
+{"from": "report/04-query", "changes": ["infra/clicks.tf", "tools/clicks.py"], "env": true, "venv": true, "postgres": true, "endpoint": "kinesis"}

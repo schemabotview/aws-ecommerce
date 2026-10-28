@@ -1,0 +1,4 @@
+{"id": "1", "account": "444455556666", "source": "book-shop.checkout",
+ "time": "2026-11-02T09:30:00Z", "region": "eu-west-2", "resources": [],
+ "detail-type": "OrderPlaced",
+ "detail": {"order": 9, "country": "FR", "total": 10.99}}

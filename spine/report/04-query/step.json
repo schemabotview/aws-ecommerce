@@ -1,0 +1,1 @@
+{"from": "report/03-catalog", "changes": ["infra/athena.tf", "reports/yesterday.sql", "tools/sales.py", "pyproject.toml", ".gitignore"], "env": true, "venv": true, "postgres": true, "endpoint": "s3"}

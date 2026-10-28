@@ -1,0 +1,27 @@
+# The book shop's AWS profiles. AWS_CONFIG_FILE points the CLI, the SDKs and
+# Terraform at this file instead of ~/.aws/config.
+
+[profile book-shop-dev]
+sso_session = book-shop
+sso_account_id = 444455556666
+sso_role_name = BookShopDeveloper
+region = eu-west-2
+
+[profile book-shop-prod]
+sso_session = book-shop
+sso_account_id = 111122223333
+sso_role_name = BookShopReadOnly
+region = eu-west-2
+
+[sso-session book-shop]
+sso_start_url = https://book-shop-example.awsapps.com/start
+sso_region = eu-west-2
+sso_registration_scopes = sso:account:access
+
+# Production's administrator: the role AWS Organizations creates in every
+# account it makes, reached from the developer's own credentials. Until the
+# pipeline has a role of its own (§9.4), this is how prod is reached.
+[profile book-shop-prod-admin]
+role_arn = arn:aws:iam::111122223333:role/OrganizationAccountAccessRole
+credential_source = Environment
+region = eu-west-2

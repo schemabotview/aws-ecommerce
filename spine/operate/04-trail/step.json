@@ -1,0 +1,1 @@
+{"from": "operate/03-alarms", "changes": ["infra/trail.tf"], "env": true, "venv": true, "postgres": true}
