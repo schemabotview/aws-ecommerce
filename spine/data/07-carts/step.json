@@ -1,0 +1,1 @@
+{"from": "data/06-secrets", "changes": ["infra/tables.tf", "infra/iam.tf", "book_shop/cart.py", "tools/carts.py"], "env": true, "venv": true, "postgres": true}

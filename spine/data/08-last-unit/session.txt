@@ -1,0 +1,325 @@
+$ cd infra
+$ terraform plan -out=tfplan
+aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
+ly]
+aws_acm_certificate.shop: Refreshing state... [id=arn:aws:acm:eu-west-2:44445555
+6666:certificate/8bd90642-d1d1-452e-890f-400b3727c4e7]
+data.aws_iam_policy_document.app_trust: Reading...
+data.aws_iam_policy_document.app_trust: Read complete after 0s [id=1077804475]
+aws_secretsmanager_secret.payments: Refreshing state... [id=arn:aws:secretsmanag
+er:eu-west-2:444455556666:secret:book-shop/payments-api-key-KeuCYo]
+aws_ecr_repository.app: Refreshing state... [id=book-shop]
+aws_dynamodb_table.carts: Refreshing state... [id=book-shop-carts]
+aws_eip.nat: Refreshing state... [id=eipalloc-6ff6a2527581beced]
+aws_route53_zone.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND]
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
+aws_ecs_cluster.shop: Refreshing state... [id=arn:aws:ecs:eu-west-2:444455556666
+:cluster/book-shop]
+aws_vpc.shop: Refreshing state... [id=vpc-e3500a5c4abdcac35]
+aws_s3_bucket.uploads: Refreshing state... [id=book-shop-uploads-444455556666]
+aws_cloudwatch_log_group.app: Refreshing state... [id=/book-shop/app]
+aws_iam_role.execution: Refreshing state... [id=BookShopExecution]
+aws_iam_role.app: Refreshing state... [id=BookShopApp]
+aws_route53_record.validation["book-shop.example.com"]: Refreshing state... [id=
+2ZK1ZCR6K7HTYSHM5XMFND__d930b28be6c5927595552b219965053e.book-shop.example.com._
+CNAME]
+data.aws_iam_policy_document.catalog: Reading...
+data.aws_iam_policy_document.catalog: Read complete after 0s [id=3118418309]
+aws_s3_bucket_versioning.catalog: Refreshing state... [id=book-shop-catalog-4444
+55556666]
+aws_internet_gateway.shop: Refreshing state... [id=igw-9bb99313e3559d59f]
+aws_route_table.private: Refreshing state... [id=rtb-b3c9465183df1b91c]
+aws_route_table.public: Refreshing state... [id=rtb-e5c7633cefa18a098]
+aws_lb_target_group.app: Refreshing state... [id=arn:aws:elasticloadbalancing:eu
+-west-2:444455556666:targetgroup/book-shop-app/a13717916e126457]
+aws_subnet.this["app-c"]: Refreshing state... [id=subnet-e56d56ed1dbd82035]
+aws_security_group.this["db"]: Refreshing state... [id=sg-98bc7ab1c20bfa122]
+aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c8b428e052e]
+aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a394010c40419]
+aws_subnet.this["data-c"]: Refreshing state... [id=subnet-60f987a7b700f6f9f]
+aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce869754647c8473]
+aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b62140a09169ec7ff]
+aws_security_group.this["alb"]: Refreshing state... [id=sg-1292ef779761e6b9e]
+aws_subnet.this["app-b"]: Refreshing state... [id=subnet-f7e3a7a4ba6f7ed13]
+aws_security_group.this["app"]: Refreshing state... [id=sg-0ea1f02f93c435340]
+aws_subnet.this["data-a"]: Refreshing state... [id=subnet-c7a720642ba246ff7]
+aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
+aws_s3_bucket_public_access_block.uploads: Refreshing state... [id=book-shop-upl
+oads-444455556666]
+aws_s3_bucket_cors_configuration.uploads: Refreshing state... [id=book-shop-uplo
+ads-444455556666]
+data.aws_iam_policy_document.execution: Reading...
+data.aws_iam_policy_document.execution: Read complete after 0s [id=3229690975]
+aws_ecs_task_definition.app: Refreshing state... [id=book-shop]
+aws_acm_certificate_validation.shop: Refreshing state... [id=2026-11-02 09:30:00
+ +0000 UTC]
+aws_s3_bucket_policy.catalog: Refreshing state... [id=book-shop-catalog-44445555
+6666]
+aws_s3_bucket_lifecycle_configuration.catalog: Refreshing state... [id=book-shop
+-catalog-444455556666]
+aws_vpc_endpoint.s3: Refreshing state... [id=vpce-b3f3a79917dfc3a98]
+aws_route.public_internet: Refreshing state... [id=r-rtb-e5c7633cefa18a098108028
+9494]
+aws_vpc_security_group_egress_rule.alb_app: Refreshing state... [id=sgr-72f34ea4
+1ac2722c1]
+aws_vpc_security_group_egress_rule.app_out: Refreshing state... [id=sgr-615841b9
+17e0c5c82]
+aws_vpc_security_group_ingress_rule.this["http"]: Refreshing state... [id=sgr-53
+a8fe45fdb109b8c]
+aws_vpc_security_group_ingress_rule.this["https"]: Refreshing state... [id=sgr-2
+eba2a5dc5ea961db]
+aws_vpc_security_group_ingress_rule.this["app_alb"]: Refreshing state... [id=sgr
+-61ea7866148cdc96f]
+aws_vpc_security_group_ingress_rule.this["db_app"]: Refreshing state... [id=sgr-
+6e8abec5ee98759ac]
+aws_nat_gateway.a: Refreshing state... [id=nat-0e556a59c79dfb70c]
+aws_db_subnet_group.data: Refreshing state... [id=book-shop-data]
+aws_network_acl.data: Refreshing state... [id=acl-c0fda9619b350bd6d]
+aws_lb.shop: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-west-2:4444
+55556666:loadbalancer/app/book-shop/3fb1738b10ff2017]
+aws_route_table_association.this["data-b"]: Refreshing state... [id=rtbassoc-047
+18beae952daaf1]
+aws_route_table_association.this["data-c"]: Refreshing state... [id=rtbassoc-43e
+4ec2fc8562cf05]
+aws_route_table_association.this["app-a"]: Refreshing state... [id=rtbassoc-63af
+24dc5926c42f9]
+aws_route_table_association.this["data-a"]: Refreshing state... [id=rtbassoc-905
+28cedb357e43a3]
+aws_route_table_association.this["public-a"]: Refreshing state... [id=rtbassoc-c
+5db509e02f0fff92]
+aws_route_table_association.this["app-c"]: Refreshing state... [id=rtbassoc-396f
+f0e232233df43]
+aws_route_table_association.this["public-b"]: Refreshing state... [id=rtbassoc-6
+c78e88ccbd487489]
+aws_route_table_association.this["app-b"]: Refreshing state... [id=rtbassoc-bc17
+97f9fcb119fd7]
+aws_route_table_association.this["public-c"]: Refreshing state... [id=rtbassoc-9
+df09e3cd1e2023e5]
+aws_iam_role_policy.execution: Refreshing state... [id=BookShopExecution:pull-an
+d-log]
+aws_route.private_out: Refreshing state... [id=r-rtb-b3c9465183df1b91c1080289494
+]
+aws_db_instance.orders: Refreshing state... [id=db-M5ENSHXFPU6XHZ4G4ZEI5QIO2U]
+aws_lb_listener.https: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-w
+est-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/c602f22870b50359]
+aws_lb_listener.http: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-we
+st-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b69bb98]
+aws_route53_record.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND_book-sho
+p.example.com_A]
+aws_ecs_service.app: Refreshing state... [id=arn:aws:ecs:eu-west-2:444455556666:
+service/book-shop/book-shop]
+aws_iam_role_policy.app: Refreshing state... [id=BookShopApp:book-shop-app]
+aws_appautoscaling_target.app: Refreshing state... [id=service/book-shop/book-sh
+op]
+aws_appautoscaling_policy.cpu: Refreshing state... [id=cpu-60]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+ <= read (data resources)
+
+Terraform will perform the following actions:
+
+  # data.aws_iam_policy_document.app will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "app" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "s3:GetObject",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "arn:aws:s3:::book-shop-catalog-444455556666/books/*",
+            ]
+          + sid       = "ReadBooks"
+        }
+      + statement {
+          + actions   = [
+              + "s3:ListBucket",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "arn:aws:s3:::book-shop-catalog-444455556666",
+            ]
+          + sid       = "ListBooks"
+        }
+      + statement {
+          + actions   = [
+              + "secretsmanager:GetSecretValue",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "arn:aws:secretsmanager:eu-west-2:444455556666:secret:rds!db-94e
+c1fbb-3711-4afa-b368-7c8aa0206489-WKUVTV",
+            ]
+          + sid       = "ReadDatabaseSecret"
+        }
+      + statement {
+          + actions   = [
+              + "dynamodb:DeleteItem",
+              + "dynamodb:Query",
+              + "dynamodb:UpdateItem",
+            ]
+          + resources = [
+              + "arn:aws:dynamodb:eu-west-2:444455556666:table/book-shop-carts",
+            ]
+          + sid       = "Carts"
+        }
+      + statement {
+          + actions   = [
+              + "dynamodb:UpdateItem",
+            ]
+          + resources = [
+              + (known after apply),
+            ]
+          + sid       = "ReserveStock"
+        }
+      + statement {
+          + actions   = [
+              + "s3:PutObject",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "arn:aws:s3:::book-shop-uploads-444455556666/reviews/*",
+            ]
+          + sid       = "SignPhotoUploads"
+        }
+    }
+
+  # aws_dynamodb_table.stock will be created
+  + resource "aws_dynamodb_table" "stock" {
+      + arn              = (known after apply)
+      + billing_mode     = "PAY_PER_REQUEST"
+      + hash_key         = "book"
+      + id               = (known after apply)
+      + name             = "book-shop-stock"
+      + read_capacity    = (known after apply)
+      + region           = "eu-west-2"
+      + stream_arn       = (known after apply)
+      + stream_label     = (known after apply)
+      + stream_view_type = (known after apply)
+      + tags_all         = {
+          + "app"        = "book-shop"
+          + "env"        = "dev"
+          + "managed-by" = "terraform"
+        }
+      + write_capacity   = (known after apply)
+
+      + attribute {
+          + name = "book"
+          + type = "S"
+        }
+
+      + global_secondary_index (known after apply)
+
+      + global_table_witness (known after apply)
+
+      + point_in_time_recovery (known after apply)
+
+      + server_side_encryption (known after apply)
+
+      + ttl (known after apply)
+
+      + warm_throughput (known after apply)
+    }
+
+  # aws_iam_role_policy.app will be updated in-place
+  ~ resource "aws_iam_role_policy" "app" {
+        id          = "BookShopApp:book-shop-app"
+        name        = "book-shop-app"
+      ~ policy      = jsonencode(
+            {
+              - Statement = [
+                  - {
+                      - Action   = "s3:GetObject"
+                      - Effect   = "Allow"
+                      - Resource = "arn:aws:s3:::book-shop-catalog-444455556666/
+books/*"
+                      - Sid      = "ReadBooks"
+                    },
+                  - {
+                      - Action   = "s3:ListBucket"
+                      - Effect   = "Allow"
+                      - Resource = "arn:aws:s3:::book-shop-catalog-444455556666"
+                      - Sid      = "ListBooks"
+                    },
+                  - {
+                      - Action   = "secretsmanager:GetSecretValue"
+                      - Effect   = "Allow"
+                      - Resource = "arn:aws:secretsmanager:eu-west-2:44445555666
+6:secret:rds!db-94ec1fbb-3711-4afa-b368-7c8aa0206489-WKUVTV"
+                      - Sid      = "ReadDatabaseSecret"
+                    },
+                  - {
+                      - Action   = [
+                          - "dynamodb:UpdateItem",
+                          - "dynamodb:Query",
+                          - "dynamodb:DeleteItem",
+                        ]
+                      - Effect   = "Allow"
+                      - Resource = "arn:aws:dynamodb:eu-west-2:444455556666:tabl
+e/book-shop-carts"
+                      - Sid      = "Carts"
+                    },
+                  - {
+                      - Action   = "s3:PutObject"
+                      - Effect   = "Allow"
+                      - Resource = "arn:aws:s3:::book-shop-uploads-444455556666/
+reviews/*"
+                      - Sid      = "SignPhotoUploads"
+                    },
+                ]
+              - Version   = "2012-10-17"
+            }
+        ) -> (known after apply)
+        # (2 unchanged attributes hidden)
+    }
+
+Plan: 1 to add, 1 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+$ terraform apply tfplan
+aws_dynamodb_table.stock: Creating...
+aws_dynamodb_table.stock: Creation complete after 6s [id=book-shop-stock]
+data.aws_iam_policy_document.app: Reading...
+data.aws_iam_policy_document.app: Read complete after 0s [id=1693710728]
+aws_iam_role_policy.app: Modifying... [id=BookShopApp:book-shop-app]
+aws_iam_role_policy.app: Modifications complete after 0s [id=BookShopApp:book-sh
+op-app]
+
+Apply complete! Resources: 1 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+app_role_arn = "arn:aws:iam::444455556666:role/BookShopApp"
+db_secret_arn = "arn:aws:secretsmanager:eu-west-2:444455556666:secret:rds!db-94e
+c1fbb-3711-4afa-b368-7c8aa0206489-WKUVTV"
+lb_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:loadbalancer/app/b
+ook-shop/3fb1738b10ff2017"
+repository_url = "444455556666.dkr.ecr.eu-west-2.amazonaws.com/book-shop"
+target_group_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:targetgr
+oup/book-shop-app/a13717916e126457"
+vpc_id = "vpc-e3500a5c4abdcac35"
+zone_id = "2ZK1ZCR6K7HTYSHM5XMFND"
+$ cd ..
+$ python -m tools.last_unit
+c-17 sold out: transaction cancelled, cart kept
+c-18 bought {'bk-1002': 1}
+$ aws dynamodb scan --table-name book-shop-stock --output text \
+>   --query 'Items[].[book.S, stock.N]'
+bk-1001	38
+bk-1002	0
+$ aws dynamodb scan --table-name book-shop-carts --output text \
+>   --query 'Items[].[customer.S, book.S, quantity.N]'
+c-17	bk-1001	3
+c-17	bk-1002	1

@@ -1,0 +1,313 @@
+$ cd infra
+$ terraform plan -out=tfplan
+aws_acm_certificate.shop: Refreshing state... [id=arn:aws:acm:eu-west-2:44445555
+6666:certificate/8bd90642-d1d1-452e-890f-400b3727c4e7]
+aws_ecr_repository.app: Refreshing state... [id=book-shop]
+aws_eip.nat: Refreshing state... [id=eipalloc-6ff6a2527581beced]
+aws_cloudwatch_log_group.app: Refreshing state... [id=/book-shop/app]
+aws_route53_zone.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND]
+data.aws_iam_policy_document.app_trust: Reading...
+data.aws_iam_policy_document.app_trust: Read complete after 0s [id=1077804475]
+aws_ecs_cluster.shop: Refreshing state... [id=arn:aws:ecs:eu-west-2:444455556666
+:cluster/book-shop]
+aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
+ly]
+aws_vpc.shop: Refreshing state... [id=vpc-e3500a5c4abdcac35]
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
+data.aws_iam_policy_document.execution: Reading...
+data.aws_iam_policy_document.execution: Read complete after 0s [id=3229690975]
+aws_route53_record.validation["book-shop.example.com"]: Refreshing state... [id=
+2ZK1ZCR6K7HTYSHM5XMFND__d930b28be6c5927595552b219965053e.book-shop.example.com._
+CNAME]
+aws_iam_role.app: Refreshing state... [id=BookShopApp]
+aws_iam_role.execution: Refreshing state... [id=BookShopExecution]
+aws_internet_gateway.shop: Refreshing state... [id=igw-9bb99313e3559d59f]
+aws_route_table.public: Refreshing state... [id=rtb-e5c7633cefa18a098]
+aws_route_table.private: Refreshing state... [id=rtb-b3c9465183df1b91c]
+aws_lb_target_group.app: Refreshing state... [id=arn:aws:elasticloadbalancing:eu
+-west-2:444455556666:targetgroup/book-shop-app/a13717916e126457]
+aws_security_group.this["db"]: Refreshing state... [id=sg-98bc7ab1c20bfa122]
+aws_security_group.this["app"]: Refreshing state... [id=sg-0ea1f02f93c435340]
+aws_security_group.this["alb"]: Refreshing state... [id=sg-1292ef779761e6b9e]
+data.aws_iam_policy_document.catalog: Reading...
+data.aws_iam_policy_document.catalog: Read complete after 0s [id=3118418309]
+aws_s3_bucket_versioning.catalog: Refreshing state... [id=book-shop-catalog-4444
+55556666]
+aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c8b428e052e]
+aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a394010c40419]
+aws_subnet.this["app-b"]: Refreshing state... [id=subnet-f7e3a7a4ba6f7ed13]
+aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b62140a09169ec7ff]
+aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce869754647c8473]
+aws_subnet.this["app-c"]: Refreshing state... [id=subnet-e56d56ed1dbd82035]
+aws_subnet.this["data-a"]: Refreshing state... [id=subnet-c7a720642ba246ff7]
+aws_subnet.this["data-c"]: Refreshing state... [id=subnet-60f987a7b700f6f9f]
+aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
+aws_acm_certificate_validation.shop: Refreshing state... [id=2026-11-02 09:30:00
+ +0000 UTC]
+aws_iam_role_policy.execution: Refreshing state... [id=BookShopExecution:pull-an
+d-log]
+aws_ecs_task_definition.app: Refreshing state... [id=book-shop]
+aws_route.public_internet: Refreshing state... [id=r-rtb-e5c7633cefa18a098108028
+9494]
+aws_vpc_endpoint.s3: Refreshing state... [id=vpce-b3f3a79917dfc3a98]
+aws_vpc_security_group_egress_rule.alb_app: Refreshing state... [id=sgr-72f34ea4
+1ac2722c1]
+aws_vpc_security_group_egress_rule.app_out: Refreshing state... [id=sgr-615841b9
+17e0c5c82]
+aws_vpc_security_group_ingress_rule.this["db_app"]: Refreshing state... [id=sgr-
+6e8abec5ee98759ac]
+aws_vpc_security_group_ingress_rule.this["http"]: Refreshing state... [id=sgr-53
+a8fe45fdb109b8c]
+aws_vpc_security_group_ingress_rule.this["https"]: Refreshing state... [id=sgr-2
+eba2a5dc5ea961db]
+aws_vpc_security_group_ingress_rule.this["app_alb"]: Refreshing state... [id=sgr
+-61ea7866148cdc96f]
+aws_iam_role_policy.app: Refreshing state... [id=BookShopApp:book-shop-app]
+aws_s3_bucket_policy.catalog: Refreshing state... [id=book-shop-catalog-44445555
+6666]
+aws_s3_bucket_lifecycle_configuration.catalog: Refreshing state... [id=book-shop
+-catalog-444455556666]
+aws_lb.shop: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-west-2:4444
+55556666:loadbalancer/app/book-shop/3fb1738b10ff2017]
+aws_network_acl.data: Refreshing state... [id=acl-c0fda9619b350bd6d]
+aws_nat_gateway.a: Refreshing state... [id=nat-0e556a59c79dfb70c]
+aws_route_table_association.this["public-b"]: Refreshing state... [id=rtbassoc-6
+c78e88ccbd487489]
+aws_route_table_association.this["data-c"]: Refreshing state... [id=rtbassoc-43e
+4ec2fc8562cf05]
+aws_route_table_association.this["data-b"]: Refreshing state... [id=rtbassoc-047
+18beae952daaf1]
+aws_route_table_association.this["app-c"]: Refreshing state... [id=rtbassoc-396f
+f0e232233df43]
+aws_route_table_association.this["data-a"]: Refreshing state... [id=rtbassoc-905
+28cedb357e43a3]
+aws_route_table_association.this["public-c"]: Refreshing state... [id=rtbassoc-9
+df09e3cd1e2023e5]
+aws_route_table_association.this["app-a"]: Refreshing state... [id=rtbassoc-63af
+24dc5926c42f9]
+aws_route_table_association.this["app-b"]: Refreshing state... [id=rtbassoc-bc17
+97f9fcb119fd7]
+aws_route_table_association.this["public-a"]: Refreshing state... [id=rtbassoc-c
+5db509e02f0fff92]
+aws_lb_listener.https: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-w
+est-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/c602f22870b50359]
+aws_lb_listener.http: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-we
+st-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b69bb98]
+aws_route53_record.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND_book-sho
+p.example.com_A]
+aws_route.private_out: Refreshing state... [id=r-rtb-b3c9465183df1b91c1080289494
+]
+aws_ecs_service.app: Refreshing state... [id=arn:aws:ecs:eu-west-2:444455556666:
+service/book-shop/book-shop]
+aws_appautoscaling_target.app: Refreshing state... [id=service/book-shop/book-sh
+op]
+aws_appautoscaling_policy.cpu: Refreshing state... [id=cpu-60]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+ <= read (data resources)
+
+Terraform will perform the following actions:
+
+  # data.aws_iam_policy_document.app will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "app" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "s3:GetObject",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "arn:aws:s3:::book-shop-catalog-444455556666/books/*",
+            ]
+          + sid       = "ReadBooks"
+        }
+      + statement {
+          + actions   = [
+              + "s3:ListBucket",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "arn:aws:s3:::book-shop-catalog-444455556666",
+            ]
+          + sid       = "ListBooks"
+        }
+      + statement {
+          + actions   = [
+              + "s3:PutObject",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+            ]
+          + sid       = "SignPhotoUploads"
+        }
+    }
+
+  # aws_iam_role_policy.app will be updated in-place
+  ~ resource "aws_iam_role_policy" "app" {
+        id          = "BookShopApp:book-shop-app"
+        name        = "book-shop-app"
+      ~ policy      = jsonencode(
+            {
+              - Statement = [
+                  - {
+                      - Action   = "s3:GetObject"
+                      - Effect   = "Allow"
+                      - Resource = "arn:aws:s3:::book-shop-catalog-444455556666/
+books/*"
+                      - Sid      = "ReadBooks"
+                    },
+                  - {
+                      - Action   = "s3:ListBucket"
+                      - Effect   = "Allow"
+                      - Resource = "arn:aws:s3:::book-shop-catalog-444455556666"
+                      - Sid      = "ListBooks"
+                    },
+                ]
+              - Version   = "2012-10-17"
+            }
+        ) -> (known after apply)
+        # (2 unchanged attributes hidden)
+    }
+
+  # aws_s3_bucket.uploads will be created
+  + resource "aws_s3_bucket" "uploads" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = "book-shop-uploads-444455556666"
+      + bucket_domain_name          = (known after apply)
+      + bucket_namespace            = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_region               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = "eu-west-2"
+      + request_payer               = (known after apply)
+      + tags_all                    = {
+          + "app"        = "book-shop"
+          + "env"        = "dev"
+          + "managed-by" = "terraform"
+        }
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + cors_rule (known after apply)
+
+      + grant (known after apply)
+
+      + lifecycle_rule (known after apply)
+
+      + logging (known after apply)
+
+      + object_lock_configuration (known after apply)
+
+      + replication_configuration (known after apply)
+
+      + server_side_encryption_configuration (known after apply)
+
+      + versioning (known after apply)
+
+      + website (known after apply)
+    }
+
+  # aws_s3_bucket_cors_configuration.uploads will be created
+  + resource "aws_s3_bucket_cors_configuration" "uploads" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+      + region = "eu-west-2"
+
+      + cors_rule {
+          + allowed_headers = [
+              + "content-type",
+            ]
+          + allowed_methods = [
+              + "PUT",
+            ]
+          + allowed_origins = [
+              + "https://book-shop.example.com",
+            ]
+          + expose_headers  = []
+            id              = null
+          + max_age_seconds = 300
+        }
+    }
+
+  # aws_s3_bucket_public_access_block.uploads will be created
+  + resource "aws_s3_bucket_public_access_block" "uploads" {
+      + block_public_acls       = true
+      + block_public_policy     = true
+      + bucket                  = (known after apply)
+      + id                      = (known after apply)
+      + ignore_public_acls      = true
+      + region                  = "eu-west-2"
+      + restrict_public_buckets = true
+    }
+
+Plan: 3 to add, 1 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+$ terraform apply tfplan
+aws_s3_bucket.uploads: Creating...
+aws_s3_bucket.uploads: Creation complete after 0s [id=book-shop-uploads-44445555
+6666]
+data.aws_iam_policy_document.app: Reading...
+data.aws_iam_policy_document.app: Read complete after 0s [id=1897036658]
+aws_s3_bucket_public_access_block.uploads: Creating...
+aws_s3_bucket_public_access_block.uploads: Creation complete after 0s [id=book-s
+hop-uploads-444455556666]
+aws_s3_bucket_cors_configuration.uploads: Creating...
+aws_s3_bucket_cors_configuration.uploads: Creation complete after 0s [id=book-sh
+op-uploads-444455556666]
+aws_iam_role_policy.app: Modifying... [id=BookShopApp:book-shop-app]
+aws_iam_role_policy.app: Modifications complete after 0s [id=BookShopApp:book-sh
+op-app]
+
+Apply complete! Resources: 3 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+app_role_arn = "arn:aws:iam::444455556666:role/BookShopApp"
+lb_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:loadbalancer/app/b
+ook-shop/3fb1738b10ff2017"
+repository_url = "444455556666.dkr.ecr.eu-west-2.amazonaws.com/book-shop"
+target_group_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:targetgr
+oup/book-shop-app/a13717916e126457"
+vpc_id = "vpc-e3500a5c4abdcac35"
+zone_id = "2ZK1ZCR6K7HTYSHM5XMFND"
+$ cd ..
+$ python -m book_shop.web > app.log 2>&1 & APP=$!; sleep 1
+$ curl -s -X POST 127.0.0.1:8080/books/bk-1001/reviews/r-77/photo > signed.json
+$ python -m json.tool signed.json
+{
+    "key": "reviews/bk-1001/r-77.jpg",
+    "expires_in": 300,
+    "url": "https://s3.eu-west-2.amazonaws.com/book-shop-uploads-444455556666/re
+views/bk-1001/r-77.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOS
+FODNN7EXAMPLE%2F20261102%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261102T093
+000Z&X-Amz-Expires=300&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Signature=0
+61615e5fe6325e1ffb0f3c38d4428c3396dd2876ba02ecc5355ac0b9e0ef09d"
+}
+$ URL=$(python -c 'import json; print(json.load(open("signed.json"))["url"])')
+$ curl -s -w '%{http_code}\n' -X PUT -H 'Content-Type: image/jpeg' \
+>   --data-binary @data/photos/r-77.jpg "$URL"
+200
+$ kill $APP
+$ aws s3 ls s3://book-shop-uploads-444455556666 --recursive
+2026-11-02 09:30:00        676 reviews/bk-1001/r-77.jpg

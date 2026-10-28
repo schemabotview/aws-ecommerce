@@ -1,0 +1,1 @@
+{"from": "data/04-database", "changes": ["db/migrations/001_orders.sql", "book_shop/orders.py", "tools/place_orders.py", "env.sh"], "env": true, "venv": true, "postgres": true}

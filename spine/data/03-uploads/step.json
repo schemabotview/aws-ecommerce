@@ -1,0 +1,1 @@
+{"from": "data/02-catalog", "changes": ["infra/uploads.tf", "infra/iam.tf", "book_shop/uploads.py", "book_shop/web.py", "data/photos/r-77.jpg"], "env": true, "venv": true, "endpoint": "s3"}

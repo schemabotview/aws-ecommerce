@@ -1,0 +1,16 @@
+$ createdb book_shop
+$ psql -q -f db/migrations/001_orders.sql book_shop
+$ python -m tools.place_orders
+c-17: order 1 placed
+c-18: out of stock, nothing was written
+$ psql -c 'SELECT id, customer, total FROM orders' book_shop
+ id | customer | total 
+----+----------+-------
+  1 | c-17     | 21.98
+(1 row)
+$ psql -c 'SELECT id, stock FROM books ORDER BY id' book_shop
+   id    | stock 
+---------+-------
+ bk-1001 |    38
+ bk-1002 |     1
+(2 rows)

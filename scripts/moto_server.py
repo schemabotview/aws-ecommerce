@@ -55,7 +55,9 @@ for AWS behaviour:
                   the key). Every OTHER principal — the app's role sessions above all — is evaluated
                   by moto, identity policies only (no resource policies, conditions or SCPs). One
                   consequence a frame must say: alex's AssumeRole is not checked against the trust
-                  policy, so alex can stand in for ECS here, which AWS would refuse.
+                  policy, so alex can stand in for ECS here, which AWS would refuse. A presigned URL
+                  signed with alex's key is alex's request too; one signed by any other principal is
+                  not supported under enforcement (moto's check needs an Authorization header).
   conditions      A policy statement whose condition does not match does not APPLY (neutral); moto
                   returned DENIED for it — an Allow or a Deny alike. moto evaluated only StringEquals
                   and took any other operator as matched: Bool is added (case-insensitive, as AWS
@@ -68,6 +70,14 @@ for AWS behaviour:
                   moto's ListObjectVersions — newest first, by time — kept them oldest first and
                   called the older one IsLatest. Equal times now break toward the later write, as on
                   AWS, where the later write is later.
+  rds-standby     A Multi-AZ DB instance reports its standby's zone (SecondaryAvailabilityZone), as AWS
+                  does: the first other AZ of its subnet group. moto reported none.
+  secret-resource  With IAM enforcement on, a Secrets Manager call is authorized against the secret
+                  it names (by name or ARN, as AWS does); moto authorized every one against "*", so a
+                  policy allowing ONE secret (the app's database password, §7.6) allowed none.
+  rds-secret      The secret RDS manages for a master user holds THAT user (moto: always "admin",
+                  password "P@55w0rd!"), with a generated password; its name's id comes from the
+                  seeded random stream (moto used uuid4, so it changed on every recording).
   checkpoints     /moto-api/spine-save and /spine-load write and read everything the emulator holds,
                   so scripts/spine.py can resume the chain after any step (see `save`).
 """
@@ -723,6 +733,56 @@ def _latest_version():
     models.S3Backend.list_object_versions = list_object_versions
 
 
+# ── rds-standby ──────────────────────────────────────────────────────────────────────────────────
+
+@patch('rds-standby')
+def _rds_standby():
+    from moto.rds.models import DBInstance
+
+    def secondary_availability_zone(self):
+        if not self.multi_az or not getattr(self, 'db_subnet_group', None):
+            return None
+        zones = sorted({subnet.availability_zone for subnet in self.db_subnet_group._subnets})
+        return next((zone for zone in zones if zone != self.availability_zone), None)
+    DBInstance.secondary_availability_zone = property(secondary_availability_zone)
+
+
+# ── secret-resource ──────────────────────────────────────────────────────────────────────────────
+
+@patch('secret-resource')
+def _secret_resource():
+    from moto.secretsmanager.responses import SecretsManagerResponse
+
+    def determine_resource(self) -> str:
+        secret_id = self._get_param('SecretId')
+        if not secret_id:
+            return '*'
+        secret = self.backend.secrets.get(secret_id)
+        if secret is not None:
+            return secret.arn
+        return secret_id if secret_id.startswith('arn:') else \
+            f'arn:aws:secretsmanager:{self.region}:{self.current_account}:secret:{secret_id}'
+    SecretsManagerResponse._determine_resource = determine_resource
+
+
+# ── rds-secret ───────────────────────────────────────────────────────────────────────────────────
+
+@patch('rds-secret')
+def _rds_secret():
+    import string
+    from moto.rds.models import MasterUserSecret
+
+    def secret_string(self) -> str:
+        alphabet = string.ascii_letters + string.digits + '!#$%&()*+,-.:;<=>?[]^_{|}~'
+        password = ''.join(mock_random.choice(alphabet) for _ in range(28))
+        return json.dumps({'username': self.resource.master_username, 'password': password})
+
+    def secret_name(self) -> str:
+        return f'rds!{self.resource.resource_type}-{mock_random.uuid4()}'
+    MasterUserSecret._generate_secret_string = secret_string
+    MasterUserSecret._generate_secret_name = secret_name
+
+
 # ── developer-key ────────────────────────────────────────────────────────────────────────────────
 
 DEVELOPER_KEY = 'AKIAIOSFODNN7EXAMPLE'  # env.sh's — the AWS documentation's example key
@@ -735,6 +795,10 @@ def _developer_key():
 
     def authorize(self, iam_request_cls, resource='*'):
         if f'Credential={DEVELOPER_KEY}/' in (self.headers.get('Authorization') or ''):
+            return None
+        # A presigned URL carries its credential in the query string, not a header (moto's enforcement
+        # assumed a header and crashed): one signed with alex's key is alex's request.
+        if f'X-Amz-Credential={DEVELOPER_KEY}%2F' in self.uri or f'X-Amz-Credential={DEVELOPER_KEY}/' in self.uri:
             return None
         return original(self, iam_request_cls, resource)
     ActionAuthenticatorMixin._authenticate_and_authorize_action = authorize

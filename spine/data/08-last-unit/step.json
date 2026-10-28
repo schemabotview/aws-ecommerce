@@ -1,0 +1,1 @@
+{"from": "data/07-carts", "changes": ["infra/tables.tf", "infra/iam.tf", "book_shop/stock.py", "tools/last_unit.py"], "env": true, "venv": true, "postgres": true}
