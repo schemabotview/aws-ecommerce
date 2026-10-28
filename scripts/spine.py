@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
-"""Replay every spine step and compare its terminal transcript with what the commands really print.
+"""Record each spine step ONCE, from its parent's recorded state; check the records without running anything.
 
 The spine is the course's one project, `book-shop`, kept as real files: one snapshot per step in
 spine/<course>/<step>/project/. Each step's session.txt is the terminal pane a scene shows — `$ `
 lines are commands (`> ` lines continue one), everything else is their output. Scenes import these
-files with Vite's `?raw`, so a frame can only show what this script has replayed.
+files with Vite's `?raw`, so a frame can only show what a real run printed.
 
-  python3 scripts/spine.py            check every step (exit 1 on any difference)
-  python3 scripts/spine.py --write    re-run every step and rewrite its session.txt / captures
-  python3 scripts/spine.py start/05   only the steps whose path starts with an argument
+  python3 scripts/spine.py                    check: every step recorded, current, untouched. Runs NOTHING.
+  python3 scripts/spine.py --record net/04    record those steps: each runs ONCE, from its parent's
+                                              recorded state, and writes session.txt, captured/, state/
+  python3 scripts/spine.py --replay [steps]   deliberate, after upgrading a tool: run the whole chain from
+                                              the start and compare with what was recorded
+
+RECORDED ONCE, NEVER REPLAYED. When a step is recorded, the machine's whole state after it — the
+home directory (working copy, Terraform's files) and everything the emulator holds — is committed
+beside it in `state/` (home.tar.gz, emulator.pickle.gz, recorded.json). The next step is recorded by
+restoring that state and running only its own commands; nothing before it runs again. recorded.json
+holds the step's KEY (a hash of its own content and every step before it: step.json, files, typed
+commands — not the scripts) and a hash of the transcript it wrote. So the check needs no run: a step
+whose key no longer matches was edited (or a step before it was), and is re-recorded; a transcript
+that no longer matches its hash was edited by hand. Editing step N makes N and every step after it
+stale — the chain is a line — and they are recorded again, in order, each from the one before.
 
 THE SPINE IS CUMULATIVE (python-expense-tracker's rule). Every step is the step before it plus the
 changes it declares, and this script fails a step whose project differs from its parent's anywhere
@@ -27,11 +39,11 @@ and ONE working copy of the project, start to finish. A step's files are laid ov
 (its declared changes; a file it no longer has is removed), and its session runs where the previous
 session left off: the same buckets, the same Terraform state, the same .terraform/ and lock file. So
 the cloud a section starts from is the cloud the previous section's commands really made — never a
-silent re-apply, never a hand-written setup list. Checking one step therefore runs the chain up to
-it (and reports only the steps asked for). The chain is a line: a step has at most one child; a
+silent re-apply, never a hand-written setup list: the state a step starts from is its parent's
+recorded state. The chain is a line: a step has at most one child; a
 "wrong version first, then the fix" is two consecutive steps, the fix building on the failure.
 
-A lab runs alone, on a fresh emulator, after the chain.
+A lab runs alone, on a fresh emulator; it has no state to keep, only its transcript.
 
 What makes a replay deterministic — all of it about the MACHINE, never the commands:
   - Pinned tools from scripts/toolchain.py, in .spine-cache/: AWS CLI v2, Terraform and the AWS
@@ -68,6 +80,7 @@ step.json (other keys, all optional):
   {"volatile": true}            every digit masked in the comparison (timings the frame never quotes)
 """
 import difflib
+import gzip
 import hashlib
 import json
 import os
@@ -97,9 +110,7 @@ REGION = 'eu-west-2'
 SEED = 42
 MARK = '__SPINE_MARK__'
 COLUMNS = 80  # the IDE terminal's width (src/scenes/ide.ts EDITOR_COLS)
-MACHINE = toolchain.CACHE / 'machine'          # the learner's machine while a replay runs
-# The machine after each chain step (see checkpoint_keys), per tree of steps.
-CHECKPOINTS = toolchain.CACHE / 'checkpoints' / hashlib.sha256(str(ROOT).encode()).hexdigest()[:8]
+MACHINE = toolchain.CACHE / 'machine'  # the learner's machine while a recording runs
 REGISTRY: dict = {}  # the local registry's proxy settings, set in main()
 # Never part of a snapshot: what a run creates, not what the learner writes.
 IGNORED = {'__pycache__', '.venv', '.terraform', '.pytest_cache'}
@@ -323,14 +334,12 @@ def chain() -> list[Path]:
     return out
 
 
-def checkpoint_keys(line: list[Path]) -> list[str]:
-    """One key per chain step: a hash of the replay machine's own code and of EVERY step up to and
-    including this one — its step.json, its files, the commands it types (not their output, so
-    --write keeps the key). A checkpoint is only ever restored under the same key, so editing a
-    step, or anything before it, or the machine, makes every later checkpoint unreachable."""
+def state_keys(line: list[Path]) -> list[str]:
+    """One key per chain step: a hash of EVERY step up to and including this one — its step.json,
+    its files, the commands it types (not their output). A step's recorded state (`state/`) is valid
+    only under its key: editing a step, or any step before it, makes it and every later state stale.
+    The replay's own scripts are NOT in the key — improving the machine never forces a re-record."""
     h = hashlib.sha256()
-    for name in ('spine.py', 'moto_server.py', 'toolchain.py', 'registry.py'):
-        h.update((toolchain.REPO / 'scripts' / name).read_bytes())
     out = []
     for step in line:
         h.update((step / 'step.json').read_bytes())
@@ -340,6 +349,26 @@ def checkpoint_keys(line: list[Path]) -> list[str]:
         h.update(repr(commands((step / 'session.txt').read_text(), columns)).encode())
         out.append(h.hexdigest()[:20])
     return out
+
+
+def machine_version() -> str:
+    """Which replay machine recorded a step (informational: the key does not depend on it)."""
+    h = hashlib.sha256()
+    for name in ('spine.py', 'moto_server.py', 'toolchain.py', 'registry.py'):
+        h.update((toolchain.REPO / 'scripts' / name).read_bytes())
+    return h.hexdigest()[:12]
+
+
+def transcript_hash(step: Path) -> str:
+    """The recorded output: session.txt and every captured file, as the recording wrote them."""
+    h = hashlib.sha256((step / 'session.txt').read_bytes())
+    for made in sorted(config_of(step).get('capture', [])):
+        h.update(made.encode() + b'\0' + (step / 'captured' / made).read_bytes())
+    return h.hexdigest()
+
+
+def recorded(step: Path) -> dict:
+    return json.loads((step / 'state' / 'recorded.json').read_text()) if (step / 'state' / 'recorded.json').exists() else {}
 
 
 def leftovers() -> None:
@@ -388,24 +417,30 @@ class Machine:
         leftovers()
         shutil.rmtree(self.root, ignore_errors=True)
 
-    def save(self, key: str) -> None:
-        """A checkpoint: the home directory (working copy, Terraform's files, the venv) and everything
-        the emulator holds, as they are after the step just run."""
-        target = CHECKPOINTS / key
-        if target.exists():
-            return
-        partial = CHECKPOINTS / f'.{key}.partial'
-        shutil.rmtree(partial, ignore_errors=True)
-        partial.mkdir(parents=True)
-        subprocess.run(['tar', '-C', str(self.root), '-cf', str(partial / 'home.tar'), 'home'], check=True)
-        emulator('spine-save', partial / 'moto.pickle')
-        partial.rename(target)
+    def save(self, step: Path, key: str) -> None:
+        """The step's recorded state, committed beside it in `state/`: the home directory (working
+        copy, Terraform's files, the CLI's cache — not the venv, which `run` rebuilds) and everything
+        the emulator holds, as they are after the step."""
+        target = step / 'state'
+        shutil.rmtree(target, ignore_errors=True)
+        target.mkdir()
+        subprocess.run(['tar', '-C', str(self.root), '--exclude', f'home/{PROJECT}/.venv', '--sort=name', '--mtime=@0',
+                        '--owner=0', '--group=0', '--numeric-owner', '-czf', str(target / 'home.tar.gz'), 'home'], check=True)
+        raw = self.root / 'emulator.pickle'
+        emulator('spine-save', raw)
+        with open(raw, 'rb') as f, gzip.GzipFile(target / 'emulator.pickle.gz', 'wb', mtime=0) as out:
+            shutil.copyfileobj(f, out)
+        raw.unlink()
 
-    def restore(self, key: str, step: Path) -> None:
-        """The machine as it was after `step`, from its checkpoint."""
+    def restore(self, step: Path) -> None:
+        """The machine as it was after `step`, from its recorded state."""
         shutil.rmtree(self.home)
-        subprocess.run(['tar', '-C', str(self.root), '-xf', str(CHECKPOINTS / key / 'home.tar')], check=True)
-        emulator('spine-load', CHECKPOINTS / key / 'moto.pickle')
+        subprocess.run(['tar', '-C', str(self.root), '-xzf', str(step / 'state' / 'home.tar.gz')], check=True)
+        raw = self.root / 'emulator.pickle'
+        with gzip.open(step / 'state' / 'emulator.pickle.gz', 'rb') as f, open(raw, 'wb') as out:
+            shutil.copyfileobj(f, out)
+        emulator('spine-load', raw)
+        raw.unlink()
         self.files = files(step)
 
     def lay(self, step: Path) -> None:
@@ -522,8 +557,8 @@ def masked(text: str, step: Path) -> str:
 
 
 def main() -> int:
-    write = '--write' in sys.argv
-    fresh = '--fresh' in sys.argv
+    record = '--record' in sys.argv
+    replay = '--replay' in sys.argv
     only = [a for a in sys.argv[1:] if not a.startswith('--')]
     every = sorted(p.parent for p in ROOT.glob('*/*/session.txt'))
     asked = lambda s: not only or any(str(s.relative_to(ROOT)).startswith(o) for o in only)
@@ -533,35 +568,95 @@ def main() -> int:
     for problem in (p for s in every for p in lineage(s)):
         problems += 1
         print(f'✗ {problem}')
-    if problems and write:
-        print('✗ the chain is broken: fix step.json or the snapshots before rewriting transcripts')
+    if problems and (record or replay):
+        print('✗ the chain is broken: fix step.json or the snapshots first')
         return 1
     line = chain()
-    last = max((i for i, s in enumerate(line) if asked(s)), default=-1)
-    runs: list[tuple[Path, tuple[str, dict[str, str]]]] = []
-    if last >= 0:
-        # The chain up to the last step asked for, in order — from the newest checkpoint before the
-        # first step asked for, when one exists for exactly this chain (checkpoint_keys).
-        keys = checkpoint_keys(line)
-        first = min(i for i, s in enumerate(line) if asked(s))
-        start = 0 if fresh else next((j + 1 for j in range(first - 1, -1, -1) if (CHECKPOINTS / keys[j]).is_dir()), 0)
+    keys = dict(zip(line, state_keys(line)))
+    labs = [s for s in every if config_of(s).get('lab')]
+
+    if not (record or replay):
+        # THE CHECK: nothing runs. Every step was recorded once, by a real run; what is checked is
+        # that the record still belongs to the step (its key) and the transcript is the recording's.
+        for step in line + labs:
+            name, rec = step.relative_to(ROOT), recorded(step)
+            if not rec:
+                problems += 1
+                print(f'✗ {name}: not recorded — python3 scripts/spine.py --record {name}')
+            elif step in keys and rec.get('key') != keys[step]:
+                problems += 1
+                print(f'✗ {name}: stale — it, or a step before it, changed since it was recorded: --record {name}')
+            elif rec.get('transcript') != transcript_hash(step):
+                problems += 1
+                print(f'✗ {name}: session.txt or captured/ was edited by hand — only a recording writes them')
+        print(f"{'✗' if problems else '✓'} {len(line) + len(labs)} step(s): recorded, current, untouched — {problems} problem(s)")
+        return 1 if problems else 0
+
+    def write(step: Path, transcript: str, captured: dict[str, str]) -> None:
+        # A new run that differs from the transcript on file only where masked() says a run may (the
+        # order of concurrent progress lines, elapsed counters) leaves the file alone: no churn.
+        old = step / 'session.txt'
+        if not (old.exists() and masked(old.read_text(), step) == masked(transcript, step)):
+            old.write_text(transcript)
+        for file, text in captured.items():
+            target = step / 'captured' / file
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(text)
+
+    def stamp(step: Path, key: str | None) -> None:
+        (step / 'state').mkdir(exist_ok=True)
+        (step / 'state' / 'recorded.json').write_text(json.dumps(
+            {'key': key, 'transcript': transcript_hash(step), 'machine': machine_version()}, indent=1) + '\n')
+
+    targets = [i for i, s in enumerate(line) if asked(s)]
+    if record and targets:
+        # RECORD: run ONLY the steps asked for, each from its parent's recorded state — the
+        # chain before them is never re-run.
         machine = Machine(config_of(line[0]))
         try:
-            if start:
-                machine.restore(keys[start - 1], line[start - 1])
-                print(f'… from the checkpoint after {line[start - 1].relative_to(ROOT)}')
-            for i in range(start, last + 1):
-                step = line[i]
+            at = None  # the index of the step the machine is in the state of
+            for i in targets:
+                if at != i - 1 and i > 0:
+                    parent = line[i - 1]
+                    if recorded(parent).get('key') != keys[parent]:
+                        raise SystemExit(f'✗ {parent.relative_to(ROOT)} is not recorded as it is now: record it first')
+                    machine.restore(parent)
+                    print(f'… from the recorded state of {parent.relative_to(ROOT)}')
+                transcript, captured = machine.run(line[i])
+                write(line[i], transcript, captured)
+                machine.save(line[i], keys[line[i]])
+                stamp(line[i], keys[line[i]])
+                at = i
+                print(f'recorded {line[i].relative_to(ROOT)}')
+        finally:
+            machine.close()
+        stale = [s for s in line[targets[-1] + 1:] if recorded(s).get('key') != keys[s]]
+        if stale:
+            print(f'… now stale, downstream: {", ".join(str(s.relative_to(ROOT)) for s in stale)}')
+    if record:
+        for lab in (s for s in labs if asked(s)):
+            machine = Machine(config_of(lab))
+            try:
+                write(lab, *machine.run(lab))
+                stamp(lab, None)
+                print(f'recorded {lab.relative_to(ROOT)}')
+            finally:
+                machine.close()
+        return 0
+
+    # REPLAY (deliberate: after upgrading moto, Terraform, the CLI or the patch layer): run the
+    # chain from the start and every lab, and compare with what was recorded.
+    runs: list[tuple[Path, tuple[str, dict[str, str]]]] = []
+    if targets:
+        machine = Machine(config_of(line[0]))
+        try:
+            for step in line[:targets[-1] + 1]:
                 result = machine.run(step)
-                machine.save(keys[i])
                 if asked(step):
                     runs.append((step, result))
         finally:
             machine.close()
-        for stale in CHECKPOINTS.glob('*'):  # checkpoints of a chain that no longer exists
-            if stale.name not in keys and not stale.name.startswith('.'):
-                shutil.rmtree(stale)
-    for lab in (s for s in every if config_of(s).get('lab') and asked(s)):
+    for lab in (s for s in labs if asked(s)):
         machine = Machine(config_of(lab))
         try:
             runs.append((lab, machine.run(lab)))
@@ -569,14 +664,6 @@ def main() -> int:
             machine.close()
     for step, (transcript, captured) in runs:
         name = step.relative_to(ROOT)
-        if write:
-            (step / 'session.txt').write_text(transcript)
-            for file, text in captured.items():
-                target = step / 'captured' / file
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_text(text)
-            print(f'wrote {name}')
-            continue
         expected = (step / 'session.txt').read_text()
         if masked(transcript, step) != masked(expected, step):
             problems += 1
@@ -586,8 +673,7 @@ def main() -> int:
             if (step / 'captured' / file).read_text() != text:
                 problems += 1
                 print(f'✗ {name}: captured/{file} differs from a real run')
-    if not write:
-        print(f"{'✗' if problems else '✓'} {len(runs)} spine step(s) replayed, {problems} problem(s)")
+    print(f"{'✗' if problems else '✓'} {len(runs)} spine step(s) replayed, {problems} problem(s)")
     return 1 if problems else 0
 
 

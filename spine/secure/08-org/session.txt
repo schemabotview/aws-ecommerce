@@ -140,12 +140,12 @@ aws_organizations_organization.org: Creating...
 aws_organizations_organization.org: Creation complete after 0s [id=o-ri57qxlq5e]
 aws_organizations_policy.london_only: Creating...
 aws_organizations_policy.london_only: Creation complete after 0s [id=p-dnlb4ltl]
-aws_organizations_organizational_unit.security: Creating...
-aws_organizations_organizational_unit.security: Creation complete after 0s [id=o
-u-2j32-o9l8lpva]
 aws_organizations_organizational_unit.workloads: Creating...
 aws_organizations_organizational_unit.workloads: Creation complete after 0s [id=
 ou-2j32-cackdsws]
+aws_organizations_organizational_unit.security: Creating...
+aws_organizations_organizational_unit.security: Creation complete after 0s [id=o
+u-2j32-o9l8lpva]
 aws_organizations_policy_attachment.workloads: Creating...
 aws_organizations_policy_attachment.workloads: Creation complete after 0s [id=ou
 -2j32-cackdsws:p-dnlb4ltl]
@@ -166,8 +166,8 @@ $ ROOT=$(terraform output -raw root_id)
 $ aws organizations list-organizational-units-for-parent --parent-id "$ROOT" \
 >   --query 'OrganizationalUnits[].Name'
 [
-    "Security",
-    "Workloads"
+    "Workloads",
+    "Security"
 ]
 $ WORKLOADS=$(terraform output -raw workloads_id)
 $ aws organizations list-policies-for-target --target-id "$WORKLOADS" \

@@ -326,6 +326,10 @@ python-expense-tracker, with its rules: every step has exactly one of `first`, `
   state, `.terraform/` and lock file. No hidden re-apply, no setup lists. The chain is a line (a
   failure and its fix are two consecutive steps). `setup` is only for what happens off screen
   between two sections (a colleague's console click). Labs run alone.
+- **new — recorded once, never replayed.** A step runs once, when it is authored, from its
+  parent's recorded state; the machine's state after it is committed beside it (`state/`), so the
+  next section starts from it without re-running anything before it. The check runs nothing: it
+  proves each record still belongs to its step and each transcript is the recording's.
 
 Terraform-specific replay rules, proven by the spike (`SPIKE.md` §1, §4):
 

@@ -39,6 +39,9 @@ When a pinned moto release has one, delete it here: the matrix is the test.
   cf-cache        CloudFront cache policies (Create / Get / GetConfig / Update / Delete / List); and a
                   distribution no longer reports ForwardedValues it was never given (a cache policy
                   replaces them) or an SSLSupportMethod for the default certificate.
+  org-not-in-use  CreatePolicy before the organization exists: AWS answers 400
+                  AWSOrganizationsNotInUseException; moto crashed (500), which the provider retries 25
+                  times with back-off — a "hang" of minutes, one run in five (the walk order decides).
 
 And two things that are not fixes but the REPLAY's own machinery, said here so nobody mistakes them
 for AWS behaviour:
@@ -629,6 +632,21 @@ def _cloudfront_cache_policies():
             self.ssl_support_method = None
     models.DefaultCacheBehaviour.__init__ = behaviour_init
     models.ViewerCertificate.__init__ = certificate_init
+
+
+# ── org-not-in-use ───────────────────────────────────────────────────────────────────────────────
+
+@patch('org-not-in-use')
+def _org_not_in_use():
+    from moto.organizations.exceptions import AWSOrganizationsNotInUseException
+    from moto.organizations.models import OrganizationsBackend
+    original = OrganizationsBackend.create_policy
+
+    def create_policy(self, **kwargs):
+        if self.org is None:
+            raise AWSOrganizationsNotInUseException
+        return original(self, **kwargs)
+    OrganizationsBackend.create_policy = create_policy
 
 
 # ── developer-key ────────────────────────────────────────────────────────────────────────────────

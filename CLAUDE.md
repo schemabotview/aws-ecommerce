@@ -32,8 +32,9 @@ a lockfile (`package-lock.json` is gitignored for exactly this reason — remove
 npm run dev                      # the app, :5173
 npx tsc --noEmit && npm run build
 npm run check                    # check-content + check-render (every section at 3840×2160)
-npm run check:spine              # replay the chain and the labs; --write to rewrite transcripts
-npm run check:spine -- network/06   # one step: resumes from the checkpoint before it (seconds)
+npm run check:spine              # every step recorded, current, untouched — runs NOTHING (< 1 s)
+python3 scripts/spine.py --record network/06   # record a step: runs ONLY it, from its parent's state
+python3 scripts/spine.py --replay  # deliberate, after a tool upgrade: the whole chain from the start
 npm run shots -- <slug-prefix>   # 4K PNGs in out/shots/ — then LOOK
 python3 spike/terraform-on-moto/matrix.py [case…]   # Terraform × moto support matrix
 ```
@@ -54,13 +55,16 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 - **The chain is a line.** A failure and its fix are two consecutive steps.
 - **`changes` is the section's diff**, checked both ways; `[]` is a section that only looks. A file a
   step's session writes and captures (the lock file) may appear in the next step undeclared.
-- Checking one step resumes from the **checkpoint** after the step before it, when one exists:
-  every chain step saves the machine (home, working copy, Terraform's files) and everything the
-  emulator holds (`.spine-cache/checkpoints/`). A checkpoint's key hashes the replay's own scripts
-  and every step up to it (step.json, files, typed commands — not output), so editing a step, an
-  earlier one, or `scripts/` makes the later ones unreachable and they are re-run. The full,
-  unfiltered check runs from scratch and is the gate; `--fresh` ignores checkpoints anywhere.
-  One replay at a time (port 5000, a machine lock).
+- **Recorded once, never replayed.** `--record` runs a step ONCE, from its parent's recorded state,
+  and commits the machine's state after it in `state/` (home.tar.gz: working copy and Terraform's
+  files; emulator.pickle.gz: everything moto holds; recorded.json: the step's key and the hash of the
+  transcript it wrote). The check runs nothing: a key that no longer matches means the step or one
+  before it was edited (re-record it and everything after it, in order); a transcript that no longer
+  matches its hash was edited by hand. The key hashes the steps (step.json, files, typed commands),
+  NOT `scripts/`, so improving the machine forces no re-record. A re-record that differs from the
+  file only where `masked()` allows leaves the file alone. `--replay` re-runs everything from scratch
+  and compares: use it after upgrading moto, Terraform, the CLI or the patch layer, not to author.
+  One recording at a time (port 5000, a machine lock).
 - Every terminal is 80 columns: `spine.py` wraps at 80, `ide.ts` draws 80.
 
 ## The machine (all in `scripts/`, all in SPIKE.md)
@@ -88,9 +92,14 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   moto_server.py — the replay's machinery, not a fix). So the app's role sessions are really refused
   and allowed; alex is not held to a trust policy (§4.3 says so). moto evaluates identity policies
   only: resource policies, conditions, SCPs and other accounts are doc-cited, and the frame says so.
-- A checkpoint pickles every moto backend in one go; what cannot travel (locks, `cryptography`
+- A recorded state pickles every moto backend in one go; what cannot travel (locks, `cryptography`
   keys and certificates) has a reducer in `_Pickler`. A new service that will not pickle fails the
   save with its traceback.
+- **A Terraform "hang" is usually moto answering 500**, which the provider retries 25 times with
+  back-off. Find the call with `TF_LOG=DEBUG`, moto's traceback by sending its stderr to a file, and
+  check the CONFIG first: the org lab's policy had no dependency on the organization, a race that
+  fails on AWS too (`org-not-in-use` now answers as AWS does). A stopped recording kills what it left
+  running (`leftovers()`); orphaned providers once made runs 3–4× slower.
 
 ## Frames
 

@@ -43,6 +43,9 @@ resource "aws_organizations_organizational_unit" "env" {
 resource "aws_organizations_policy" "london_only" {
   name = "LondonOnly"
   type = "SERVICE_CONTROL_POLICY"
+  # Nothing here names the organization, so without this Terraform may
+  # create the policy first — and AWS refuses: no organization yet.
+  depends_on = [aws_organizations_organization.org]
   content = jsonencode({
     Version = "2012-10-17"
     Statement = [{
