@@ -1,6 +1,6 @@
 # Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–8 (see `CLAUDE.md`, Status).
+**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–9 (see `CLAUDE.md`, Status).
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
@@ -252,14 +252,14 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | Modules | refactor into `modules/`; `moved` blocks; plan: 0 to change | the root → modules graph; addresses before and after |
-| 2 | Two environments, two accounts | `envs/dev`, `envs/prod`, tfvars | one module set → two accounts, two states |
-| 3 | ◆ full scene: a delivery pipeline | concept | commit → test → build image → plan on PR → review → apply dev → apply prod |
-| 4 | A role for the pipeline | GitHub OIDC provider and role | GitHub → OIDC token → STS → role, no stored key |
-| 5 | Checks before apply | `.github/workflows/` (actionlint), tflint, plan in the PR | the gate: what blocks a merge |
-| 6 | Drift and import | a hand-made change; `import` block | config ≠ state ≠ real, reconciled |
-| 7 | Replacement and protecting state | a forced replacement; `prevent_destroy`, `create_before_destroy` | the replace sequence, both orders |
-| 8 | ◆ full scene: releasing a new version | concept + lab (failed requests at 2%) | all-at-once / rolling / blue-green / canary on one time axis |
+| 1 | Modules | Course 5's network → `modules/network` (inputs name, cidr); a `moved` block per resource; plan 0 / 0 / 0, 27 moved | the root → module graph; addresses before and after |
+| 2 | Two environments, two accounts | `envs/prod/state` (prod's state bucket, local state), `envs/prod` calls the same module with 10.40.0.0/16 in 111122223333 through OrganizationAccountAccessRole; each account's VPC read back | one module → two roots, two accounts, two states |
+| 3 | ◆ full scene: a delivery pipeline | concept | pull request (commit → check → plan → review) → merge (apply dev → approve → apply prod); what each stage proves or blocks |
+| 4 | A role for the pipeline | `modules/pipeline`: GitHub's OIDC provider + `BookShopPipeline` in both accounts; prod trusts only `environment:production`; trust read back (stored, tokens not checked: doc-cited) | job → OIDC token → STS → role, no stored key |
+| 5 | Checks before apply | `.github/workflows/infra.yml` (check, plan-dev, apply-dev, apply-prod behind the `production` environment), `tools/jobs.py`; fmt / validate / plan -detailed-exitcode run locally; a scratch file fails fmt (exit 3). Not run on GitHub | the gate as the workflow declares it; what each check answered |
+| 6 | Drift and import | sam (off screen) sets fulfilment's visibility to 60 s and makes `book-shop-returns` by hand; plan puts 60 → 30 back; `import` block adopts the queue (max size 1 MiB → 256 KiB, the provider's default, narrated) | account → refresh → state → compare → code → apply; what was found |
+| 7 | Replacement and protecting state | loyalty → `book-shop-points`: queue, policy and subscription replaced with `create_before_destroy` (+ `depends_on` the policy); `prevent_destroy` on the orders DB refuses `plan -replace` | -/+ against +/-; the order the apply really ran in |
+| 8 | ◆ full scene: releasing a new version | lab `release_model.py` (2% failures, 2 min alarm, 420 req/s): all at once 1008, rolling 216, canary 101 | the four strategies; failed requests on one time axis |
 
 **10. `report` · Report on sales · 6**
 

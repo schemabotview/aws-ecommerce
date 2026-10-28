@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict sXJbn4aq0KivZtSHFh8RzPbigobBIwJhWPDkGb4z2vcMvQfpCIn2nhEFXsMv1Ew
+\restrict JwZHeGwQr2LqiktetYcslNPzSTq1oogWwN9OAg2jrKfVcYw4GIs0CQCxXtgHCY2
 
 -- Dumped from database version 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)
@@ -177,5 +177,5 @@ ALTER TABLE ONLY public.order_lines
 -- PostgreSQL database dump complete
 --
 
-\unrestrict sXJbn4aq0KivZtSHFh8RzPbigobBIwJhWPDkGb4z2vcMvQfpCIn2nhEFXsMv1Ew
+\unrestrict JwZHeGwQr2LqiktetYcslNPzSTq1oogWwN9OAg2jrKfVcYw4GIs0CQCxXtgHCY2
 

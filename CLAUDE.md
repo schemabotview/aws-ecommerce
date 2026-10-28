@@ -17,13 +17,13 @@ Engine `@graphlearning/graphl-flow` ^0.6.0, shell `@graphlearning/shell` ^1.0.4.
 ## Status
 
 Authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections), Course 4 `secure`
-(8), Course 5 `network` (10), Course 6 `run` (9), Course 7 `data` (9) and Course 8 `decouple` (9),
-one chain: `start/02` → … → `secure/07` → `network/02` → … → `run/08` → `data/02` → … → `data/08` →
-`decouple/02` → … → `decouple/08`. No narration audio yet.
+(8), Course 5 `network` (10), Course 6 `run` (9), Course 7 `data` (9), Course 8 `decouple` (9) and
+Course 9 `deliver` (8), one chain: `start/02` → … → `secure/07` → `network/02` → … → `run/08` →
+`data/02` → … → `data/08` → `decouple/02` → … → `decouple/08` → `deliver/02` → … → `deliver/07`
+(`deliver/08` is a lab). No narration audio yet.
 
-**graphl-flow 0.6.0 is not on npm yet** (branch `claude/pensive-johnson-ixdglh` of graphl-flow: AWS
-icons, `dashed` groups, `muted` items, `hcl`, folded terminals). Until it is published: build it
-(`npm pack` there), install that tarball into `node_modules` here without saving, and do not commit
+**graphl-flow 0.6.0 is on graphl-flow's `main` but not yet on npm** (AWS icons, `dashed` groups,
+`muted` items, `hcl`, folded terminals). Until it is published: build it (`npm pack` there), install that tarball into `node_modules` here without saving, and do not commit
 a lockfile (`package-lock.json` is gitignored for exactly this reason — remove that line when
 0.6.0 is published, and commit the lockfile).
 
@@ -85,6 +85,15 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   and state machines; `no-poller` stops moto invoking a function (in Docker) inside SendMessage.
   `tools/poll.py` plays the SQS poller and `tools/run_workflow.py` walks the ASL, each with the real
   handler code, and every frame that uses them says so.
+- Course 9's patches (all in moto_server.py's docstring): `accounts` (a role session acts in its
+  role's account, as on AWS — before it, §9.2's production still acted in development),
+  `sqs-keep-policy` (SetQueueAttributes changes only the attributes it names; moto cleared the
+  queue's Policy, so sam's console click in §9.6 removed the topic's permission to send); sessions of
+  OrganizationAccountAccessRole are not evaluated, like the developer key.
+- **A fresh machine's plugin cache is filled from the verified provider zip** (`toolchain.terraform()`):
+  a restored working copy's `.terraform/providers` links into the cache, and an empty cache made every
+  Terraform command in a restored step fail ("Required plugins are not installed") while the step
+  still recorded. Read a fresh recording before trusting it.
 - `TF_IN_AUTOMATION` is never set: it rewords Terraform's hints, and a learner's terminal lacks it.
 - Ids are seeded from a request's CANONICAL content: idempotency tokens dropped and tags sorted by
   key, because the provider sends a tag map in Go's random order (a seed that saw the order gave
@@ -168,6 +177,12 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 | workflow | `book-shop-checkout`: ReserveStock → ChargePayment (retry PaymentTimeout 2 s × 2.0, max 2; catch all → ReleaseStock → OrderFailed) → ShipOrder; functions book-shop-reserve/charge/ship/release (role BookShopCheckoutSteps), state machine role BookShopCheckoutFlow; order 10 times out twice then pays at 6 s, order 11 declined |
 | idempotency | table `book-shop-idempotency` (key, TTL `expires` 7 d), key `fulfil#<order>`; order 12 sent twice |
 | clock | 2026-11-02 09:30:00 UTC (the spine's default) |
+| modules | `infra/modules/network` (inputs `name`, `cidr`; 27 resources moved, plan 0 / 0 / 0), `infra/modules/pipeline` |
+| production | account 111122223333, root `infra/envs/prod`, VPC 10.40.0.0/16, state `book-shop-tfstate-111122223333` (made by `infra/envs/prod/state`, local state), reached through OrganizationAccountAccessRole (profile `book-shop-prod-admin`; sessions not evaluated) |
+| pipeline | repository `book-shop-example/book-shop`; GitHub OIDC provider `token.actions.githubusercontent.com` (audience `sts.amazonaws.com`) and role **BookShopPipeline** in both accounts: dev trusts `main` and pull requests, prod only `environment:production`; permissions: the shop's services and roles named `BookShop*`; `.github/workflows/infra.yml` jobs check, plan-dev, apply-dev, apply-prod (environment `production`); not run on GitHub |
+| drift | sam (off screen): fulfilment visibility 30 → 60 s, `book-shop-returns` made by hand (4 d); the plan puts 30 back and imports returns (max size 1 MiB → 256 KiB) |
+| replacement | `book-shop-loyalty` → `book-shop-points`: queue, queue policy and subscription `create_before_destroy`, the subscription `depends_on` the policy; orders DB `prevent_destroy` (`plan -replace` refused) |
+| release model | 1.2.0 fails 2% of requests, alarm after 2 min, 420 req/s: failed requests all at once 1008, rolling (1 task of 7 a minute) 216, canary (10%) 101 — a model, labelled |
 
 Extend this table; never change a value a frame already quotes.
 

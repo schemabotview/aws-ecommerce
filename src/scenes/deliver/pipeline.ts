@@ -41,7 +41,7 @@ export const deliverPipeline: SceneModel = {
     { from: 'commit', to: 'check' },
     { from: 'check', to: 'plan' },
     { from: 'plan', to: 'review' },
-    { from: 'review', to: 'merge' },
+    { from: 'pr', to: 'main', label: 'approved, merged' },
     { from: 'merge', to: 'dev' },
     { from: 'dev', to: 'approve' },
     { from: 'approve', to: 'prod' },

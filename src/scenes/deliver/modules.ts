@@ -15,10 +15,10 @@ const plan = session.split('\n').find((l) => l.startsWith('Plan: ')) ?? ''
 export const deliverModules: SceneModel = ideFrame({
   tree: deliverTree(2, { active: 'infra/network.tf', fresh: ['infra/network.tf', 'infra/modules/network/main.tf',
     'infra/modules/network/variables.tf', 'infra/modules/network/outputs.tf'] }),
-  editor: { file: 'infra/network.tf', code, show: [[1, lineOf(code, 'to   = module.network.aws_subnet.this') + 1]],
+  editor: { file: 'infra/network.tf', code, show: [[1, lineOf(code, '}')], [lineOf(code, '# The resources moved'), lineOf(code, 'to   = module.network.aws_subnet.this') + 1]],
     highlight: [lineOf(code, 'module "network" {'), lineOf(code, 'from = aws_vpc.shop'), lineOf(code, 'to   = module.network.aws_vpc.this')] },
   session,
-  keep: [['Initializing modules...', '- network in modules/network'], '# aws_vpc.shop has moved to', ['Plan: ', 'Plan: ']],
+  keep: [['Initializing modules...', '- network in modules/network'], '# aws_vpc.shop has moved to', 'Plan: '],
   side: [
     {
       type: 'group', id: 'graph', title: 'The root, and the module it calls', tone: 'source', children: [

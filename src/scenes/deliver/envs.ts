@@ -43,6 +43,7 @@ export const deliverEnvs: SceneModel = ideFrame({
         ['the code', 'modules/network', 'modules/network'],
         ['inputs', 'cidr 10.20.0.0/16', 'cidr 10.40.0.0/16'],
         ['account, state', '4444…, its bucket', '1111…, its bucket'],
+        ['reached through', 'BookShopDeveloper', 'OrganizationAccountAccessRole'],
         ['a mistake reaches', 'dev only', 'prod only'],
       ],
     },
