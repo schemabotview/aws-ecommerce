@@ -1,11 +1,12 @@
 import { start } from './start'
+import { secure } from './secure'
 import { network } from './network'
 import type { Course, Section } from './types'
 
 // Course registry, in syllabus order (COURSE-PLAN.md). A course is registered once it is authored.
-// The pilot: Course 3 (`start`) whole, and Course 5's first section (`network`), a full-scene detour.
 export const COURSES: Record<string, Course> = {
   [start.id]: start,
+  [secure.id]: secure,
   [network.id]: network,
 }
 

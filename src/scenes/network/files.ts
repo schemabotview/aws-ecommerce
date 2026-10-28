@@ -1,10 +1,10 @@
 import type { TreeEntry } from '@graphlearning/graphl-flow'
 import { projectTree, type TreeOptions } from '../tree'
+import { SECURE_FILES } from '../secure/files'
 
-// The project through Course 5: what each step adds to what Course 3 left. Mirrors the spine's
+// The project through Course 5: what each step adds to what Course 4 left. Mirrors the spine's
 // `changes` (spine/network/*/step.json); check-render would not notice a drift here, so keep both.
-const BASE = ['.gitignore', 'aws-config', 'env.sh', 'infra/.terraform.lock.hcl', 'infra/backend.tf', 'infra/bootstrap/',
-  'infra/budget.tf', 'infra/providers.tf', 'infra/s3.tf']
+const BASE = SECURE_FILES
 const ADDS: Record<number, string[]> = {
   2: ['infra/network.tf'],
   3: ['infra/routes.tf', 'tools/which_route.py'],
@@ -20,5 +20,5 @@ export function netTree(n: number, { active, fresh }: Pick<TreeOptions, 'active'
   const paths = [...BASE, ...Object.entries(ADDS).filter(([k]) => +k <= n).flatMap(([, v]) => v)]
   const made: Record<string, string | undefined> = { 'infra/.terraform/': undefined, 'infra/terraform.tfstate': 'moved to S3', 'infra/tfplan': undefined }
   if (n >= 3) made['.venv/'] = 'boto3, for tools/'
-  return projectTree(paths, { active, fresh, made, closed: ['infra/bootstrap'] })
+  return projectTree(paths, { active, fresh, made, closed: ['infra/bootstrap', 'data'] })
 }

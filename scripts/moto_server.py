@@ -39,13 +39,28 @@ When a pinned moto release has one, delete it here: the matrix is the test.
   cf-cache        CloudFront cache policies (Create / Get / GetConfig / Update / Delete / List); and a
                   distribution no longer reports ForwardedValues it was never given (a cache policy
                   replaces them) or an SSLSupportMethod for the default certificate.
+
+And two things that are not fixes but the REPLAY's own machinery, said here so nobody mistakes them
+for AWS behaviour:
+
+  developer-key   With IAM enforcement on (`"enforce_iam"`, Course 4 on), a request signed with
+                  env.sh's key — alex's — is not evaluated: it stands for alex's BookShopDeveloper
+                  session, which may do anything in dev, and moto knows no such user (it would refuse
+                  the key). Every OTHER principal — the app's role sessions above all — is evaluated
+                  by moto, identity policies only (no resource policies, conditions or SCPs). One
+                  consequence a frame must say: alex's AssumeRole is not checked against the trust
+                  policy, so alex can stand in for ECS here, which AWS would refuse.
+  checkpoints     /moto-api/spine-save and /spine-load write and read everything the emulator holds,
+                  so scripts/spine.py can resume the chain after any step (see `save`).
 """
 import hashlib
 import io
 import os
+import pickle
 import json
 import re
 import threading
+import traceback
 from collections import Counter
 import sys
 from datetime import datetime, timezone
@@ -199,6 +214,14 @@ class ContentSeed:
                 if path == '/moto-api/seed':
                     self.base = int(re.search(r'a=(\d+)', environ.get('QUERY_STRING', '')).group(1))
                     self.seen.clear()
+                if path in ('/moto-api/spine-save', '/moto-api/spine-load'):
+                    try:
+                        (save if path.endswith('save') else load)(self, raw.decode())
+                    except Exception:  # the replay prints this: which backend would not travel, and why
+                        start_response('500 Internal Server Error', [('Content-Type', 'text/plain')])
+                        return [traceback.format_exc().encode()]
+                    start_response('200 OK', [('Content-Type', 'text/plain')])
+                    return [b'ok']
                 return self.app(environ, start_response)
             query = '&'.join(sorted(q for q in environ.get('QUERY_STRING', '').split('&') if q.split('=')[0] not in _TOKENS))
             key = b'\0'.join([environ['REQUEST_METHOD'].encode(), environ.get('HTTP_HOST', '').encode(), path.encode(),
@@ -210,6 +233,88 @@ class ContentSeed:
                     log.write(digest[:12].encode() + b' ' + key.replace(b'\0', b' | ')[:600] + b'\n')
             mock_random.seed(f'{self.base}:{digest}:{self.seen[digest]}')
             return list(self.app(environ, start_response))
+
+
+# ── checkpoints ──────────────────────────────────────────────────────────────────────────────────
+
+class _Pickler(pickle.Pickler):
+    """What in a backend cannot travel as it is: a lock (it travels as a new, free lock), and
+    `cryptography`'s keys and certificates (ACM's), which travel as PEM and are loaded back."""
+
+    def reducer_override(self, obj):
+        from cryptography import x509
+        from cryptography.hazmat.primitives import serialization as ser
+        from cryptography.hazmat.primitives.asymmetric import types
+        if isinstance(obj, _LOCKS):
+            return type(obj) if isinstance(obj, threading.Condition) else _new_lock(obj), ()
+        if isinstance(obj, types.PrivateKeyTypes.__args__):
+            pem = obj.private_bytes(ser.Encoding.PEM, ser.PrivateFormat.PKCS8, ser.NoEncryption())
+            return _private_key, (pem,)
+        if isinstance(obj, types.PublicKeyTypes.__args__):
+            return _public_key, (obj.public_bytes(ser.Encoding.PEM, ser.PublicFormat.SubjectPublicKeyInfo),)
+        if isinstance(obj, x509.Certificate):
+            return _certificate, (obj.public_bytes(ser.Encoding.PEM),)
+        return NotImplemented
+
+
+_LOCKS = (type(threading.Lock()), type(threading.RLock()), threading.Condition)
+
+
+# Loaders by name: cryptography's own are Rust builtins pickle cannot name.
+def _private_key(pem: bytes):
+    from cryptography.hazmat.primitives.serialization import load_pem_private_key
+    return load_pem_private_key(pem, None)
+
+
+def _public_key(pem: bytes):
+    from cryptography.hazmat.primitives.serialization import load_pem_public_key
+    return load_pem_public_key(pem)
+
+
+def _certificate(pem: bytes):
+    from cryptography.x509 import load_pem_x509_certificate
+    return load_pem_x509_certificate(pem)
+
+
+def _new_lock(lock):
+    return threading.RLock if isinstance(lock, type(threading.RLock())) else threading.Lock
+
+
+def save(seed: 'ContentSeed', target: str) -> None:
+    """Everything the emulator knows, to a file: every backend in use (in ONE pickle, so objects one
+    service holds of another's stay shared), the seeding state and IAM enforcement's counters."""
+    from moto import settings
+    from moto.core.base_backend import BackendDict
+    from moto.core.responses import ActionAuthenticatorMixin
+    state = {
+        'backends': [(bd.backend.__module__, bd.backend.__qualname__, dict(bd)) for bd in BackendDict._instances],
+        'seen': seed.seen, 'base': seed.base, 'random': mock_random.getstate(),
+        'auth': (settings.INITIAL_NO_AUTH_ACTION_COUNT, ActionAuthenticatorMixin.request_count),
+    }
+    with open(target, 'wb') as out:
+        _Pickler(out, protocol=pickle.HIGHEST_PROTOCOL).dump(state)
+
+
+def load(seed: 'ContentSeed', target: str) -> None:
+    """The emulator as `save` left it. Each service's module-level BackendDict is refilled IN PLACE —
+    moto's handlers reach it by that one object."""
+    import importlib
+    from moto import settings
+    from moto.core.base_backend import BackendDict
+    from moto.core.responses import ActionAuthenticatorMixin
+    with open(target, 'rb') as f:
+        state = pickle.load(f)
+    BackendDict.reset()
+    for module, qualname, accounts in state['backends']:
+        owner = vars(importlib.import_module(module))
+        found = [v for v in owner.values() if isinstance(v, BackendDict) and v.backend.__qualname__ == qualname]
+        if len(found) != 1:
+            raise RuntimeError(f'checkpoint: no single BackendDict for {module}.{qualname}')
+        found[0].update(accounts)
+        BackendDict._instances.append(found[0])
+    seed.seen, seed.base = state['seen'], state['base']
+    mock_random.setstate(state['random'])
+    settings.INITIAL_NO_AUTH_ACTION_COUNT, ActionAuthenticatorMixin.request_count = state['auth']
 
 
 # ── s3-create-tags ───────────────────────────────────────────────────────────────────────────────
@@ -524,6 +629,23 @@ def _cloudfront_cache_policies():
             self.ssl_support_method = None
     models.DefaultCacheBehaviour.__init__ = behaviour_init
     models.ViewerCertificate.__init__ = certificate_init
+
+
+# ── developer-key ────────────────────────────────────────────────────────────────────────────────
+
+DEVELOPER_KEY = 'AKIAIOSFODNN7EXAMPLE'  # env.sh's — the AWS documentation's example key
+
+
+@patch('developer-key')
+def _developer_key():
+    from moto.core.authorization import ActionAuthenticatorMixin
+    original = ActionAuthenticatorMixin._authenticate_and_authorize_action
+
+    def authorize(self, iam_request_cls, resource='*'):
+        if f'Credential={DEVELOPER_KEY}/' in (self.headers.get('Authorization') or ''):
+            return None
+        return original(self, iam_request_cls, resource)
+    ActionAuthenticatorMixin._authenticate_and_authorize_action = authorize
 
 
 # ── the server ───────────────────────────────────────────────────────────────────────────────────

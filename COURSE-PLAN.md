@@ -1,6 +1,6 @@
 # Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** No course content is authored yet.
+**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3, 4 and 5 (see `CLAUDE.md`, Status).
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
@@ -182,14 +182,14 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | Principals and authentication | users, roles, federated sessions | who can make a request, and how each proves it |
-| 2 | A role for the app | `iam.tf`: `ShopApp` role, trust policy | trust policy (who may assume) vs permissions policy (what it may do): two arrows |
-| 3 | Assuming the role | `sts assume-role` (emulated) | app → STS → temporary credentials → S3 |
-| 4 | Policy statements | `aws_iam_policy_document`: read the catalog | a statement: effect, action, resource, condition |
-| 5 | ◆ full scene: how IAM decides | concept + lab (the denied request under enforcement) | the canonical evaluation flowchart, explicit deny → SCP → resource → identity → session → implicit deny, the lab's path lit |
-| 6 | A request denied, and fixed | moto with IAM enforcement: `AccessDenied`, then allowed | the evaluation path for this request, the failing step lit |
-| 7 | Resource policies and a second account | bucket policy for an auditor in another account | two accounts; both sides must allow |
-| 8 | ◆ full scene: an organization and its guardrails | `aws_organizations_*` (plan; SCPs doc-cited) | the org tree: root, OUs Security / Workloads / Prod / Dev, an SCP on an OU |
+| 1 | Principals and authentication | concept | principals → what each signs with (long-term AKIA / temporary ASIA + token) → authentication → authorization; long-term against temporary |
+| 2 | A role for the app | `infra/iam.tf`: role `BookShopApp`, trust `ecs-tasks.amazonaws.com`; `get-role`, no permissions | trust policy (who may assume) vs permissions policy (what it may do): two arrows |
+| 3 | Assuming the role | IAM enforced from here; `data/books/bk-1001.json` uploaded; `sts assume-role`; `tools/as-app.sh`: GetObject → AccessDenied | caller → STS → temporary credentials → S3, refused; same read, two principals |
+| 4 | Policy statements | `aws_iam_policy_document` ReadBooks (GetObject `books/*`); the read works, a read outside books/ and a write are refused | a statement: effect, action, resource, condition; does it match? |
+| 5 | ◆ full scene: how IAM decides | lab `decide.py` under enforcement: allowed / explicit deny (NoDrafts) / implicit deny (PutObject) | the canonical evaluation flowchart; where each request stopped |
+| 6 | A request denied, and fixed | `s3 ls books/` → AccessDenied; + ListBooks (ListBucket on the BUCKET's ARN); plan, apply, listed | what IAM compared: ReadBooks no match, ListBooks match; what each S3 action acts on |
+| 7 | Resource policies and a second account | bucket policy AuditorReads for `Auditor` in 777788889999 (stored, not evaluated: doc-cited) | two accounts; both sides must allow |
+| 8 | ◆ full scene: an organization and its guardrails | lab: `org/main.tf` applied from the management account: OUs, SCP LondonOnly on Workloads (stored, not enforced) | the org tree, the SCP's reach; an SCP is a ceiling, not a grant |
 
 **5. `network` · Give it a network · 10**
 

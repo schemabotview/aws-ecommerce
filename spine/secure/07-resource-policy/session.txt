@@ -1,0 +1,89 @@
+$ cd infra
+$ terraform plan -out=tfplan
+data.aws_iam_policy_document.app_trust: Reading...
+data.aws_iam_policy_document.app_trust: Read complete after 0s [id=1077804475]
+aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
+ly]
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
+aws_iam_role.app: Refreshing state... [id=BookShopApp]
+data.aws_iam_policy_document.catalog: Reading...
+data.aws_iam_policy_document.catalog: Read complete after 0s [id=3396613952]
+data.aws_iam_policy_document.app: Reading...
+data.aws_iam_policy_document.app: Read complete after 0s [id=2842283945]
+aws_iam_role_policy.app: Refreshing state... [id=BookShopApp:book-shop-app]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_s3_bucket_policy.catalog will be created
+  + resource "aws_s3_bucket_policy" "catalog" {
+      + bucket = "book-shop-catalog-444455556666"
+      + id     = (known after apply)
+      + policy = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = [
+                          + "s3:ListBucket",
+                          + "s3:GetObject",
+                        ]
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + AWS = "arn:aws:iam::777788889999:role/Auditor"
+                        }
+                      + Resource  = [
+                          + "arn:aws:s3:::book-shop-catalog-444455556666/*",
+                          + "arn:aws:s3:::book-shop-catalog-444455556666",
+                        ]
+                      + Sid       = "AuditorReads"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + region = "eu-west-2"
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+$ terraform apply tfplan
+aws_s3_bucket_policy.catalog: Creating...
+aws_s3_bucket_policy.catalog: Creation complete after 0s [id=book-shop-catalog-4
+44455556666]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+app_role_arn = "arn:aws:iam::444455556666:role/BookShopApp"
+$ aws s3api get-bucket-policy --bucket book-shop-catalog-444455556666 \
+>   --query Policy --output text | python -m json.tool
+{
+    "Statement": [
+        {
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetObject"
+            ],
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::777788889999:role/Auditor"
+            },
+            "Resource": [
+                "arn:aws:s3:::book-shop-catalog-444455556666/*",
+                "arn:aws:s3:::book-shop-catalog-444455556666"
+            ],
+            "Sid": "AuditorReads"
+        }
+    ],
+    "Version": "2012-10-17"
+}

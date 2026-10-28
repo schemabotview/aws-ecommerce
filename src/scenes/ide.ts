@@ -36,7 +36,8 @@ export const trim = (text: string) => text.replace(/\n+$/, '')
 /**
  * A spine session.txt as terminal rows. graphl-flow draws `$ cmd` as a command and `! text` as an
  * error. The replay writes plain output (already wrapped at 80 columns), so errors are marked here:
- * the AWS CLI's `aws: [ERROR]: …` (with the rows it wrapped onto), Terraform's `Error: …` block (to
+ * the AWS CLI's `aws: [ERROR]: …`, `An error occurred …` and `fatal error:` / `upload failed:` … (the high-level `aws s3`
+ * commands), each with the rows it wrapped onto; Terraform's `Error: …` block (to
  * the next command), and a Python traceback (its header through the exception line).
  */
 export function terminal(session: string): string {
@@ -45,7 +46,7 @@ export function terminal(session: string): string {
   let previous = ''
   for (const line of trim(session).split('\n')) {
     if (line.startsWith('$ ') || line.startsWith('> ')) mode = 'none'
-    else if (line.startsWith('aws: [ERROR]') || line.startsWith('An error occurred')) mode = 'aws'
+    else if (line.startsWith('aws: [ERROR]') || line.startsWith('An error occurred') || /^(fatal error|upload failed|download failed): /.test(line)) mode = 'aws'
     else if (/^(│ )?Error: /.test(line)) mode = 'terraform'
     else if (line === 'Traceback (most recent call last):') mode = 'python'
     // an AWS CLI error is one line, wrapped: it goes on while the row before it filled the pane

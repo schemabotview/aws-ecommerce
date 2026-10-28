@@ -10,7 +10,7 @@ import session from '../../../spine/network/08-alb/session.txt?raw'
 // source: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html
 const rows = terminal(session)
 export const networkAlb: SceneModel = mapFrame({
-  built: [...BUILT.start, 'vpc', ...SUBNETS, 'igw', 'nat-a'],
+  built: [...BUILT.secure, 'vpc', ...SUBNETS, 'igw', 'nat-a'],
   fresh: ['alb'],
   side: [
     {

@@ -9,7 +9,7 @@ import session from '../../../spine/network/05-nat/session.txt?raw'
 // source: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html
 const rows = terminal(session)
 export const networkNat: SceneModel = mapFrame({
-  built: [...BUILT.start, 'vpc', ...SUBNETS, 'igw'],
+  built: [...BUILT.secure, 'vpc', ...SUBNETS, 'igw'],
   fresh: ['nat-a'],
   side: [
     {

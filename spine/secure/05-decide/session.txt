@@ -1,0 +1,4 @@
+$ python decide.py
+s3:GetObject  books/bk-1001.json          allowed
+s3:GetObject  books/drafts/bk-2001.json   AccessDenied
+s3:PutObject  books/bk-1002.json          AccessDenied

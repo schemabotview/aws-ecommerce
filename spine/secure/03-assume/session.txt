@@ -1,0 +1,13 @@
+$ BUCKET=book-shop-catalog-444455556666
+$ aws s3 cp data/books/bk-1001.json s3://$BUCKET/books/
+upload: data/books/bk-1001.json to s3://book-shop-catalog-444455556666/books/bk-
+1001.json
+$ ROLE=$(terraform -chdir=infra output -raw app_role_arn)
+$ aws sts assume-role --role-arn "$ROLE" --role-session-name task-1 \
+>   --query 'Credentials.[AccessKeyId, Expiration]' --output text
+ASIAWO645SY5LG7PD57U	2026-11-02T10:30:00+00:00
+$ tools/as-app.sh aws sts get-caller-identity --query Arn --output text
+arn:aws:sts::444455556666:assumed-role/BookShopApp/task-1
+$ tools/as-app.sh aws s3 cp s3://$BUCKET/books/bk-1001.json -
+download failed: s3://book-shop-catalog-444455556666/books/bk-1001.json to - An 
+error occurred (403) when calling the HeadObject operation: Forbidden

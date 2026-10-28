@@ -10,7 +10,7 @@ import session from '../../../spine/network/02-vpc/session.txt?raw'
 // every AWS account does; the shop does not use it, and the query filters it out by the VPC's id.
 const rows = terminal(session)
 export const networkVpc: SceneModel = mapFrame({
-  built: BUILT.start,
+  built: BUILT.secure,
   fresh: ['vpc', ...SUBNETS],
   side: [
     {

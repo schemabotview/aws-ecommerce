@@ -68,6 +68,7 @@ step.json (other keys, all optional):
   {"volatile": true}            every digit masked in the comparison (timings the frame never quotes)
 """
 import difflib
+import hashlib
 import json
 import os
 import re
@@ -96,6 +97,9 @@ REGION = 'eu-west-2'
 SEED = 42
 MARK = '__SPINE_MARK__'
 COLUMNS = 80  # the IDE terminal's width (src/scenes/ide.ts EDITOR_COLS)
+MACHINE = toolchain.CACHE / 'machine'          # the learner's machine while a replay runs
+# The machine after each chain step (see checkpoint_keys), per tree of steps.
+CHECKPOINTS = toolchain.CACHE / 'checkpoints' / hashlib.sha256(str(ROOT).encode()).hexdigest()[:8]
 REGISTRY: dict = {}  # the local registry's proxy settings, set in main()
 # Never part of a snapshot: what a run creates, not what the learner writes.
 IGNORED = {'__pycache__', '.venv', '.terraform', '.pytest_cache'}
@@ -194,6 +198,15 @@ def start_moto(venv: Path, config: dict, clock: Path) -> subprocess.Popen:
     return server
 
 
+def emulator(action: str, path: Path) -> None:
+    """Save or load the emulator's whole state (scripts/moto_server.py, `checkpoints`)."""
+    req = urllib.request.Request(f'http://127.0.0.1:{PORT}/moto-api/{action}', data=str(path).encode(), method='POST')
+    try:
+        urllib.request.urlopen(req, timeout=600).read()
+    except urllib.error.HTTPError as error:
+        raise SystemExit(f'the emulator could not {action[6:]} a checkpoint:\n{error.read().decode()[-3000:]}')
+
+
 def enforce_iam() -> None:
     """From now on the emulator authorises every request against IAM (moto's reset-auth)."""
     req = urllib.request.Request(f'http://127.0.0.1:{PORT}/moto-api/reset-auth', data=b'0', method='POST',
@@ -249,6 +262,27 @@ def commands(session: str, columns: int) -> list[tuple[str, list[str]]]:
     return out
 
 
+S3_PROGRESS = re.compile(r'^Completed [\d.]+ \w*Bytes/~?[\d.]+ \w*Bytes .* remaining')
+
+
+def overwrite(output: str) -> str:
+    """What a terminal leaves on screen. A line redrawn with carriage returns keeps its last
+    non-blank state; a line cleared to blank is gone. And the `aws s3` commands' transfer progress
+    ("Completed 137 Bytes/137 Bytes … remaining") is dropped: on a terminal it is redrawn in place
+    and overwritten by the result line, while through the replay's pipe it arrives as lines, more or
+    fewer of them depending on timing."""
+    lines = []
+    for line in output.split('\n'):
+        if '\r' in line:
+            line = next((part for part in reversed(line.split('\r')) if part.strip()), None)
+            if line is None:
+                continue
+        if S3_PROGRESS.match(line):
+            continue
+        lines.append(line)
+    return '\n'.join(lines)
+
+
 def real_endpoints(output: str, cmd: str, config: dict) -> str:
     words = cmd.split()
     service = words[words.index('aws') + 1] if 'aws' in words[:-1] else config.get('endpoint')
@@ -289,17 +323,39 @@ def chain() -> list[Path]:
     return out
 
 
+def checkpoint_keys(line: list[Path]) -> list[str]:
+    """One key per chain step: a hash of the replay machine's own code and of EVERY step up to and
+    including this one — its step.json, its files, the commands it types (not their output, so
+    --write keeps the key). A checkpoint is only ever restored under the same key, so editing a
+    step, or anything before it, or the machine, makes every later checkpoint unreachable."""
+    h = hashlib.sha256()
+    for name in ('spine.py', 'moto_server.py', 'toolchain.py', 'registry.py'):
+        h.update((toolchain.REPO / 'scripts' / name).read_bytes())
+    out = []
+    for step in line:
+        h.update((step / 'step.json').read_bytes())
+        for rel, data in files(step).items():
+            h.update(rel.encode() + b'\0' + hashlib.sha256(data).digest())
+        columns = config_of(step).get('columns', COLUMNS)
+        h.update(repr(commands((step / 'session.txt').read_text(), columns)).encode())
+        out.append(h.hexdigest()[:20])
+    return out
+
+
 class Machine:
     """One emulator, one home, one working copy of the project, one shared clock — a learner's
     machine for the length of the chain (or of one lab)."""
 
     def __init__(self, config: dict):
         self.venv = toolchain.tools()
-        self.tmp = tempfile.TemporaryDirectory()
-        self.home = Path(self.tmp.name) / 'home'
+        # A FIXED place, not a temp dir: a checkpoint's home holds absolute paths (the venv's,
+        # .terraform's, the shell state's), which are only true again if home is where it was.
+        self.root = MACHINE
+        shutil.rmtree(self.root, ignore_errors=True)
+        self.home = self.root / 'home'
         self.project = self.home / PROJECT
         self.project.mkdir(parents=True)
-        self.clock = Path(self.tmp.name) / 'clock'
+        self.clock = self.root / 'clock'
         self.clock.write_text(CLOCK)
         self.server = start_moto(self.venv, config, self.clock)
         self.files: dict[str, bytes] = {}
@@ -307,7 +363,27 @@ class Machine:
     def close(self):
         self.server.kill()
         self.server.wait()
-        self.tmp.cleanup()
+        shutil.rmtree(self.root, ignore_errors=True)
+
+    def save(self, key: str) -> None:
+        """A checkpoint: the home directory (working copy, Terraform's files, the venv) and everything
+        the emulator holds, as they are after the step just run."""
+        target = CHECKPOINTS / key
+        if target.exists():
+            return
+        partial = CHECKPOINTS / f'.{key}.partial'
+        shutil.rmtree(partial, ignore_errors=True)
+        partial.mkdir(parents=True)
+        subprocess.run(['tar', '-C', str(self.root), '-cf', str(partial / 'home.tar'), 'home'], check=True)
+        emulator('spine-save', partial / 'moto.pickle')
+        partial.rename(target)
+
+    def restore(self, key: str, step: Path) -> None:
+        """The machine as it was after `step`, from its checkpoint."""
+        shutil.rmtree(self.home)
+        subprocess.run(['tar', '-C', str(self.root), '-xf', str(CHECKPOINTS / key / 'home.tar')], check=True)
+        emulator('spine-load', CHECKPOINTS / key / 'moto.pickle')
+        self.files = files(step)
 
     def lay(self, step: Path) -> None:
         """Make the working copy's tracked files the step's: write what it has, remove what it no
@@ -320,6 +396,7 @@ class Machine:
             target.parent.mkdir(parents=True, exist_ok=True)
             if not target.exists() or target.read_bytes() != data:
                 target.write_bytes(data)
+            target.chmod((step / 'project' / rel).stat().st_mode & 0o777)  # a tool stays executable
         self.files = new
 
     def run(self, step: Path) -> tuple[str, dict[str, str]]:
@@ -347,6 +424,13 @@ class Machine:
         state.unlink(missing_ok=True)
         if prelude:
             subprocess.run(['bash', '-c', f'cd {self.project}\n{prelude}export -p > {state}'], env=env, check=True)
+        # What a terminal keeps from one command to the next: the environment AND the shell variables
+        # a command set (`BUCKET=…`, which `export -p` alone would lose) — every variable bash did not
+        # start with.
+        start = set(subprocess.run(['bash', '-c', 'compgen -v'], env=env, capture_output=True, text=True).stdout.split())
+        start |= {'_', 'PIPESTATUS', 'FUNCNAME', 'BASH_COMMAND', 'BASH_LINENO', 'BASH_SOURCE', 'BASH_REMATCH'}
+        keep = ('{ export -p; for __spine_v in $(compgen -v); do case "$__spine_v" in __spine_*|'
+                + '|'.join(sorted(start)) + ') ;; *) declare -p "$__spine_v" 2>/dev/null;; esac; done; }')
         cwd = self.project
         blocks: list[str] = []
         for first, more in commands((step / 'session.txt').read_text(), columns):
@@ -359,13 +443,14 @@ class Machine:
                 script = state.read_text() + '\n' + script
             # FAKETIME_SHARED names a semaphore owned by the process that set it; carried into a later
             # command after its owner exited, libfaketime aborts that command (exit 1, one run in a few).
-            r = subprocess.run(['bash', '-c', 'unset FAKETIME_SHARED\n' + script + f'unset FAKETIME_SHARED; export -p > {state}'],
+            r = subprocess.run(['bash', '-c', 'unset FAKETIME_SHARED\n' + script + f'unset FAKETIME_SHARED; {keep} > {state}'],
                                env={**env, **clock}, capture_output=True, text=True)
             # The shell's OWN stderr (not the command's, which is in stdout) is where bash reports a
             # command that died of a signal. Silence there is the norm; anything else is the machine.
             if r.stderr.strip():
                 raise SystemExit(f'{step.relative_to(ROOT)}: `{first}` — the replay shell reported: {r.stderr.strip()[:500]}')
             output, _, after = r.stdout.partition(MARK)
+            output = overwrite(output)
             if 'libfaketime:' in output:  # the replay's clock failed: never a command's output, never hidden
                 raise SystemExit(f'{step.relative_to(ROOT)}: `{first}` — libfaketime failed: {output[:600]}')
             if after:
@@ -415,6 +500,7 @@ def masked(text: str, step: Path) -> str:
 
 def main() -> int:
     write = '--write' in sys.argv
+    fresh = '--fresh' in sys.argv
     only = [a for a in sys.argv[1:] if not a.startswith('--')]
     every = sorted(p.parent for p in ROOT.glob('*/*/session.txt'))
     asked = lambda s: not only or any(str(s.relative_to(ROOT)).startswith(o) for o in only)
@@ -431,14 +517,27 @@ def main() -> int:
     last = max((i for i, s in enumerate(line) if asked(s)), default=-1)
     runs: list[tuple[Path, tuple[str, dict[str, str]]]] = []
     if last >= 0:
+        # The chain up to the last step asked for, in order — from the newest checkpoint before the
+        # first step asked for, when one exists for exactly this chain (checkpoint_keys).
+        keys = checkpoint_keys(line)
+        first = min(i for i, s in enumerate(line) if asked(s))
+        start = 0 if fresh else next((j + 1 for j in range(first - 1, -1, -1) if (CHECKPOINTS / keys[j]).is_dir()), 0)
         machine = Machine(config_of(line[0]))
         try:
-            for step in line[:last + 1]:  # the chain up to the last step asked for, in order
+            if start:
+                machine.restore(keys[start - 1], line[start - 1])
+                print(f'… from the checkpoint after {line[start - 1].relative_to(ROOT)}')
+            for i in range(start, last + 1):
+                step = line[i]
                 result = machine.run(step)
+                machine.save(keys[i])
                 if asked(step):
                     runs.append((step, result))
         finally:
             machine.close()
+        for stale in CHECKPOINTS.glob('*'):  # checkpoints of a chain that no longer exists
+            if stale.name not in keys and not stale.name.startswith('.'):
+                shutil.rmtree(stale)
     for lab in (s for s in every if config_of(s).get('lab') and asked(s)):
         machine = Machine(config_of(lab))
         try:

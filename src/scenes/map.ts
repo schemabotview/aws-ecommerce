@@ -43,7 +43,8 @@ const CONTROLS = [p('iam', 'iam', 'Roles'), p('state', 's3', 'Terraform state'),
 const SUBNETS = ['public', 'app', 'data'].flatMap((t) => AZS.map((a) => `${t}-${a}`))
 export const BUILT: Record<string, string[]> = {
   start: ['catalog', 'state', 'budget'],
-  network: ['catalog', 'state', 'budget', 'vpc', ...SUBNETS, 'igw', 'nat-a', 'alb', 'dns', 'cert', 's3-endpoint'],
+  secure: ['catalog', 'state', 'budget', 'iam'],
+  network: ['catalog', 'state', 'budget', 'iam', 'vpc', ...SUBNETS, 'igw', 'nat-a', 'alb', 'dns', 'cert', 's3-endpoint'],
 }
 export { SUBNETS }
 

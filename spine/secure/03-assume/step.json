@@ -1,0 +1,1 @@
+{"from": "secure/02-role", "changes": ["tools/as-app.sh", "data/books/bk-1001.json"], "env": true, "enforce_iam": true}

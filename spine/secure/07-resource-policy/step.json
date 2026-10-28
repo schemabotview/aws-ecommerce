@@ -1,0 +1,1 @@
+{"from": "secure/06-denied", "changes": ["infra/s3.tf"], "env": true}

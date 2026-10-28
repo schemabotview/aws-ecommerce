@@ -1,0 +1,1 @@
+{"from": "secure/03-assume", "changes": ["infra/iam.tf"], "env": true}

@@ -1,18 +1,28 @@
 $ cd infra
 $ terraform plan -out=tfplan
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
 aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
 ly]
 aws_vpc.shop: Refreshing state... [id=vpc-e3500a5c4abdcac35]
-aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
-aws_subnet.this["app-b"]: Refreshing state... [id=subnet-f7e3a7a4ba6f7ed13]
+data.aws_iam_policy_document.app_trust: Reading...
+data.aws_iam_policy_document.app_trust: Read complete after 0s [id=1077804475]
+data.aws_iam_policy_document.app: Reading...
+data.aws_iam_policy_document.app: Read complete after 0s [id=2842283945]
+data.aws_iam_policy_document.catalog: Reading...
+data.aws_iam_policy_document.catalog: Read complete after 0s [id=3396613952]
+aws_iam_role.app: Refreshing state... [id=BookShopApp]
+aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a394010c40419]
 aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b62140a09169ec7ff]
+aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
+aws_subnet.this["app-b"]: Refreshing state... [id=subnet-f7e3a7a4ba6f7ed13]
 aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce869754647c8473]
 aws_subnet.this["data-c"]: Refreshing state... [id=subnet-60f987a7b700f6f9f]
-aws_subnet.this["app-c"]: Refreshing state... [id=subnet-e56d56ed1dbd82035]
-aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c8b428e052e]
 aws_subnet.this["data-a"]: Refreshing state... [id=subnet-c7a720642ba246ff7]
-aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a394010c40419]
-aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
+aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c8b428e052e]
+aws_subnet.this["app-c"]: Refreshing state... [id=subnet-e56d56ed1dbd82035]
+aws_s3_bucket_policy.catalog: Refreshing state... [id=book-shop-catalog-44445555
+6666]
+aws_iam_role_policy.app: Refreshing state... [id=BookShopApp:book-shop-app]
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
@@ -144,39 +154,40 @@ $ terraform apply tfplan
 aws_route_table.public: Creating...
 aws_route_table.public: Creation complete after 0s [id=rtb-e5c7633cefa18a098]
 aws_route_table.private: Creating...
-aws_route_table.private: Creation complete after 1s [id=rtb-b3c9465183df1b91c]
+aws_route_table.private: Creation complete after 0s [id=rtb-b3c9465183df1b91c]
+aws_route_table_association.this["public-b"]: Creating...
+aws_route_table_association.this["public-b"]: Creation complete after 0s [id=rtb
+assoc-6c78e88ccbd487489]
+aws_route_table_association.this["app-b"]: Creating...
+aws_route_table_association.this["app-b"]: Creation complete after 0s [id=rtbass
+oc-bc1797f9fcb119fd7]
+aws_route_table_association.this["public-c"]: Creating...
+aws_route_table_association.this["public-c"]: Creation complete after 0s [id=rtb
+assoc-9df09e3cd1e2023e5]
 aws_route_table_association.this["data-c"]: Creating...
 aws_route_table_association.this["data-c"]: Creation complete after 0s [id=rtbas
 soc-43e4ec2fc8562cf05]
 aws_route_table_association.this["app-c"]: Creating...
 aws_route_table_association.this["app-c"]: Creation complete after 0s [id=rtbass
 oc-396ff0e232233df43]
-aws_route_table_association.this["app-b"]: Creating...
-aws_route_table_association.this["app-b"]: Creation complete after 0s [id=rtbass
-oc-bc1797f9fcb119fd7]
 aws_route_table_association.this["data-b"]: Creating...
 aws_route_table_association.this["data-b"]: Creation complete after 0s [id=rtbas
 soc-04718beae952daaf1]
-aws_route_table_association.this["public-b"]: Creating...
-aws_route_table_association.this["public-b"]: Creation complete after 0s [id=rtb
-assoc-6c78e88ccbd487489]
 aws_route_table_association.this["data-a"]: Creating...
 aws_route_table_association.this["data-a"]: Creation complete after 0s [id=rtbas
 soc-90528cedb357e43a3]
-aws_route_table_association.this["public-a"]: Creating...
-aws_route_table_association.this["public-a"]: Creation complete after 0s [id=rtb
-assoc-c5db509e02f0fff92]
 aws_route_table_association.this["app-a"]: Creating...
 aws_route_table_association.this["app-a"]: Creation complete after 0s [id=rtbass
 oc-63af24dc5926c42f9]
-aws_route_table_association.this["public-c"]: Creating...
-aws_route_table_association.this["public-c"]: Creation complete after 0s [id=rtb
-assoc-9df09e3cd1e2023e5]
+aws_route_table_association.this["public-a"]: Creating...
+aws_route_table_association.this["public-a"]: Creation complete after 0s [id=rtb
+assoc-c5db509e02f0fff92]
 
 Apply complete! Resources: 11 added, 0 changed, 0 destroyed.
 
 Outputs:
 
+app_role_arn = "arn:aws:iam::444455556666:role/BookShopApp"
 vpc_id = "vpc-e3500a5c4abdcac35"
 $ cd ..
 $ python tools/which_route.py app-a 10.20.20.15

@@ -16,11 +16,9 @@ Engine `@graphlearning/graphl-flow` ^0.6.0, shell `@graphlearning/shell` ^1.0.4.
 
 ## Status
 
-Authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections) and Course 5 `network`
-(10 sections). No narration audio yet. **Course 4 (`secure`) is not authored**: Course 5's chain
-continues from `start/08-budget`. When Course 4 is written, `network/02-vpc`'s `from` moves to its
-last step and the network transcripts are rewritten (`--write`); scenes find lines by text, so they
-follow.
+Authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections), Course 4 `secure`
+(8 sections) and Course 5 `network` (10 sections), one chain: `start/02` → … → `secure/07` →
+`network/02` → … No narration audio yet.
 
 **graphl-flow 0.6.0 is not on npm yet** (branch `claude/pensive-johnson-ixdglh` of graphl-flow: AWS
 icons, `dashed` groups, `muted` items, `hcl`, folded terminals). Until it is published: build it
@@ -35,6 +33,7 @@ npm run dev                      # the app, :5173
 npx tsc --noEmit && npm run build
 npm run check                    # check-content + check-render (every section at 3840×2160)
 npm run check:spine              # replay the chain and the labs; --write to rewrite transcripts
+npm run check:spine -- network/06   # one step: resumes from the checkpoint before it (seconds)
 npm run shots -- <slug-prefix>   # 4K PNGs in out/shots/ — then LOOK
 python3 spike/terraform-on-moto/matrix.py [case…]   # Terraform × moto support matrix
 ```
@@ -55,7 +54,13 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 - **The chain is a line.** A failure and its fix are two consecutive steps.
 - **`changes` is the section's diff**, checked both ways; `[]` is a section that only looks. A file a
   step's session writes and captures (the lock file) may appear in the next step undeclared.
-- Checking one step replays the chain up to it. One replay at a time (port 5000, a machine lock).
+- Checking one step resumes from the **checkpoint** after the step before it, when one exists:
+  every chain step saves the machine (home, working copy, Terraform's files) and everything the
+  emulator holds (`.spine-cache/checkpoints/`). A checkpoint's key hashes the replay's own scripts
+  and every step up to it (step.json, files, typed commands — not output), so editing a step, an
+  earlier one, or `scripts/` makes the later ones unreachable and they are re-run. The full,
+  unfiltered check runs from scratch and is the gate; `--fresh` ignores checkpoints anywhere.
+  One replay at a time (port 5000, a machine lock).
 - Every terminal is 80 columns: `spine.py` wraps at 80, `ide.ts` draws 80.
 
 ## The machine (all in `scripts/`, all in SPIKE.md)
@@ -78,6 +83,14 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   tools then failed SILENTLY (an `aws` call printing nothing, about one run in three). Every command
   and `setup` now unsets it, and any `libfaketime:` line in output fails the replay.
 - A typed line exactly 80 wide is refused (it reads as wrapped): reword or split it with `\`.
+- **IAM is enforced from `secure/03-assume` on**, for every principal but one: env.sh's key is
+  alex's, standing for BookShopDeveloper, and is never evaluated (`developer-key` in
+  moto_server.py — the replay's machinery, not a fix). So the app's role sessions are really refused
+  and allowed; alex is not held to a trust policy (§4.3 says so). moto evaluates identity policies
+  only: resource policies, conditions, SCPs and other accounts are doc-cited, and the frame says so.
+- A checkpoint pickles every moto backend in one go; what cannot travel (locks, `cryptography`
+  keys and certificates) has a reducer in `_Pickler`. A new service that will not pickle fails the
+  save with its traceback.
 
 ## Frames
 
@@ -101,7 +114,10 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 | --- | --- |
 | app | `book-shop` (package `book_shop`), `book-shop.example.com`, books `GET /books/bk-1001` |
 | Region | `eu-west-2` (London), AZs a/b/c |
-| accounts | development **444455556666** (the course builds here until Course 9), production **111122223333** |
+| accounts | development **444455556666** (the course builds here until Course 9), production **111122223333**, audit **777788889999** (role `Auditor`), management **123456789012** |
+| organization | root → OU Security (audit), OU Workloads (SCP `LondonOnly`: deny outside eu-west-2 except iam/organizations/sts) → OU Prod (prod), OU Dev (dev) |
+| app role | **BookShopApp**, trusted by `ecs-tasks.amazonaws.com`; inline policy `book-shop-app`: ReadBooks (s3:GetObject `books/*`), ListBooks (s3:ListBucket on the bucket); session `task-1` via `tools/as-app.sh` |
+| catalog | `books/bk-1001.json`: "Night Trains of Europe", Ana Lima, 12.99 GBP, stock 40; bucket policy AuditorReads (GetObject, ListBucket for the Auditor role) |
 | people | **alex** (developer), **sam** (teammate); Identity Center session `book-shop`, portal `https://book-shop-example.awsapps.com/start`; roles BookShopDeveloper (dev), BookShopReadOnly (prod) |
 | buckets | `book-shop-catalog-444455556666`; state `book-shop-tfstate-444455556666`, key `book-shop/terraform.tfstate`, `use_lockfile` |
 | tags | default: `app = book-shop`, `env = dev`, `managed-by = terraform` |

@@ -1,59 +1,69 @@
 $ cd infra
 $ terraform plan -out=tfplan
-aws_vpc.shop: Refreshing state... [id=vpc-e3500a5c4abdcac35]
-aws_eip.nat: Refreshing state... [id=eipalloc-6ff6a2527581beced]
 aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
 ly]
+aws_vpc.shop: Refreshing state... [id=vpc-e3500a5c4abdcac35]
+data.aws_iam_policy_document.app_trust: Reading...
+data.aws_iam_policy_document.app_trust: Read complete after 0s [id=1077804475]
+aws_eip.nat: Refreshing state... [id=eipalloc-6ff6a2527581beced]
 aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
 aws_route_table.private: Refreshing state... [id=rtb-b3c9465183df1b91c]
-aws_internet_gateway.shop: Refreshing state... [id=igw-9bb99313e3559d59f]
 aws_route_table.public: Refreshing state... [id=rtb-e5c7633cefa18a098]
-aws_security_group.this["db"]: Refreshing state... [id=sg-98bc7ab1c20bfa122]
-aws_security_group.this["alb"]: Refreshing state... [id=sg-1292ef779761e6b9e]
+aws_internet_gateway.shop: Refreshing state... [id=igw-9bb99313e3559d59f]
 aws_security_group.this["app"]: Refreshing state... [id=sg-0ea1f02f93c435340]
-aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
+aws_security_group.this["alb"]: Refreshing state... [id=sg-1292ef779761e6b9e]
+aws_security_group.this["db"]: Refreshing state... [id=sg-98bc7ab1c20bfa122]
+aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a394010c40419]
 aws_subnet.this["data-c"]: Refreshing state... [id=subnet-60f987a7b700f6f9f]
+aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
+aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b62140a09169ec7ff]
+aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce869754647c8473]
+aws_subnet.this["data-a"]: Refreshing state... [id=subnet-c7a720642ba246ff7]
 aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c8b428e052e]
 aws_subnet.this["app-b"]: Refreshing state... [id=subnet-f7e3a7a4ba6f7ed13]
 aws_subnet.this["app-c"]: Refreshing state... [id=subnet-e56d56ed1dbd82035]
-aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a394010c40419]
-aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce869754647c8473]
-aws_subnet.this["data-a"]: Refreshing state... [id=subnet-c7a720642ba246ff7]
-aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b62140a09169ec7ff]
+aws_iam_role.app: Refreshing state... [id=BookShopApp]
+data.aws_iam_policy_document.catalog: Reading...
+data.aws_iam_policy_document.catalog: Read complete after 0s [id=3396613952]
+data.aws_iam_policy_document.app: Reading...
+data.aws_iam_policy_document.app: Read complete after 0s [id=2842283945]
 aws_route.public_internet: Refreshing state... [id=r-rtb-e5c7633cefa18a098108028
 9494]
 aws_vpc_security_group_egress_rule.app_out: Refreshing state... [id=sgr-615841b9
 17e0c5c82]
 aws_vpc_security_group_egress_rule.alb_app: Refreshing state... [id=sgr-72f34ea4
 1ac2722c1]
+aws_vpc_security_group_ingress_rule.this["http"]: Refreshing state... [id=sgr-53
+a8fe45fdb109b8c]
 aws_vpc_security_group_ingress_rule.this["https"]: Refreshing state... [id=sgr-2
 eba2a5dc5ea961db]
 aws_vpc_security_group_ingress_rule.this["app_alb"]: Refreshing state... [id=sgr
 -61ea7866148cdc96f]
 aws_vpc_security_group_ingress_rule.this["db_app"]: Refreshing state... [id=sgr-
 6e8abec5ee98759ac]
-aws_vpc_security_group_ingress_rule.this["http"]: Refreshing state... [id=sgr-53
-a8fe45fdb109b8c]
-aws_nat_gateway.a: Refreshing state... [id=nat-0e556a59c79dfb70c]
 aws_network_acl.data: Refreshing state... [id=acl-c0fda9619b350bd6d]
-aws_route_table_association.this["app-a"]: Refreshing state... [id=rtbassoc-63af
-24dc5926c42f9]
-aws_route_table_association.this["data-b"]: Refreshing state... [id=rtbassoc-047
-18beae952daaf1]
-aws_route_table_association.this["data-c"]: Refreshing state... [id=rtbassoc-43e
-4ec2fc8562cf05]
-aws_route_table_association.this["data-a"]: Refreshing state... [id=rtbassoc-905
-28cedb357e43a3]
-aws_route_table_association.this["public-c"]: Refreshing state... [id=rtbassoc-9
-df09e3cd1e2023e5]
+aws_nat_gateway.a: Refreshing state... [id=nat-0e556a59c79dfb70c]
 aws_route_table_association.this["public-b"]: Refreshing state... [id=rtbassoc-6
 c78e88ccbd487489]
-aws_route_table_association.this["app-c"]: Refreshing state... [id=rtbassoc-396f
-f0e232233df43]
+aws_route_table_association.this["data-c"]: Refreshing state... [id=rtbassoc-43e
+4ec2fc8562cf05]
+aws_route_table_association.this["data-b"]: Refreshing state... [id=rtbassoc-047
+18beae952daaf1]
+aws_route_table_association.this["public-c"]: Refreshing state... [id=rtbassoc-9
+df09e3cd1e2023e5]
 aws_route_table_association.this["app-b"]: Refreshing state... [id=rtbassoc-bc17
 97f9fcb119fd7]
+aws_route_table_association.this["data-a"]: Refreshing state... [id=rtbassoc-905
+28cedb357e43a3]
+aws_route_table_association.this["app-a"]: Refreshing state... [id=rtbassoc-63af
+24dc5926c42f9]
+aws_route_table_association.this["app-c"]: Refreshing state... [id=rtbassoc-396f
+f0e232233df43]
 aws_route_table_association.this["public-a"]: Refreshing state... [id=rtbassoc-c
 5db509e02f0fff92]
+aws_s3_bucket_policy.catalog: Refreshing state... [id=book-shop-catalog-44445555
+6666]
+aws_iam_role_policy.app: Refreshing state... [id=BookShopApp:book-shop-app]
 aws_route.private_out: Refreshing state... [id=r-rtb-b3c9465183df1b91c1080289494
 ]
 
@@ -281,6 +291,7 @@ Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
 
 Outputs:
 
+app_role_arn = "arn:aws:iam::444455556666:role/BookShopApp"
 target_group_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:targetgr
 oup/book-shop-app/a13717916e126457"
 vpc_id = "vpc-e3500a5c4abdcac35"
