@@ -79,6 +79,7 @@ step.json (other keys, all optional):
   {"enforce_iam": true}         from this step on, the emulator authorises every request against IAM
   {"volatile": true}            every digit masked in the comparison (timings the frame never quotes)
   {"docker": true}              a Docker daemon, as a learner has one (toolchain.docker: the mirror, the relay)
+  {"postgres": true}            the local PostgreSQL 16 (toolchain.postgres); database book_shop is kept in state/
 """
 import difflib
 import gzip
@@ -373,6 +374,20 @@ def recorded(step: Path) -> dict:
     return json.loads((step / 'state' / 'recorded.json').read_text()) if (step / 'state' / 'recorded.json').exists() else {}
 
 
+DATABASE = 'book_shop'  # the local PostgreSQL database the shop's SQL runs in (Course 7 on)
+
+
+def database_exists() -> bool:
+    r = subprocess.run(['psql', '-tAc', f"SELECT 1 FROM pg_database WHERE datname = '{DATABASE}'", 'postgres'],
+                       capture_output=True, text=True)
+    return r.returncode == 0 and r.stdout.strip() == '1'
+
+
+def drop_database() -> None:
+    if database_exists():
+        subprocess.run(['dropdb', '--force', DATABASE], check=True)
+
+
 def leftovers() -> None:
     """Kill what a stopped replay left running: Terraform's providers (from the plugin cache), a
     Terraform or a shell still in the machine's home, the emulator. Left alive they hold the cached
@@ -411,6 +426,7 @@ class Machine:
         self.clock = self.root / 'clock'
         self.clock.write_text(CLOCK)
         self.server = start_moto(self.venv, config, self.clock)
+        drop_database()  # a fresh machine has no shop database; a restored one gets its own back
         self.files: dict[str, bytes] = {}
 
     def close(self):
@@ -428,6 +444,9 @@ class Machine:
         target.mkdir()
         subprocess.run(['tar', '-C', str(self.root), '--exclude', f'home/{PROJECT}/.venv', '--sort=name', '--mtime=@0',
                         '--owner=0', '--group=0', '--numeric-owner', '-czf', str(target / 'home.tar.gz'), 'home'], check=True)
+        if database_exists():  # the local PostgreSQL's book_shop database is machine state too
+            with open(target / 'postgres.sql', 'w') as out:
+                subprocess.run(['pg_dump', '--no-owner', '--no-privileges', DATABASE], stdout=out, check=True)
         raw = self.root / 'emulator.pickle'
         emulator('spine-save', raw)
         with open(raw, 'rb') as f, gzip.GzipFile(target / 'emulator.pickle.gz', 'wb', mtime=0) as out:
@@ -438,6 +457,12 @@ class Machine:
         """The machine as it was after `step`, from its recorded state."""
         shutil.rmtree(self.home)
         subprocess.run(['tar', '-C', str(self.root), '-xzf', str(step / 'state' / 'home.tar.gz')], check=True)
+        drop_database()
+        if (step / 'state' / 'postgres.sql').exists():
+            toolchain.postgres()
+            subprocess.run(['createdb', DATABASE], check=True)
+            subprocess.run(['psql', '-q', '-v', 'ON_ERROR_STOP=1', '-d', DATABASE, '-f', str(step / 'state' / 'postgres.sql')],
+                           check=True, capture_output=True)
         raw = self.root / 'emulator.pickle'
         with gzip.open(step / 'state' / 'emulator.pickle.gz', 'rb') as f, open(raw, 'wb') as out:
             shutil.copyfileobj(f, out)
@@ -474,6 +499,8 @@ class Machine:
                 (site / '_spine_base.pth').write_text(str(next(self.venv.glob('lib/python3*/site-packages'))) + '\n')
             env['PATH'] = f"{venv / 'bin'}:{env['PATH']}"
             env['VIRTUAL_ENV'] = str(venv)
+        if config.get('postgres'):  # the local cluster (toolchain.postgres); its data is in state/
+            toolchain.postgres()
         if config.get('docker'):  # the daemon, and the way out for a build step (toolchain.docker)
             proxy = toolchain.docker()
             # The daemon outlives a recording: what an earlier RECORDING left (a container named shop,

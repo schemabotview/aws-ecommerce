@@ -1,0 +1,1 @@
+{"from": "run/08-graceful", "changes": ["infra/s3.tf", "data/books/bk-1001.json"], "env": true}

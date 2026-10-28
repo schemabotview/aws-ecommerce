@@ -154,6 +154,15 @@ def docker() -> str:
     return ''
 
 
+def postgres() -> None:
+    """PostgreSQL 16 as a learner's laptop has it: the local cluster running, and a role for this
+    machine's user, so `psql` and the app connect over the local socket with no password."""
+    if subprocess.run(['pg_ctlcluster', '16', 'main', 'status'], capture_output=True).returncode != 0:
+        subprocess.run(['pg_ctlcluster', '16', 'main', 'start'], check=True)
+    subprocess.run(['su', 'postgres', '-c', "psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname = 'root'\" | grep -q 1"
+                    " || createuser -s root"], check=True, capture_output=True)
+
+
 @contextlib.contextmanager
 def exclusive():
     """One replay at a time on this machine: Terraform's plugin cache is not safe for concurrent

@@ -56,6 +56,18 @@ for AWS behaviour:
                   by moto, identity policies only (no resource policies, conditions or SCPs). One
                   consequence a frame must say: alex's AssumeRole is not checked against the trust
                   policy, so alex can stand in for ECS here, which AWS would refuse.
+  conditions      A policy statement whose condition does not match does not APPLY (neutral); moto
+                  returned DENIED for it — an Allow or a Deny alike. moto evaluated only StringEquals
+                  and took any other operator as matched: Bool is added (case-insensitive, as AWS
+                  compares it). And a bucket policy is evaluated
+                  with aws:SecureTransport = true: the emulator listens on plain HTTP, but every request
+                  it stands in for is HTTPS on AWS (the CLI, the SDKs and Terraform use the HTTPS
+                  regional endpoints). Together: §7.2's HttpsOnly Deny no longer refuses everyone; a
+                  plain-HTTP request's denial is AWS's documentation here, not a run.
+  latest-version  The replay's clock is frozen, so two versions of an object carry one instant, and
+                  moto's ListObjectVersions — newest first, by time — kept them oldest first and
+                  called the older one IsLatest. Equal times now break toward the later write, as on
+                  AWS, where the later write is later.
   checkpoints     /moto-api/spine-save and /spine-load write and read everything the emulator holds,
                   so scripts/spine.py can resume the chain after any step (see `save`).
 """
@@ -661,6 +673,54 @@ def _ecr_digest():
     def create_digest(self) -> None:
         self._image_digest = 'sha256:' + hashlib.sha256(self.image_manifest.encode()).hexdigest()
     Image._create_digest = create_digest
+
+
+# ── conditions ───────────────────────────────────────────────────────────────────────────────────
+
+@patch('conditions')
+def _conditions():
+    from moto.iam.access_control import IAMPolicy, IAMPolicyStatement, PermissionResult
+    from moto.s3.models import FakeBucket
+    from moto.iam import policy_conditions
+    statement = IAMPolicyStatement.is_action_permitted
+
+    def bool_operation(expected, actual: str) -> bool:
+        values = [expected] if isinstance(expected, str) else expected
+        return actual.lower() in [str(v).lower() for v in values]
+    policy_conditions.CONDITION_OPERATIONS['Bool'] = bool_operation
+
+    def is_action_permitted(self, action, resource='*', principal=None, incoming_condition_values=None):
+        if self._statement.get('Condition') and not self._check_conditions(incoming_condition_values):
+            return PermissionResult.NEUTRAL
+        return statement(self, action, resource, principal, incoming_condition_values)
+    IAMPolicyStatement.is_action_permitted = is_action_permitted
+
+    def get_permission(self, action, resource):
+        if self.policy is None:
+            return PermissionResult.NEUTRAL
+        return IAMPolicy(self.policy.decode()).is_action_permitted(
+            action, resource, incoming_condition_values={'aws:SecureTransport': 'true'})
+    FakeBucket.get_permission = get_permission
+
+
+# ── latest-version ───────────────────────────────────────────────────────────────────────────────
+
+@patch('latest-version')
+def _latest_version():
+    from moto.s3 import models
+
+    original = models.S3Backend.list_object_versions
+
+    def list_object_versions(self, *args, **kwargs):
+        # The sort's key function is called once per version, in insertion order (oldest first within
+        # a key): a growing 10 µs (above float precision at this epoch) orders ties by write.
+        millis, step = models.unix_time_millis, iter(range(1, 1 << 30))
+        models.unix_time_millis = lambda t: millis(t) + next(step) * 0.01
+        try:
+            return original(self, *args, **kwargs)
+        finally:
+            models.unix_time_millis = millis
+    models.S3Backend.list_object_versions = list_object_versions
 
 
 # ── developer-key ────────────────────────────────────────────────────────────────────────────────

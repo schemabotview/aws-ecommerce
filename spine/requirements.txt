@@ -3,3 +3,4 @@ boto3==1.43.117
 botocore==1.43.117
 libfaketime==3.0.1
 pytest==9.1.1
+psycopg[binary]==3.3.6
