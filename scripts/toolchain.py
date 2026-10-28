@@ -107,6 +107,19 @@ def terraform() -> tuple[Path, Path]:
         rc.write_text(f'plugin_cache_dir = "{root / "plugins"}"\n')
         (root / 'plugins').mkdir()
         stamp.write_text(pins)
+    # A recorded working copy's .terraform/providers links into the plugin cache, which a learner's
+    # earlier `init` filled. A fresh machine restores that working copy without ever running the
+    # init: fill the cache from the verified release zip, laid out as init lays it out.
+    cached = root / 'plugins' / 'registry.terraform.io' / 'hashicorp' / 'aws' / PROVIDER_AWS / PLATFORM
+    if not cached.exists():
+        zipped = root / 'releases' / 'terraform-provider-aws' / PROVIDER_AWS / f'terraform-provider-aws_{PROVIDER_AWS}_{PLATFORM}.zip'
+        part = cached.with_name(f'.{PLATFORM}.part')
+        shutil.rmtree(part, ignore_errors=True)
+        with zipfile.ZipFile(zipped) as z:
+            z.extractall(part)
+        for f in part.iterdir():
+            f.chmod(0o755)
+        part.rename(cached)
     return root / 'bin', rc
 
 
