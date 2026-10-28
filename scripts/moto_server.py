@@ -77,6 +77,10 @@ for AWS behaviour:
                   compare dates as AWS does; moto passed no condition values for identity policies
                   and took an unknown operator as matched, so §11.8's "revoke older sessions" Deny
                   would have refused the NEW session too.
+  aws-managed     An AWS-managed policy (arn:aws:iam::aws:policy/…) exists in every account, as on
+                  AWS; moto knew them only when told to load all ~1,200 at start-up, which the chain
+                  never did, so §11.7's AWSBackupServiceRolePolicyForBackup "did not exist". It is
+                  now made from moto's own copy of AWS's document the first time it is named.
   latest-version  The replay's clock is frozen, so two versions of an object carry one instant, and
                   moto's ListObjectVersions — newest first, by time — kept them oldest first and
                   called the older one IsLatest. Equal times now break toward the later write, as on
@@ -92,6 +96,9 @@ for AWS behaviour:
   kinesis-tags    CreateStream with Tags (provider 6.x tags on create, as CreateStream accepts them
                   on AWS): moto dropped them, so every plan after §10.5 "added" the default tags
                   to the click stream again.
+  backup-tags     ListTags as the Go SDK sends it, /tags/<arn> with no trailing slash: moto took the
+                  path's second-to-last segment ("tags") as the ARN and answered no tags, so every
+                  plan after §11.7 "added" the default tags to the vault and the plan again.
   sqs-keep-policy SetQueueAttributes changes only the attributes it names, as on AWS; moto set the
                   queue's Policy to none whenever Policy was not among them (§9.6's console click
                   removed the topic's permission to send).
@@ -430,6 +437,19 @@ def _kinesis_tags():
             self.kinesis_backend.add_tags_to_stream(None, self._get_param('StreamName'), tags)
         return result
     KinesisResponse.create_stream = create_stream
+
+
+# ── backup-tags ──────────────────────────────────────────────────────────────────────────────────
+
+@patch('backup-tags')
+def _backup_tags():
+    from urllib.parse import unquote
+    from moto.backup.responses import BackupResponse
+
+    def list_tags(self):
+        arn = unquote(self.path.split('/tags/', 1)[1].split('?')[0].rstrip('/'))
+        return json.dumps({'Tags': self.backup_backend.list_tags(resource_arn=arn)})
+    BackupResponse.list_tags = list_tags
 
 
 # ── sqs-redrive ──────────────────────────────────────────────────────────────────────────────────
@@ -824,6 +844,30 @@ def _token_issue_time():
         if not permitted:
             self._raise_access_denied()
     access_control.IAMRequestBase.check_action_permitted = check_action_permitted
+
+
+# ── aws-managed ──────────────────────────────────────────────────────────────────────────────────
+
+@patch('aws-managed')
+def _aws_managed():
+    from moto.iam.aws_managed_policies import aws_managed_policies_data
+    from moto.iam.models import AWSManagedPolicy, IAMBackend
+    data = json.loads(aws_managed_policies_data)
+
+    def ensure(self, arn: str) -> None:
+        name = arn.rsplit('/', 1)[-1]
+        if ':iam::aws:policy/' in arn and arn not in self.managed_policies and name in data:
+            policy = AWSManagedPolicy.from_data(name, self.account_id, self.region_name, data[name])
+            if policy.arn == arn:
+                self.managed_policies[arn] = policy
+
+    for method in ('attach_role_policy', 'get_policy'):
+        def wrap(original):
+            def call(self, policy_arn, *args, **kwargs):
+                ensure(self, policy_arn)
+                return original(self, policy_arn, *args, **kwargs)
+            return call
+        setattr(IAMBackend, method, wrap(getattr(IAMBackend, method)))
 
 
 # ── latest-version ───────────────────────────────────────────────────────────────────────────────

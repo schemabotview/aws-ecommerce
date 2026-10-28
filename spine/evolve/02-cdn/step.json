@@ -1,0 +1,1 @@
+{"from": "operate/08-incident", "changes": ["infra/cdn.tf"], "env": true, "venv": true, "postgres": true}

@@ -1,0 +1,1 @@
+{"from": "operate/06-waf", "changes": ["infra/backup.tf"], "env": true, "venv": true, "postgres": true}

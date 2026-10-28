@@ -1,0 +1,13 @@
+$ python knee.py
+busy   median     p99
+ 10%      8 ms     51 ms
+ 20%      9 ms     57 ms
+ 30%     10 ms     70 ms
+ 40%     11 ms     80 ms
+ 50%     14 ms     98 ms
+ 60%     17 ms    105 ms
+ 70%     23 ms    137 ms
+ 80%     34 ms    215 ms
+ 85%     47 ms    358 ms
+ 90%     68 ms    400 ms
+ 95%    135 ms    670 ms

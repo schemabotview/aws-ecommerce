@@ -1,0 +1,2 @@
+{"type": "OrderPlaced", "order": 12, "customer": "c-17",
+ "books": {"bk-1001": 1}, "total": 10.99}

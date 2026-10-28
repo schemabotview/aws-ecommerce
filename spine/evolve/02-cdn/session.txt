@@ -1,0 +1,505 @@
+$ cd infra
+$ terraform plan -out=tfplan
+aws_dynamodb_table.stock: Refreshing state... [id=book-shop-stock]
+module.pipeline.data.aws_caller_identity.here: Reading...
+module.pipeline.data.aws_caller_identity.here: Read complete after 0s [id=444455
+556666]
+aws_cloudwatch_log_group.fulfil: Refreshing state... [id=/aws/lambda/book-shop-f
+ulfil]
+data.aws_iam_policy_document.lambda_trust: Reading...
+data.aws_iam_policy_document.lambda_trust: Read complete after 0s [id=2690255455
+]
+aws_kinesis_stream.clicks: Refreshing state... [id=arn:aws:kinesis:eu-west-2:444
+455556666:stream/book-shop-clicks]
+aws_route53_zone.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND]
+aws_dynamodb_table.idempotency: Refreshing state... [id=book-shop-idempotency]
+aws_cloudwatch_event_bus.shop: Refreshing state... [id=book-shop]
+module.network.aws_eip.nat: Refreshing state... [id=eipalloc-6ff6a2527581beced]
+data.aws_iam_policy_document.revoke: Reading...
+data.aws_iam_policy_document.revoke: Read complete after 0s [id=1065725602]
+aws_sns_topic.alerts: Refreshing state... [id=arn:aws:sns:eu-west-2:444455556666
+:book-shop-alerts]
+aws_acm_certificate.shop: Refreshing state... [id=arn:aws:acm:eu-west-2:44445555
+6666:certificate/8bd90642-d1d1-452e-890f-400b3727c4e7]
+data.aws_iam_policy_document.app_trust: Reading...
+data.aws_iam_policy_document.app_trust: Read complete after 0s [id=1077804475]
+aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
+ly]
+aws_sqs_queue.refunds: Refreshing state... [id=http://localhost:5000/44445555666
+6/book-shop-refunds]
+aws_sqs_queue.dead_letters: Refreshing state... [id=http://localhost:5000/444455
+556666/book-shop-fulfilment-dlq]
+aws_s3_bucket.uploads: Refreshing state... [id=book-shop-uploads-444455556666]
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
+aws_s3_bucket.lake: Refreshing state... [id=book-shop-lake-444455556666]
+aws_ecr_repository.app: Refreshing state... [id=book-shop]
+aws_secretsmanager_secret.payments: Refreshing state... [id=arn:aws:secretsmanag
+er:eu-west-2:444455556666:secret:book-shop/payments-api-key-KeuCYo]
+data.aws_iam_policy_document.backup_trust: Reading...
+data.aws_iam_policy_document.backup_trust: Read complete after 0s [id=1497918837
+]
+aws_ecs_cluster.shop: Refreshing state... [id=arn:aws:ecs:eu-west-2:444455556666
+:cluster/book-shop]
+aws_s3_bucket.trail: Refreshing state... [id=book-shop-trail-444455556666]
+aws_sqs_queue.vat: Refreshing state... [id=http://localhost:5000/444455556666/bo
+ok-shop-vat]
+aws_dynamodb_table.carts: Refreshing state... [id=book-shop-carts]
+aws_sqs_queue.returns: Refreshing state... [id=https://sqs.eu-west-2.amazonaws.c
+om/444455556666/book-shop-returns]
+aws_wafv2_web_acl.shop: Refreshing state... [id=3e8baab5-83d1-4fc9-bad9-225a6002
+11e7]
+aws_sqs_queue.fraud_check: Refreshing state... [id=http://localhost:5000/4444555
+56666/book-shop-fraud-check]
+data.aws_iam_policy_document.states_trust: Reading...
+data.aws_iam_policy_document.states_trust: Read complete after 0s [id=4022981484
+]
+aws_glue_catalog_database.lake: Refreshing state... [id=444455556666:book_shop_l
+ake]
+module.pipeline.aws_iam_openid_connect_provider.github: Refreshing state... [id=
+arn:aws:iam::444455556666:oidc-provider/token.actions.githubusercontent.com]
+aws_sns_topic.orders: Refreshing state... [id=arn:aws:sns:eu-west-2:444455556666
+:book-shop-orders]
+aws_sqs_queue.loyalty: Refreshing state... [id=http://localhost:5000/44445555666
+6/book-shop-points]
+aws_cloudwatch_log_group.app: Refreshing state... [id=/book-shop/app]
+module.network.aws_vpc.this: Refreshing state... [id=vpc-e3500a5c4abdcac35]
+module.pipeline.data.aws_iam_policy_document.deploy: Reading...
+module.pipeline.data.aws_iam_policy_document.deploy: Read complete after 0s [id=
+3378304592]
+aws_iam_role.steps: Refreshing state... [id=BookShopCheckoutSteps]
+aws_iam_role.fulfil: Refreshing state... [id=BookShopFulfil]
+aws_sns_topic_subscription.on_call: Refreshing state... [id=arn:aws:sns:eu-west-
+2:444455556666:book-shop-alerts:52e1fe00-75b6-4c35-b2d2-f19a5b1aa6d1]
+aws_cloudwatch_metric_alarm.burn["slow"]: Refreshing state... [id=book-shop-burn
+-slow]
+aws_cloudwatch_metric_alarm.burn["fast"]: Refreshing state... [id=book-shop-burn
+-fast]
+aws_route53_record.validation["book-shop.example.com"]: Refreshing state... [id=
+2ZK1ZCR6K7HTYSHM5XMFND__d930b28be6c5927595552b219965053e.book-shop.example.com._
+CNAME]
+aws_iam_role.app: Refreshing state... [id=BookShopApp]
+aws_iam_role.execution: Refreshing state... [id=BookShopExecution]
+aws_sqs_queue.fulfilment: Refreshing state... [id=http://localhost:5000/44445555
+6666/book-shop-fulfilment]
+aws_s3_bucket_cors_configuration.uploads: Refreshing state... [id=book-shop-uplo
+ads-444455556666]
+aws_s3_bucket_public_access_block.uploads: Refreshing state... [id=book-shop-upl
+oads-444455556666]
+aws_s3_bucket_versioning.catalog: Refreshing state... [id=book-shop-catalog-4444
+55556666]
+data.aws_iam_policy_document.catalog: Reading...
+data.aws_iam_policy_document.catalog: Read complete after 0s [id=3118418309]
+aws_s3_bucket_public_access_block.lake: Refreshing state... [id=book-shop-lake-4
+44455556666]
+aws_athena_workgroup.reports: Refreshing state... [id=book-shop-reports]
+aws_iam_role.backup: Refreshing state... [id=BookShopBackup]
+data.aws_iam_policy_document.trail: Reading...
+data.aws_iam_policy_document.trail: Read complete after 0s [id=2921212307]
+aws_iam_role.workflow: Refreshing state... [id=BookShopCheckoutFlow]
+module.pipeline.data.aws_iam_policy_document.trust: Reading...
+module.pipeline.data.aws_iam_policy_document.trust: Read complete after 0s [id=3
+68508645]
+data.aws_iam_policy_document.execution: Reading...
+data.aws_iam_policy_document.execution: Read complete after 0s [id=3229690975]
+aws_cloudwatch_log_metric_filter.this["Errors5xx"]: Refreshing state... [id=book
+-shop-errors5xx]
+aws_cloudwatch_log_metric_filter.this["Requests"]: Refreshing state... [id=book-
+shop-requests]
+module.network.aws_internet_gateway.this: Refreshing state... [id=igw-9bb99313e3
+559d59f]
+module.network.aws_route_table.private: Refreshing state... [id=rtb-b3c9465183df
+1b91c]
+module.network.aws_route_table.public: Refreshing state... [id=rtb-e5c7633cefa18
+a098]
+module.network.aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b6214
+0a09169ec7ff]
+module.network.aws_subnet.this["app-b"]: Refreshing state... [id=subnet-f7e3a7a4
+ba6f7ed13]
+module.network.aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c
+8b428e052e]
+module.network.aws_subnet.this["data-c"]: Refreshing state... [id=subnet-60f987a
+7b700f6f9f]
+module.network.aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce86
+9754647c8473]
+module.network.aws_subnet.this["app-c"]: Refreshing state... [id=subnet-e56d56ed
+1dbd82035]
+module.network.aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a
+394010c40419]
+module.network.aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77
+ba1743e06]
+module.network.aws_subnet.this["data-a"]: Refreshing state... [id=subnet-c7a7206
+42ba246ff7]
+aws_lambda_function.step["ship"]: Refreshing state... [id=book-shop-ship]
+aws_lambda_function.step["reserve"]: Refreshing state... [id=book-shop-reserve]
+aws_lambda_function.step["charge"]: Refreshing state... [id=book-shop-charge]
+aws_lambda_function.step["release"]: Refreshing state... [id=book-shop-release]
+aws_lambda_function.fulfil: Refreshing state... [id=book-shop-fulfil]
+aws_acm_certificate_validation.shop: Refreshing state... [id=2026-11-02 09:30:00
+ +0000 UTC]
+aws_iam_role_policy.revoke: Refreshing state... [id=BookShopApp:AWSRevokeOlderSe
+ssions]
+data.aws_iam_policy_document.key: Reading...
+data.aws_iam_policy_document.key: Read complete after 0s [id=4128790259]
+aws_ecs_task_definition.app: Refreshing state... [id=book-shop]
+data.aws_iam_policy_document.fulfil: Reading...
+data.aws_iam_policy_document.fulfil: Read complete after 0s [id=1204663964]
+aws_s3_bucket_lifecycle_configuration.catalog: Refreshing state... [id=book-shop
+-catalog-444455556666]
+aws_s3_bucket_policy.catalog: Refreshing state... [id=book-shop-catalog-44445555
+6666]
+aws_glue_catalog_table.order_history: Refreshing state... [id=444455556666:book_
+shop_lake:order_history]
+aws_iam_role_policy_attachment.backup: Refreshing state... [id=BookShopBackup/ar
+n:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup]
+aws_s3_bucket_policy.trail: Refreshing state... [id=book-shop-trail-444455556666
+]
+aws_cloudwatch_event_rule.this["uk-vat"]: Refreshing state... [id=book-shop/uk-v
+at]
+aws_cloudwatch_event_rule.this["refunds"]: Refreshing state... [id=book-shop/ref
+unds]
+module.pipeline.aws_iam_role.pipeline: Refreshing state... [id=BookShopPipeline]
+aws_iam_role_policy.execution: Refreshing state... [id=BookShopExecution:pull-an
+d-log]
+aws_security_group.this["app"]: Refreshing state... [id=sg-0ea1f02f93c435340]
+aws_lb_target_group.app: Refreshing state... [id=arn:aws:elasticloadbalancing:eu
+-west-2:444455556666:targetgroup/book-shop-app/a13717916e126457]
+aws_security_group.this["db"]: Refreshing state... [id=sg-98bc7ab1c20bfa122]
+aws_security_group.this["alb"]: Refreshing state... [id=sg-1292ef779761e6b9e]
+module.network.aws_vpc_endpoint.s3: Refreshing state... [id=vpce-b3f3a79917dfc3a
+98]
+module.network.aws_route.public_internet: Refreshing state... [id=r-rtb-e5c7633c
+efa18a0981080289494]
+module.network.aws_nat_gateway.a: Refreshing state... [id=nat-0e556a59c79dfb70c]
+module.network.aws_route_table_association.this["app-c"]: Refreshing state... [i
+d=rtbassoc-396ff0e232233df43]
+module.network.aws_route_table_association.this["data-c"]: Refreshing state... [
+id=rtbassoc-43e4ec2fc8562cf05]
+module.network.aws_route_table_association.this["public-a"]: Refreshing state...
+ [id=rtbassoc-c5db509e02f0fff92]
+module.network.aws_route_table_association.this["app-b"]: Refreshing state... [i
+d=rtbassoc-bc1797f9fcb119fd7]
+module.network.aws_route_table_association.this["public-c"]: Refreshing state...
+ [id=rtbassoc-9df09e3cd1e2023e5]
+module.network.aws_route_table_association.this["data-a"]: Refreshing state... [
+id=rtbassoc-90528cedb357e43a3]
+module.network.aws_route_table_association.this["public-b"]: Refreshing state...
+ [id=rtbassoc-6c78e88ccbd487489]
+module.network.aws_route_table_association.this["data-b"]: Refreshing state... [
+id=rtbassoc-04718beae952daaf1]
+module.network.aws_route_table_association.this["app-a"]: Refreshing state... [i
+d=rtbassoc-63af24dc5926c42f9]
+aws_sfn_state_machine.checkout: Refreshing state... [id=arn:aws:states:eu-west-2
+:444455556666:stateMachine:book-shop-checkout]
+aws_iam_role_policy.workflow: Refreshing state... [id=BookShopCheckoutFlow:invok
+e-steps]
+aws_lambda_event_source_mapping.fulfil: Refreshing state... [id=83897db3-ce9c-43
+3c-b02e-3b8a5e0ac386]
+aws_kms_key.data: Refreshing state... [id=94343a46-0975-48b3-96e5-7e2319a5324f]
+aws_iam_role_policy.fulfil: Refreshing state... [id=BookShopFulfil:fulfil]
+data.aws_iam_policy_document.from_topic["loyalty"]: Reading...
+data.aws_iam_policy_document.from_topic["loyalty"]: Read complete after 0s [id=3
+155152043]
+data.aws_iam_policy_document.from_topic["fraud-check"]: Reading...
+data.aws_iam_policy_document.from_topic["fraud-check"]: Read complete after 0s [
+id=2958679341]
+data.aws_iam_policy_document.from_topic["fulfilment"]: Reading...
+data.aws_iam_policy_document.from_topic["fulfilment"]: Read complete after 0s [i
+d=2956760995]
+aws_cloudtrail.audit: Refreshing state... [id=arn:aws:cloudtrail:eu-west-2:44445
+5556666:trail/book-shop-audit]
+aws_cloudwatch_event_target.this["uk-vat"]: Refreshing state... [id=book-shop-uk
+-vat-terraform-qOLm9X7MKwEXercH0M4nirsA34]
+aws_cloudwatch_event_target.this["refunds"]: Refreshing state... [id=book-shop-r
+efunds-terraform-d88RW2Th4oejmNSd80iL3o0nuF]
+data.aws_iam_policy_document.from_rule["uk-vat"]: Reading...
+data.aws_iam_policy_document.from_rule["uk-vat"]: Read complete after 0s [id=120
+3856062]
+data.aws_iam_policy_document.from_rule["refunds"]: Reading...
+data.aws_iam_policy_document.from_rule["refunds"]: Read complete after 0s [id=32
+42954869]
+module.pipeline.aws_iam_role_policy.deploy: Refreshing state... [id=BookShopPipe
+line:deploy]
+aws_vpc_security_group_ingress_rule.this["app_alb"]: Refreshing state... [id=sgr
+-61ea7866148cdc96f]
+aws_vpc_security_group_egress_rule.alb_app: Refreshing state... [id=sgr-72f34ea4
+1ac2722c1]
+aws_vpc_security_group_egress_rule.app_out: Refreshing state... [id=sgr-615841b9
+17e0c5c82]
+aws_vpc_security_group_ingress_rule.this["db_app"]: Refreshing state... [id=sgr-
+6e8abec5ee98759ac]
+aws_vpc_security_group_ingress_rule.this["http"]: Refreshing state... [id=sgr-53
+a8fe45fdb109b8c]
+aws_vpc_security_group_ingress_rule.this["https"]: Refreshing state... [id=sgr-2
+eba2a5dc5ea961db]
+aws_network_acl.data: Refreshing state... [id=acl-c0fda9619b350bd6d]
+aws_lb.shop: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-west-2:4444
+55556666:loadbalancer/app/book-shop/3fb1738b10ff2017]
+aws_db_subnet_group.data: Refreshing state... [id=book-shop-data]
+module.network.aws_route.private_out: Refreshing state... [id=r-rtb-b3c9465183df
+1b91c1080289494]
+aws_s3_bucket_server_side_encryption_configuration.lake: Refreshing state... [id
+=book-shop-lake-444455556666]
+aws_kms_alias.data: Refreshing state... [id=alias/book-shop-data]
+aws_backup_vault.shop: Refreshing state... [id=book-shop]
+aws_sqs_queue_policy.from_topic["loyalty"]: Refreshing state... [id=http://local
+host:5000/444455556666/book-shop-points]
+aws_sqs_queue_policy.from_topic["fraud-check"]: Refreshing state... [id=http://l
+ocalhost:5000/444455556666/book-shop-fraud-check]
+aws_sqs_queue_policy.from_topic["fulfilment"]: Refreshing state... [id=http://lo
+calhost:5000/444455556666/book-shop-fulfilment]
+aws_sqs_queue_policy.from_rule["uk-vat"]: Refreshing state... [id=http://localho
+st:5000/444455556666/book-shop-vat]
+aws_sqs_queue_policy.from_rule["refunds"]: Refreshing state... [id=http://localh
+ost:5000/444455556666/book-shop-refunds]
+aws_route53_record.shop: Refreshing state... [id=2ZK1ZCR6K7HTYSHM5XMFND_book-sho
+p.example.com_A]
+aws_lb_listener.https: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-w
+est-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/c602f22870b50359]
+aws_wafv2_web_acl_association.alb: Refreshing state... [id=arn:aws:wafv2:eu-west
+-2:444455556666:regional/webacl/book-shop/3e8baab5-83d1-4fc9-bad9-225a600211e7,a
+rn:aws:elasticloadbalancing:eu-west-2:444455556666:loadbalancer/app/book-shop/3f
+b1738b10ff2017]
+aws_lb_listener.http: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-we
+st-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b69bb98]
+aws_db_instance.orders: Refreshing state... [id=db-M5ENSHXFPU6XHZ4G4ZEI5QIO2U]
+aws_backup_plan.nightly: Refreshing state... [id=96a9388b-7eea-48f6-b105-83189e3
+f3394]
+aws_sns_topic_subscription.listeners["loyalty"]: Refreshing state... [id=arn:aws
+:sns:eu-west-2:444455556666:book-shop-orders:9d8c5594-6665-46cc-acf0-4b7615ae3d4
+4]
+aws_sns_topic_subscription.listeners["fraud-check"]: Refreshing state... [id=arn
+:aws:sns:eu-west-2:444455556666:book-shop-orders:2f14949f-5237-4708-a5f9-aecb80a
+51991]
+aws_sns_topic_subscription.listeners["fulfilment"]: Refreshing state... [id=arn:
+aws:sns:eu-west-2:444455556666:book-shop-orders:67924153-fac5-4b06-a036-c296e3f0
+a046]
+aws_ecs_service.app: Refreshing state... [id=arn:aws:ecs:eu-west-2:444455556666:
+service/book-shop/book-shop]
+data.aws_iam_policy_document.app: Reading...
+data.aws_iam_policy_document.app: Read complete after 0s [id=1184804765]
+aws_backup_selection.data: Refreshing state... [id=eb82cf2e-197e-478a-95f8-d1afa
+8d325e3]
+aws_iam_role_policy.app: Refreshing state... [id=BookShopApp:book-shop-app]
+aws_appautoscaling_target.app: Refreshing state... [id=service/book-shop/book-sh
+op]
+aws_appautoscaling_policy.cpu: Refreshing state... [id=cpu-60]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_cloudfront_cache_policy.never will be created
+  + resource "aws_cloudfront_cache_policy" "never" {
+      + arn         = (known after apply)
+      + default_ttl = 0
+      + etag        = (known after apply)
+      + id          = (known after apply)
+      + max_ttl     = 0
+      + min_ttl     = 0
+      + name        = "book-shop-never"
+
+      + parameters_in_cache_key_and_forwarded_to_origin {
+          + cookies_config {
+              + cookie_behavior = "none"
+            }
+          + headers_config {
+              + header_behavior = "none"
+            }
+          + query_strings_config {
+              + query_string_behavior = "none"
+            }
+        }
+    }
+
+  # aws_cloudfront_cache_policy.pages will be created
+  + resource "aws_cloudfront_cache_policy" "pages" {
+      + arn         = (known after apply)
+      + default_ttl = 60
+      + etag        = (known after apply)
+      + id          = (known after apply)
+      + max_ttl     = 300
+      + min_ttl     = 0
+      + name        = "book-shop-pages"
+
+      + parameters_in_cache_key_and_forwarded_to_origin {
+          + cookies_config {
+              + cookie_behavior = "none"
+            }
+          + headers_config {
+              + header_behavior = "none"
+            }
+          + query_strings_config {
+              + query_string_behavior = "none"
+            }
+        }
+    }
+
+  # aws_cloudfront_distribution.shop will be created
+  + resource "aws_cloudfront_distribution" "shop" {
+      + arn                             = (known after apply)
+      + caller_reference                = (known after apply)
+      + comment                         = "book-shop"
+      + continuous_deployment_policy_id = (known after apply)
+      + domain_name                     = (known after apply)
+      + enabled                         = true
+      + etag                            = (known after apply)
+      + hosted_zone_id                  = (known after apply)
+      + http_version                    = "http2"
+      + id                              = (known after apply)
+      + in_progress_validation_batches  = (known after apply)
+      + is_ipv6_enabled                 = false
+      + last_modified_time              = (known after apply)
+      + logging_v1_enabled              = (known after apply)
+      + price_class                     = "PriceClass_All"
+      + retain_on_delete                = false
+      + staging                         = false
+      + status                          = (known after apply)
+      + tags_all                        = {
+          + "app"        = "book-shop"
+          + "env"        = "dev"
+          + "managed-by" = "terraform"
+        }
+      + trusted_key_groups              = (known after apply)
+      + trusted_signers                 = (known after apply)
+      + wait_for_deployment             = true
+
+      + default_cache_behavior {
+          + allowed_methods        = [
+              + "GET",
+              + "HEAD",
+            ]
+          + cache_policy_id        = (known after apply)
+          + cached_methods         = [
+              + "GET",
+              + "HEAD",
+            ]
+          + compress               = false
+          + default_ttl            = (known after apply)
+          + max_ttl                = (known after apply)
+          + min_ttl                = 0
+          + target_origin_id       = "alb"
+          + trusted_key_groups     = (known after apply)
+          + trusted_signers        = (known after apply)
+          + viewer_protocol_policy = "redirect-to-https"
+
+          + grpc_config (known after apply)
+        }
+
+      + ordered_cache_behavior {
+          + allowed_methods        = [
+              + "DELETE",
+              + "GET",
+              + "HEAD",
+              + "OPTIONS",
+              + "PATCH",
+              + "POST",
+              + "PUT",
+            ]
+          + cache_policy_id        = (known after apply)
+          + cached_methods         = [
+              + "GET",
+              + "HEAD",
+            ]
+          + compress               = false
+          + default_ttl            = (known after apply)
+          + max_ttl                = (known after apply)
+          + min_ttl                = 0
+          + path_pattern           = "/checkout*"
+          + target_origin_id       = "alb"
+          + viewer_protocol_policy = "https-only"
+
+          + grpc_config (known after apply)
+        }
+
+      + origin {
+          + connection_attempts         = 3
+          + connection_timeout          = 10
+          + domain_name                 = "book-shop-1.eu-west-2.elb.amazonaws.c
+om"
+          + origin_id                   = "alb"
+          + response_completion_timeout = (known after apply)
+            # (2 unchanged attributes hidden)
+
+          + custom_origin_config {
+              + http_port                = 80
+              + https_port               = 443
+              + origin_keepalive_timeout = 5
+              + origin_protocol_policy   = "https-only"
+              + origin_read_timeout      = 30
+              + origin_ssl_protocols     = [
+                  + "TLSv1.2",
+                ]
+                # (1 unchanged attribute hidden)
+            }
+        }
+
+      + restrictions {
+          + geo_restriction {
+              + locations        = (known after apply)
+              + restriction_type = "none"
+            }
+        }
+
+      + viewer_certificate {
+          + cloudfront_default_certificate = true
+          + minimum_protocol_version       = "TLSv1"
+        }
+    }
+
+Plan: 3 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + cdn_id            = (known after apply)
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+$ terraform apply tfplan
+aws_cloudfront_cache_policy.pages: Creating...
+aws_cloudfront_cache_policy.pages: Creation complete after 0s [id=707c1e2e-c4d0-
+451a-96be-9e26f53dfa66]
+aws_cloudfront_cache_policy.never: Creating...
+aws_cloudfront_cache_policy.never: Creation complete after 0s [id=9f44ab37-3e8a-
+4793-bef8-5784a52c4e49]
+aws_cloudfront_distribution.shop: Creating...
+aws_cloudfront_distribution.shop: Still creating... [00m10s elapsed]
+aws_cloudfront_distribution.shop: Still creating... [00m20s elapsed]
+aws_cloudfront_distribution.shop: Still creating... [00m30s elapsed]
+aws_cloudfront_distribution.shop: Creation complete after 31s [id=WVABP80330IRR]
+
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+app_role_arn = "arn:aws:iam::444455556666:role/BookShopApp"
+backup_plan_id = "96a9388b-7eea-48f6-b105-83189e3f3394"
+cdn_id = "WVABP80330IRR"
+checkout_flow_arn = "arn:aws:states:eu-west-2:444455556666:stateMachine:book-sho
+p-checkout"
+db_secret_arn = "arn:aws:secretsmanager:eu-west-2:444455556666:secret:rds!db-94e
+c1fbb-3711-4afa-b368-7c8aa0206489-WKUVTV"
+dead_letter_url = "http://localhost:5000/444455556666/book-shop-fulfilment-dlq"
+lake_bucket = "book-shop-lake-444455556666"
+lb_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:loadbalancer/app/b
+ook-shop/3fb1738b10ff2017"
+orders_topic_arn = "arn:aws:sns:eu-west-2:444455556666:book-shop-orders"
+pipeline_role_arn = "arn:aws:iam::444455556666:role/BookShopPipeline"
+queue_url = "http://localhost:5000/444455556666/book-shop-fulfilment"
+repository_url = "444455556666.dkr.ecr.eu-west-2.amazonaws.com/book-shop"
+target_group_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:targetgr
+oup/book-shop-app/a13717916e126457"
+vpc_id = "vpc-e3500a5c4abdcac35"
+zone_id = "2ZK1ZCR6K7HTYSHM5XMFND"
+$ aws cloudfront get-distribution --id $(terraform output -raw cdn_id) \
+>   --query 'Distribution.[Status, DomainName]' --output text
+Deployed	mku7ai5kg6amy.cloudfront.net
+$ aws cloudfront get-distribution-config --id $(terraform output -raw cdn_id) \
+>   --query 'DistributionConfig.CacheBehaviors.Items[].PathPattern'
+[
+    "/checkout*"
+]

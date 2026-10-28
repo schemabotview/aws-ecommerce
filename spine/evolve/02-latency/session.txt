@@ -1,0 +1,14 @@
+$ python cdn_model.py
+hit ratio  Sydney  London
+       0%   325 ms    45 ms
+      10%   294 ms    42 ms
+      20%   263 ms    38 ms
+      30%   232 ms    34 ms
+      40%   201 ms    31 ms
+      50%   170 ms    28 ms
+      60%   139 ms    24 ms
+      70%   108 ms    20 ms
+      80%    77 ms    17 ms
+      90%    46 ms    14 ms
+     100%    15 ms    10 ms
+no CDN:     310 ms    40 ms
