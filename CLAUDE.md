@@ -16,8 +16,11 @@ Engine `@graphlearning/graphl-flow` ^0.6.0, shell `@graphlearning/shell` ^1.0.4.
 
 ## Status
 
-Pilot authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections) and Course 5's first
-section (`network-addresses-and-cidr`, a ◆ full scene). No narration audio yet.
+Authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections) and Course 5 `network`
+(10 sections). No narration audio yet. **Course 4 (`secure`) is not authored**: Course 5's chain
+continues from `start/08-budget`. When Course 4 is written, `network/02-vpc`'s `from` moves to its
+last step and the network transcripts are rewritten (`--write`); scenes find lines by text, so they
+follow.
 
 **graphl-flow 0.6.0 is not on npm yet** (branch `claude/pensive-johnson-ixdglh` of graphl-flow: AWS
 icons, `dashed` groups, `muted` items, `hcl`, folded terminals). Until it is published: build it
@@ -64,7 +67,17 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   sent on create, …) and ids seeded from each request's CONTENT (Terraform's walk order varies run to
   run). Each fix answers as AWS's API reference says AWS answers — never what a frame wants.
   When a fix is needed, find the call with `MATRIX_DEBUG=1`, patch, and prove it with the matrix.
+- moto's clock is frozen, so anything it does "after N seconds" never happens: the replay sets
+  `MOTO_ACM_VALIDATION_WAIT=-1` (a DNS-validated certificate is issued at once).
 - `TF_IN_AUTOMATION` is never set: it rewords Terraform's hints, and a learner's terminal lacks it.
+- Ids are seeded from a request's CANONICAL content: idempotency tokens dropped and tags sorted by
+  key, because the provider sends a tag map in Go's random order (a seed that saw the order gave
+  the same subnet two ids on two runs).
+- **`FAKETIME_SHARED` must never survive between commands.** libfaketime exports it pointing at a
+  per-process semaphore; the replay's `export -p` state carried it into the next command, whose
+  tools then failed SILENTLY (an `aws` call printing nothing, about one run in three). Every command
+  and `setup` now unsets it, and any `libfaketime:` line in output fails the replay.
+- A typed line exactly 80 wide is refused (it reads as wrapped): reword or split it with `\`.
 
 ## Frames
 
@@ -93,7 +106,13 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 | buckets | `book-shop-catalog-444455556666`; state `book-shop-tfstate-444455556666`, key `book-shop/terraform.tfstate`, `use_lockfile` |
 | tags | default: `app = book-shop`, `env = dev`, `managed-by = terraform` |
 | budget | `book-shop-dev-monthly`, 20 USD, 80% forecast → alex@book-shop.example.com |
-| VPC | 10.20.0.0/16; public 10.20.0–2.0/24, app 10.20.10–12.0/24, data 10.20.20–22.0/24 |
+| VPC | `book-shop` 10.20.0.0/16; public 10.20.0–2.0/24, app 10.20.10–12.0/24, data 10.20.20–22.0/24; the account's default VPC 172.31.0.0/16 is not used |
+| routes | tables `public` (local, 0.0.0.0/0 → igw) and `private` (local, 0.0.0.0/0 → nat-a, S3 prefix list → gateway endpoint) |
+| NAT | ONE, `nat-a` in public-a (dev: a cost trade; production one per AZ) |
+| security groups | `alb` 443, 80 from anywhere → `app` 8080 from alb → `db` 5432 from app; NACL `data`: 5432 in from 10.20.8.0/21, 1024–65535 out |
+| load balancer | `book-shop`, internet-facing, 3 public subnets; target group `book-shop-app` HTTP 8080 ip, /health every 10 s, 3 in / 2 out, 30 s draining; 80 → 301 HTTPS, 443 TLS13-1-2-2021-06 |
+| DNS / TLS | zone book-shop.example.com, alias A → the ALB; ACM certificate, DNS-validated |
+| payments API | 198.51.100.7 (documentation range) |
 | clock | 2026-11-02 09:30:00 UTC (the spine's default) |
 
 Extend this table; never change a value a frame already quotes.

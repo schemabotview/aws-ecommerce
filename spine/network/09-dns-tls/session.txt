@@ -1,0 +1,335 @@
+$ cd infra
+$ terraform plan -out=tfplan
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
+aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
+ly]
+aws_vpc.shop: Refreshing state... [id=vpc-e3500a5c4abdcac35]
+aws_eip.nat: Refreshing state... [id=eipalloc-6ff6a2527581beced]
+aws_internet_gateway.shop: Refreshing state... [id=igw-9bb99313e3559d59f]
+aws_route_table.public: Refreshing state... [id=rtb-e5c7633cefa18a098]
+aws_lb_target_group.app: Refreshing state... [id=arn:aws:elasticloadbalancing:eu
+-west-2:444455556666:targetgroup/book-shop-app/a13717916e126457]
+aws_route_table.private: Refreshing state... [id=rtb-b3c9465183df1b91c]
+aws_security_group.this["db"]: Refreshing state... [id=sg-98bc7ab1c20bfa122]
+aws_security_group.this["app"]: Refreshing state... [id=sg-0ea1f02f93c435340]
+aws_security_group.this["alb"]: Refreshing state... [id=sg-1292ef779761e6b9e]
+aws_subnet.this["data-a"]: Refreshing state... [id=subnet-c7a720642ba246ff7]
+aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a394010c40419]
+aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b62140a09169ec7ff]
+aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c8b428e052e]
+aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
+aws_subnet.this["app-b"]: Refreshing state... [id=subnet-f7e3a7a4ba6f7ed13]
+aws_subnet.this["app-c"]: Refreshing state... [id=subnet-e56d56ed1dbd82035]
+aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce869754647c8473]
+aws_subnet.this["data-c"]: Refreshing state... [id=subnet-60f987a7b700f6f9f]
+aws_route.public_internet: Refreshing state... [id=r-rtb-e5c7633cefa18a098108028
+9494]
+aws_vpc_security_group_egress_rule.app_out: Refreshing state... [id=sgr-615841b9
+17e0c5c82]
+aws_vpc_security_group_egress_rule.alb_app: Refreshing state... [id=sgr-72f34ea4
+1ac2722c1]
+aws_vpc_security_group_ingress_rule.this["https"]: Refreshing state... [id=sgr-2
+eba2a5dc5ea961db]
+aws_vpc_security_group_ingress_rule.this["app_alb"]: Refreshing state... [id=sgr
+-61ea7866148cdc96f]
+aws_vpc_security_group_ingress_rule.this["http"]: Refreshing state... [id=sgr-53
+a8fe45fdb109b8c]
+aws_vpc_security_group_ingress_rule.this["db_app"]: Refreshing state... [id=sgr-
+6e8abec5ee98759ac]
+aws_network_acl.data: Refreshing state... [id=acl-c0fda9619b350bd6d]
+aws_lb.shop: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-west-2:4444
+55556666:loadbalancer/app/book-shop/3fb1738b10ff2017]
+aws_nat_gateway.a: Refreshing state... [id=nat-0e556a59c79dfb70c]
+aws_route_table_association.this["data-b"]: Refreshing state... [id=rtbassoc-047
+18beae952daaf1]
+aws_route_table_association.this["public-c"]: Refreshing state... [id=rtbassoc-9
+df09e3cd1e2023e5]
+aws_route_table_association.this["public-a"]: Refreshing state... [id=rtbassoc-c
+5db509e02f0fff92]
+aws_route_table_association.this["app-a"]: Refreshing state... [id=rtbassoc-63af
+24dc5926c42f9]
+aws_route_table_association.this["app-b"]: Refreshing state... [id=rtbassoc-bc17
+97f9fcb119fd7]
+aws_route_table_association.this["app-c"]: Refreshing state... [id=rtbassoc-396f
+f0e232233df43]
+aws_route_table_association.this["data-a"]: Refreshing state... [id=rtbassoc-905
+28cedb357e43a3]
+aws_route_table_association.this["data-c"]: Refreshing state... [id=rtbassoc-43e
+4ec2fc8562cf05]
+aws_route_table_association.this["public-b"]: Refreshing state... [id=rtbassoc-6
+c78e88ccbd487489]
+aws_lb_listener.http: Refreshing state... [id=arn:aws:elasticloadbalancing:eu-we
+st-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b69bb98]
+aws_route.private_out: Refreshing state... [id=r-rtb-b3c9465183df1b91c1080289494
+]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # aws_acm_certificate.shop will be created
+  + resource "aws_acm_certificate" "shop" {
+      + arn                       = (known after apply)
+      + domain_name               = "book-shop.example.com"
+      + domain_validation_options = [
+          + {
+              + domain_name           = "book-shop.example.com"
+              + resource_record_name  = (known after apply)
+              + resource_record_type  = (known after apply)
+              + resource_record_value = (known after apply)
+            },
+        ]
+      + id                        = (known after apply)
+      + key_algorithm             = (known after apply)
+      + not_after                 = (known after apply)
+      + not_before                = (known after apply)
+      + pending_renewal           = (known after apply)
+      + private_key_wo            = (write-only attribute)
+      + region                    = "eu-west-2"
+      + renewal_eligibility       = (known after apply)
+      + renewal_summary           = (known after apply)
+      + status                    = (known after apply)
+      + subject_alternative_names = [
+          + "book-shop.example.com",
+        ]
+      + tags_all                  = {
+          + "app"        = "book-shop"
+          + "env"        = "dev"
+          + "managed-by" = "terraform"
+        }
+      + type                      = (known after apply)
+      + validation_emails         = (known after apply)
+      + validation_method         = "DNS"
+
+      + options (known after apply)
+    }
+
+  # aws_acm_certificate_validation.shop will be created
+  + resource "aws_acm_certificate_validation" "shop" {
+      + certificate_arn         = (known after apply)
+      + id                      = (known after apply)
+      + region                  = "eu-west-2"
+      + validation_record_fqdns = (known after apply)
+    }
+
+  # aws_lb_listener.http will be updated in-place
+  ~ resource "aws_lb_listener" "http" {
+        id                       = "arn:aws:elasticloadbalancing:eu-west-2:44445
+5556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b69bb98"
+        tags                     = {}
+        # (8 unchanged attributes hidden)
+
+      ~ default_action {
+          ~ type             = "forward" -> "redirect"
+            # (2 unchanged attributes hidden)
+
+          + redirect {
+              + host        = "#{host}"
+              + path        = "/#{path}"
+              + port        = "443"
+              + protocol    = "HTTPS"
+              + query       = "#{query}"
+              + status_code = "HTTP_301"
+            }
+        }
+    }
+
+  # aws_lb_listener.https will be created
+  + resource "aws_lb_listener" "https" {
+      + arn                                                                   = 
+(known after apply)
+      + certificate_arn                                                       = 
+(known after apply)
+      + id                                                                    = 
+(known after apply)
+      + load_balancer_arn                                                     = 
+"arn:aws:elasticloadbalancing:eu-west-2:444455556666:loadbalancer/app/book-shop/
+3fb1738b10ff2017"
+      + port                                                                  = 
+443
+      + protocol                                                              = 
+"HTTPS"
+      + region                                                                = 
+"eu-west-2"
+      + routing_http_request_x_amzn_mtls_clientcert_header_name               = 
+(known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_issuer_header_name        = 
+(known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_leaf_header_name          = 
+(known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_serial_number_header_name = 
+(known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_subject_header_name       = 
+(known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_validity_header_name      = 
+(known after apply)
+      + routing_http_request_x_amzn_tls_cipher_suite_header_name              = 
+(known after apply)
+      + routing_http_request_x_amzn_tls_version_header_name                   = 
+(known after apply)
+      + routing_http_response_access_control_allow_credentials_header_value   = 
+(known after apply)
+      + routing_http_response_access_control_allow_headers_header_value       = 
+(known after apply)
+      + routing_http_response_access_control_allow_methods_header_value       = 
+(known after apply)
+      + routing_http_response_access_control_allow_origin_header_value        = 
+(known after apply)
+      + routing_http_response_access_control_expose_headers_header_value      = 
+(known after apply)
+      + routing_http_response_access_control_max_age_header_value             = 
+(known after apply)
+      + routing_http_response_content_security_policy_header_value            = 
+(known after apply)
+      + routing_http_response_server_enabled                                  = 
+(known after apply)
+      + routing_http_response_strict_transport_security_header_value          = 
+(known after apply)
+      + routing_http_response_x_content_type_options_header_value             = 
+(known after apply)
+      + routing_http_response_x_frame_options_header_value                    = 
+(known after apply)
+      + ssl_policy                                                            = 
+"ELBSecurityPolicy-TLS13-1-2-2021-06"
+      + tags_all                                                              = 
+{
+          + "app"        = "book-shop"
+          + "env"        = "dev"
+          + "managed-by" = "terraform"
+        }
+      + tcp_idle_timeout_seconds                                              = 
+(known after apply)
+
+      + default_action {
+          + order            = (known after apply)
+          + target_group_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556
+666:targetgroup/book-shop-app/a13717916e126457"
+          + type             = "forward"
+        }
+
+      + mutual_authentication (known after apply)
+    }
+
+  # aws_route53_record.shop will be created
+  + resource "aws_route53_record" "shop" {
+      + allow_overwrite = (known after apply)
+      + fqdn            = (known after apply)
+      + id              = (known after apply)
+      + name            = "book-shop.example.com"
+      + type            = "A"
+      + zone_id         = (known after apply)
+
+      + alias {
+          + evaluate_target_health = true
+          + name                   = "book-shop-1.eu-west-2.elb.amazonaws.com"
+          + zone_id                = "Z2P70J7EXAMPLE"
+        }
+    }
+
+  # aws_route53_record.validation["book-shop.example.com"] will be created
+  + resource "aws_route53_record" "validation" {
+      + allow_overwrite = (known after apply)
+      + fqdn            = (known after apply)
+      + id              = (known after apply)
+      + name            = (known after apply)
+      + records         = (known after apply)
+      + ttl             = 300
+      + type            = (known after apply)
+      + zone_id         = (known after apply)
+    }
+
+  # aws_route53_zone.shop will be created
+  + resource "aws_route53_zone" "shop" {
+      + arn                         = (known after apply)
+      + comment                     = "Managed by Terraform"
+      + enable_accelerated_recovery = (known after apply)
+      + force_destroy               = false
+      + id                          = (known after apply)
+      + name                        = "book-shop.example.com"
+      + name_servers                = (known after apply)
+      + primary_name_server         = (known after apply)
+      + tags_all                    = {
+          + "app"        = "book-shop"
+          + "env"        = "dev"
+          + "managed-by" = "terraform"
+        }
+      + zone_id                     = (known after apply)
+    }
+
+Plan: 6 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  + lb_arn           = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:load
+balancer/app/book-shop/3fb1738b10ff2017"
+  + zone_id          = (known after apply)
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+$ terraform apply tfplan
+aws_acm_certificate.shop: Creating...
+aws_acm_certificate.shop: Creation complete after 0s [id=arn:aws:acm:eu-west-2:4
+44455556666:certificate/8bd90642-d1d1-452e-890f-400b3727c4e7]
+aws_route53_zone.shop: Creating...
+aws_route53_zone.shop: Still creating... [00m10s elapsed]
+aws_route53_zone.shop: Creation complete after 15s [id=2ZK1ZCR6K7HTYSHM5XMFND]
+aws_route53_record.validation["book-shop.example.com"]: Creating...
+aws_route53_record.validation["book-shop.example.com"]: Still creating... [00m10
+s elapsed]
+aws_route53_record.validation["book-shop.example.com"]: Creation complete after 
+16s [id=2ZK1ZCR6K7HTYSHM5XMFND__d930b28be6c5927595552b219965053e.book-shop.examp
+le.com._CNAME]
+aws_route53_record.shop: Creating...
+aws_route53_record.shop: Still creating... [00m10s elapsed]
+aws_route53_record.shop: Creation complete after 15s [id=2ZK1ZCR6K7HTYSHM5XMFND_
+book-shop.example.com_A]
+aws_lb_listener.http: Modifying... [id=arn:aws:elasticloadbalancing:eu-west-2:44
+4455556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b69bb98]
+aws_lb_listener.http: Modifications complete after 0s [id=arn:aws:elasticloadbal
+ancing:eu-west-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b
+69bb98]
+aws_acm_certificate_validation.shop: Creating...
+aws_acm_certificate_validation.shop: Creation complete after 0s [id=2026-11-02 0
+9:30:00 +0000 UTC]
+aws_lb_listener.https: Creating...
+aws_lb_listener.https: Creation complete after 0s [id=arn:aws:elasticloadbalanci
+ng:eu-west-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/c602f22870b503
+59]
+
+Warning: Invalid Attribute Combination
+
+  with aws_lb_listener.http,
+  on alb.tf line 46, in resource "aws_lb_listener" "http":
+  46:   default_action {
+
+Attribute "default_action[0].target_group_arn" cannot be specified when
+"default_action[0].type" is "redirect".
+
+This will be an error in a future release of the provider.
+
+Apply complete! Resources: 6 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+lb_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:loadbalancer/app/b
+ook-shop/3fb1738b10ff2017"
+target_group_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:targetgr
+oup/book-shop-app/a13717916e126457"
+vpc_id = "vpc-e3500a5c4abdcac35"
+zone_id = "2ZK1ZCR6K7HTYSHM5XMFND"
+$ aws route53 list-resource-record-sets --output text \
+>   --hosted-zone-id "$(terraform output -raw zone_id)" \
+>   --query "ResourceRecordSets[?Type=='A' || Type=='CNAME'].[Name, Type]"
+book-shop.example.com.	A
+_d930b28be6c5927595552b219965053e.book-shop.example.com.	CNAME
+$ aws elbv2 describe-listeners --output text \
+>   --load-balancer-arn "$(terraform output -raw lb_arn)" \
+>   --query "Listeners[].[Port, Protocol, DefaultActions[0].Type]"
+80	HTTP	redirect
+443	HTTPS	forward

@@ -195,16 +195,16 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | ◆ full scene: addresses and CIDR | lab: the shop's plan with `ipaddress` | 10.20.0.0/16 split into 9 subnets, drawn as address space |
-| 2 | A VPC across three AZs | `network.tf`: VPC + 9 subnets (`for_each`) | map: Region → VPC → 3 AZs → public / app / data bands |
-| 3 | Route tables | route tables and associations | a packet → route table → longest prefix wins |
-| 4 | The way in: an internet gateway | IGW, public routes | public subnet ↔ IGW ↔ internet; a private one has no door |
-| 5 | The way out: NAT | NAT gateway per AZ (cost noted) | who may *start* a connection, drawn both ways |
-| 6 | Security groups and network ACLs | `sg-alb` → `sg-app` → `sg-db` | stateful SG chain vs stateless NACL, one packet through each |
-| 7 | ◆ full scene: the life of a request | concept | shopper → DNS → TLS → ALB → target → app → reply, every hop on the map |
-| 8 | A load balancer and its health checks | ALB, listener, target group | health state machine: initial → healthy → unhealthy → draining |
-| 9 | A name and a certificate | Route 53 zone, alias record, ACM | the resolution chain; where TLS ends |
-| 10 | Private paths to AWS services | S3 gateway endpoint | app → S3 through NAT vs through the endpoint, and the bill for each |
+| 1 | ◆ full scene: addresses and CIDR | lab: `cidr_plan.py` (Python's `ipaddress`, runs locally) | the /16 carved into nine /24s by tier and AZ; one /24 opened: the 5 addresses AWS keeps |
+| 2 | A VPC across three AZs (map frame) | `network.tf`: VPC + 9 subnets from one `for_each`; the default VPC filtered out | the map: the VPC and nine subnets appear |
+| 3 | Route tables | `routes.tf`: two tables + associations; `tools/which_route.py` reads the real tables | nine subnets → two tables (local only); the most specific match wins |
+| 4 | The way in: an internet gateway | IGW + 0.0.0.0/0 in the public table | internet ↔ IGW ↔ the public table's row; the private table has no door |
+| 5 | The way out: NAT (map frame) | `nat.tf`: ONE NAT in public-a for dev (cost trade, said) | who may START a connection: task → NAT → internet, never in |
+| 6 | Security groups and network ACLs | `security.tf`: alb → app → db by GROUP; a stateless NACL on data; `tools/sg_rules.py` | the chain anyone → alb → app → db; SG vs NACL |
+| 7 | ◆ full scene: the life of a request | concept | browser → Route 53 → IGW → ALB (sg, TLS) → task (sg) → back; a hop-by-hop table |
+| 8 | A load balancer and its health checks (map frame) | `alb.tf`: ALB in 3 public subnets, target group, HTTP listener; no targets yet | health state machine with the shop's settings (doc-cited) |
+| 9 | A name and a certificate | `dns.tf`: zone, DNS-validated ACM cert, alias A; HTTPS listener, 80 → redirect | resolving the name; where encryption ends |
+| 10 | Private paths to AWS services | `endpoint.tf`: S3 gateway endpoint; the prefix list beats 0.0.0.0/0 | task → NAT → S3 vs task → endpoint → S3 |
 
 **6. `run` · Run the app · 9**
 

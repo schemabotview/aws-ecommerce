@@ -97,12 +97,12 @@ Plan: 3 to add, 0 to change, 0 to destroy.
 aws_s3_bucket.state: Creating...
 aws_s3_bucket.state: Creation complete after 0s [id=book-shop-tfstate-4444555566
 66]
-aws_s3_bucket_versioning.state: Creating...
-aws_s3_bucket_versioning.state: Creation complete after 2s [id=book-shop-tfstate
--444455556666]
 aws_s3_bucket_public_access_block.state: Creating...
 aws_s3_bucket_public_access_block.state: Creation complete after 0s [id=book-sho
 p-tfstate-444455556666]
+aws_s3_bucket_versioning.state: Creating...
+aws_s3_bucket_versioning.state: Creation complete after 1s [id=book-shop-tfstate
+-444455556666]
 
 Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
 $ cd ..

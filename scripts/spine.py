@@ -171,8 +171,12 @@ def faketime_env(venv: Path, clock: Path) -> dict:
 
 
 def start_moto(venv: Path, config: dict, clock: Path) -> subprocess.Popen:
+    # The clock is frozen, so anything moto does "after N seconds" never happens: a DNS-validated
+    # certificate (ACM) would stay PENDING_VALIDATION forever and `terraform apply` would wait on it.
+    # moto issues it at once instead (-1: its test is `waited > wait`, and a frozen clock has waited
+    # 0) — the state AWS reaches once the validation record exists.
     env = {**os.environ, **faketime_env(venv, clock), 'MOTO_ACCOUNT_ID': config.get('account', ACCOUNT),
-           **config.get('moto', {})}
+           'MOTO_ACM_VALIDATION_WAIT': '-1', **config.get('moto', {})}
     # moto, with the gaps the course meets closed (scripts/moto_server.py says which and why)
     server = subprocess.Popen([str(venv / 'bin' / 'python'), str(toolchain.REPO / 'scripts' / 'moto_server.py'),
                                '-H', '127.0.0.1', '-p', str(PORT)], env=env,
@@ -335,7 +339,7 @@ class Machine:
             env['VIRTUAL_ENV'] = str(venv)
         prelude = 'source env.sh >/dev/null 2>&1\n' if config.get('env') else ''
         for cmd in config.get('setup', []):
-            subprocess.run(['bash', '-c', prelude + cmd], cwd=self.project, env={**env, **clock}, check=True, capture_output=True)
+            subprocess.run(['bash', '-c', 'unset FAKETIME_SHARED\n' + prelude + cmd], cwd=self.project, env={**env, **clock}, check=True, capture_output=True)
         if config.get('enforce_iam'):
             enforce_iam()
         # A section is a new terminal: it starts in the project, with only env.sh sourced.
@@ -350,14 +354,25 @@ class Machine:
             typed = '\n'.join([f'$ {first}', *(f'> {m}' for m in more)])
             if any(len(t) == columns for t in typed.split('\n')):
                 raise SystemExit(f'{step}: a typed line exactly {columns} wide reads as wrapped — reword it:\n{typed}')
-            script = f'cd {cwd!s}\n{{ {cmd}\n}} 2>&1\necho "{MARK}$PWD"\n'
+            script = f'cd {cwd!s}\n{{ {cmd}\n}} 2>&1\necho "{MARK}$?:$PWD"\n'
             if state.exists():
                 script = state.read_text() + '\n' + script
-            r = subprocess.run(['bash', '-c', script + f'export -p > {state}'], env={**env, **clock}, capture_output=True, text=True)
+            # FAKETIME_SHARED names a semaphore owned by the process that set it; carried into a later
+            # command after its owner exited, libfaketime aborts that command (exit 1, one run in a few).
+            r = subprocess.run(['bash', '-c', 'unset FAKETIME_SHARED\n' + script + f'unset FAKETIME_SHARED; export -p > {state}'],
+                               env={**env, **clock}, capture_output=True, text=True)
+            # The shell's OWN stderr (not the command's, which is in stdout) is where bash reports a
+            # command that died of a signal. Silence there is the norm; anything else is the machine.
+            if r.stderr.strip():
+                raise SystemExit(f'{step.relative_to(ROOT)}: `{first}` — the replay shell reported: {r.stderr.strip()[:500]}')
             output, _, after = r.stdout.partition(MARK)
-            output = re.sub(r'^libfaketime: .*\n(?:tory\n)?', '', output, flags=re.M)
+            if 'libfaketime:' in output:  # the replay's clock failed: never a command's output, never hidden
+                raise SystemExit(f'{step.relative_to(ROOT)}: `{first}` — libfaketime failed: {output[:600]}')
             if after:
-                cwd = Path(after.split('\n')[0])
+                code, _, where = after.split('\n')[0].partition(':')
+                cwd = Path(where)
+                if os.environ.get('SPINE_DEBUG') and not output.strip() and code != '0':
+                    raise SystemExit(f'{step.relative_to(ROOT)}: `{first}` printed nothing and exited {code}; raw: {r.stdout[:800]!r}')
             blocks.append(typed + (f"\n{real_endpoints(output.rstrip(chr(10)), cmd, config)}" if output.strip() else ''))
         captured = {n: (self.project / n).read_text() for n in config.get('capture', [])}
         fix = lambda s: s.replace(str(self.home), SHOWN_HOME).replace(str(self.home.resolve()), SHOWN_HOME)

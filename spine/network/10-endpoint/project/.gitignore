@@ -1,0 +1,7 @@
+# What Terraform makes on this machine: the provider it downloaded, local
+# state (until it moves to S3), and saved plans. The lock file IS committed.
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+tfplan

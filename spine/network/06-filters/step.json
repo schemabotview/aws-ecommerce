@@ -1,0 +1,1 @@
+{"from": "network/05-nat", "changes": ["infra/security.tf", "tools/sg_rules.py"], "env": true, "venv": true}

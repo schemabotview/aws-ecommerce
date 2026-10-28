@@ -6,7 +6,8 @@
                   gave each subnet another subnet's id on every replay). So before each request the
                   stream is re-seeded from WHAT the request asks for — method, host, path, query and
                   body, minus the idempotency tokens a client invents (ClientToken, CallerReference …)
-                  — and how many times that same request was made before. A resource's id is then a
+                  and with tags sorted by key (the Go SDK sends a map's tags in random order) — and
+                  how many times that same request was made before. A resource's id is then a
                   function of its own declaration, whatever ran before it. Requests are handled one at
                   a time, so the seed-then-generate pair is never interleaved.
 
@@ -33,12 +34,15 @@ When a pinned moto release has one, delete it here: the matrix is the test.
                   ListStateMachineVersions (moto publishes none, so: none).
   backup-sel      AWS Backup Create / Get / Delete / ListBackupSelections.
   ce-tags         Cost Explorer UpdateCostAllocationTagsStatus / ListCostAllocationTags.
+  elb-scheme      An ALB created without a Scheme is internet-facing, as on AWS; moto passed the
+                  missing parameter on as None and reported Scheme: None.
   cf-cache        CloudFront cache policies (Create / Get / GetConfig / Update / Delete / List); and a
                   distribution no longer reports ForwardedValues it was never given (a cache policy
                   replaces them) or an SSLSupportMethod for the default certificate.
 """
 import hashlib
 import io
+import os
 import json
 import re
 import threading
@@ -130,10 +134,18 @@ class CborBridge:
 
 _TOKENS = ('ClientToken', 'ClientRequestToken', 'IdempotencyToken', 'CallerReference', 'clientToken', 'idempotencyToken')
 _XML_TOKENS = re.compile(rb'<(%s)>[^<]*</\1>' % b'|'.join(t.encode() for t in _TOKENS))
-_FORM_TOKENS = re.compile(rb'(^|&)(%s)=[^&]*' % b'|'.join(t.encode() for t in _TOKENS))
 
 
-def _without_tokens(body: bytes) -> bytes:
+_TAG_PAIR = re.compile(r'^(?P<list>.+)\.(?P<n>\d+)\.(?P<part>Key|Value)$')
+_XML_TAGS = re.compile(rb'(<(?:TagSet|Tags)[^>]*>)(.*?)(</(?:TagSet|Tags)>)', re.S)
+_XML_TAG = re.compile(rb'<Tag>.*?</Tag>', re.S)
+
+
+def _canonical(body: bytes) -> bytes:
+    """The request's content, minus what a client invents per call (idempotency tokens) and in an
+    order that does not depend on the client: tags sorted by key. The Go SDK walks a map to build a
+    tag list, and Go randomises map order, so the provider sends `default_tags` in a different order
+    on every run — the same VPC would get a different id each time."""
     stripped = body.lstrip()
     if stripped.startswith(b'{'):
         try:
@@ -141,16 +153,32 @@ def _without_tokens(body: bytes) -> bytes:
         except ValueError:
             return body
 
-        def drop(value):
+        def norm(value):
             if isinstance(value, dict):
-                return {k: drop(v) for k, v in value.items() if k not in _TOKENS}
+                return {k: norm(v) for k, v in value.items() if k not in _TOKENS}
             if isinstance(value, list):
-                return [drop(v) for v in value]
+                items = [norm(v) for v in value]
+                if items and all(isinstance(i, dict) and 'Key' in i for i in items):
+                    items.sort(key=lambda i: str(i['Key']))
+                return items
             return value
-        return json.dumps(drop(doc), sort_keys=True).encode()
+        return json.dumps(norm(doc), sort_keys=True).encode()
     if stripped.startswith(b'<'):
-        return _XML_TOKENS.sub(b'', body)
-    return _FORM_TOKENS.sub(b'', body)
+        body = _XML_TOKENS.sub(b'', body)
+        return _XML_TAGS.sub(lambda m: m[1] + b''.join(sorted(_XML_TAG.findall(m[2]))) + m[3], body)
+    # A query-protocol form: re-number every Key/Value list in key order, then sort the parameters.
+    pairs = [p.split('=', 1) + [''] for p in body.decode(errors='replace').split('&') if p]
+    params = {p[0]: p[1] for p in pairs if p[0] not in _TOKENS}
+    lists: dict[str, dict[str, dict[str, str]]] = {}
+    for name in list(params):
+        m = _TAG_PAIR.match(name)
+        if m:
+            lists.setdefault(m['list'], {}).setdefault(m['n'], {})[m['part']] = params.pop(name)
+    for prefix, members in lists.items():
+        for i, tag in enumerate(sorted(members.values(), key=lambda t: t.get('Key', '')), 1):
+            for part, value in tag.items():
+                params[f'{prefix}.{i}.{part}'] = value
+    return '&'.join(f'{k}={v}' for k, v in sorted(params.items())).encode()
 
 
 class ContentSeed:
@@ -174,9 +202,12 @@ class ContentSeed:
                 return self.app(environ, start_response)
             query = '&'.join(sorted(q for q in environ.get('QUERY_STRING', '').split('&') if q.split('=')[0] not in _TOKENS))
             key = b'\0'.join([environ['REQUEST_METHOD'].encode(), environ.get('HTTP_HOST', '').encode(), path.encode(),
-                               query.encode(), environ.get('HTTP_X_AMZ_TARGET', '').encode(), _without_tokens(raw)])
+                               query.encode(), environ.get('HTTP_X_AMZ_TARGET', '').encode(), _canonical(raw)])
             digest = hashlib.sha256(key).hexdigest()
             self.seen[digest] += 1
+            if os.environ.get('MOTO_SEED_LOG'):  # what each seed was made from, to find a varying field
+                with open(os.environ['MOTO_SEED_LOG'], 'ab') as log:
+                    log.write(digest[:12].encode() + b' ' + key.replace(b'\0', b' | ')[:600] + b'\n')
             mock_random.seed(f'{self.base}:{digest}:{self.seen[digest]}')
             return list(self.app(environ, start_response))
 
@@ -397,6 +428,20 @@ def _ce_tags():
         return json.dumps({'CostAllocationTags': tags})
     CostExplorerResponse.update_cost_allocation_tags_status = update_cost_allocation_tags_status
     CostExplorerResponse.list_cost_allocation_tags = list_cost_allocation_tags
+
+
+# ── elb-scheme ───────────────────────────────────────────────────────────────────────────────────
+
+@patch('elb-scheme')
+def _elb_scheme():
+    from moto.elbv2.models import ELBv2Backend
+    original = ELBv2Backend.create_load_balancer
+
+    def create_load_balancer(self, *args, **kwargs):
+        if kwargs.get('scheme') is None:
+            kwargs['scheme'] = 'internet-facing'
+        return original(self, *args, **kwargs)
+    ELBv2Backend.create_load_balancer = create_load_balancer
 
 
 # ── cf-cache ─────────────────────────────────────────────────────────────────────────────────────

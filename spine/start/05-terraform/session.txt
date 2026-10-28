@@ -85,7 +85,7 @@ To perform exactly these actions, run the following command to apply:
     terraform apply "tfplan"
 $ terraform apply tfplan
 aws_s3_bucket.catalog: Creating...
-aws_s3_bucket.catalog: Creation complete after 1s [id=book-shop-catalog-44445555
+aws_s3_bucket.catalog: Creation complete after 0s [id=book-shop-catalog-44445555
 6666]
 
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.

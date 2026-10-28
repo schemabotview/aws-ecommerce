@@ -1,0 +1,294 @@
+$ cd infra
+$ terraform plan -out=tfplan
+aws_vpc.shop: Refreshing state... [id=vpc-e3500a5c4abdcac35]
+aws_eip.nat: Refreshing state... [id=eipalloc-6ff6a2527581beced]
+aws_budgets_budget.dev: Refreshing state... [id=444455556666:book-shop-dev-month
+ly]
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-444455556666]
+aws_route_table.private: Refreshing state... [id=rtb-b3c9465183df1b91c]
+aws_internet_gateway.shop: Refreshing state... [id=igw-9bb99313e3559d59f]
+aws_route_table.public: Refreshing state... [id=rtb-e5c7633cefa18a098]
+aws_security_group.this["db"]: Refreshing state... [id=sg-98bc7ab1c20bfa122]
+aws_security_group.this["alb"]: Refreshing state... [id=sg-1292ef779761e6b9e]
+aws_security_group.this["app"]: Refreshing state... [id=sg-0ea1f02f93c435340]
+aws_subnet.this["app-a"]: Refreshing state... [id=subnet-164b3e77ba1743e06]
+aws_subnet.this["data-c"]: Refreshing state... [id=subnet-60f987a7b700f6f9f]
+aws_subnet.this["data-b"]: Refreshing state... [id=subnet-1842f6c8b428e052e]
+aws_subnet.this["app-b"]: Refreshing state... [id=subnet-f7e3a7a4ba6f7ed13]
+aws_subnet.this["app-c"]: Refreshing state... [id=subnet-e56d56ed1dbd82035]
+aws_subnet.this["public-b"]: Refreshing state... [id=subnet-7ff7a394010c40419]
+aws_subnet.this["public-c"]: Refreshing state... [id=subnet-4ce869754647c8473]
+aws_subnet.this["data-a"]: Refreshing state... [id=subnet-c7a720642ba246ff7]
+aws_subnet.this["public-a"]: Refreshing state... [id=subnet-b62140a09169ec7ff]
+aws_route.public_internet: Refreshing state... [id=r-rtb-e5c7633cefa18a098108028
+9494]
+aws_vpc_security_group_egress_rule.app_out: Refreshing state... [id=sgr-615841b9
+17e0c5c82]
+aws_vpc_security_group_egress_rule.alb_app: Refreshing state... [id=sgr-72f34ea4
+1ac2722c1]
+aws_vpc_security_group_ingress_rule.this["https"]: Refreshing state... [id=sgr-2
+eba2a5dc5ea961db]
+aws_vpc_security_group_ingress_rule.this["app_alb"]: Refreshing state... [id=sgr
+-61ea7866148cdc96f]
+aws_vpc_security_group_ingress_rule.this["db_app"]: Refreshing state... [id=sgr-
+6e8abec5ee98759ac]
+aws_vpc_security_group_ingress_rule.this["http"]: Refreshing state... [id=sgr-53
+a8fe45fdb109b8c]
+aws_nat_gateway.a: Refreshing state... [id=nat-0e556a59c79dfb70c]
+aws_network_acl.data: Refreshing state... [id=acl-c0fda9619b350bd6d]
+aws_route_table_association.this["app-a"]: Refreshing state... [id=rtbassoc-63af
+24dc5926c42f9]
+aws_route_table_association.this["data-b"]: Refreshing state... [id=rtbassoc-047
+18beae952daaf1]
+aws_route_table_association.this["data-c"]: Refreshing state... [id=rtbassoc-43e
+4ec2fc8562cf05]
+aws_route_table_association.this["data-a"]: Refreshing state... [id=rtbassoc-905
+28cedb357e43a3]
+aws_route_table_association.this["public-c"]: Refreshing state... [id=rtbassoc-9
+df09e3cd1e2023e5]
+aws_route_table_association.this["public-b"]: Refreshing state... [id=rtbassoc-6
+c78e88ccbd487489]
+aws_route_table_association.this["app-c"]: Refreshing state... [id=rtbassoc-396f
+f0e232233df43]
+aws_route_table_association.this["app-b"]: Refreshing state... [id=rtbassoc-bc17
+97f9fcb119fd7]
+aws_route_table_association.this["public-a"]: Refreshing state... [id=rtbassoc-c
+5db509e02f0fff92]
+aws_route.private_out: Refreshing state... [id=r-rtb-b3c9465183df1b91c1080289494
+]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_lb.shop will be created
+  + resource "aws_lb" "shop" {
+      + arn                                                          = (known af
+ter apply)
+      + arn_suffix                                                   = (known af
+ter apply)
+      + client_keep_alive                                            = 3600
+      + desync_mitigation_mode                                       = "defensiv
+e"
+      + dns_name                                                     = (known af
+ter apply)
+      + drop_invalid_header_fields                                   = false
+      + enable_deletion_protection                                   = false
+      + enable_http2                                                 = true
+      + enable_prefix_for_ipv6_source_nat                            = (known af
+ter apply)
+      + enable_tls_version_and_cipher_suite_headers                  = false
+      + enable_waf_fail_open                                         = false
+      + enable_xff_client_port                                       = false
+      + enable_zonal_shift                                           = false
+      + enforce_security_group_inbound_rules_on_private_link_traffic = (known af
+ter apply)
+      + id                                                           = (known af
+ter apply)
+      + idle_timeout                                                 = 60
+      + internal                                                     = (known af
+ter apply)
+      + ip_address_type                                              = (known af
+ter apply)
+      + load_balancer_type                                           = "applicat
+ion"
+      + name                                                         = "book-sho
+p"
+      + name_prefix                                                  = (known af
+ter apply)
+      + preserve_host_header                                         = false
+      + region                                                       = "eu-west-
+2"
+      + secondary_ips_auto_assigned_per_subnet                       = (known af
+ter apply)
+      + security_groups                                              = [
+          + "sg-1292ef779761e6b9e",
+        ]
+      + subnets                                                      = [
+          + "subnet-4ce869754647c8473",
+          + "subnet-7ff7a394010c40419",
+          + "subnet-b62140a09169ec7ff",
+        ]
+      + tags_all                                                     = {
+          + "app"        = "book-shop"
+          + "env"        = "dev"
+          + "managed-by" = "terraform"
+        }
+      + vpc_id                                                       = (known af
+ter apply)
+      + xff_header_processing_mode                                   = "append"
+      + zone_id                                                      = (known af
+ter apply)
+
+      + subnet_mapping (known after apply)
+    }
+
+  # aws_lb_listener.http will be created
+  + resource "aws_lb_listener" "http" {
+      + arn                                                                   = 
+(known after apply)
+      + id                                                                    = 
+(known after apply)
+      + load_balancer_arn                                                     = 
+(known after apply)
+      + port                                                                  = 
+80
+      + protocol                                                              = 
+"HTTP"
+      + region                                                                = 
+"eu-west-2"
+      + routing_http_request_x_amzn_mtls_clientcert_header_name               = 
+(known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_issuer_header_name        = 
+(known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_leaf_header_name          = 
+(known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_serial_number_header_name = 
+(known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_subject_header_name       = 
+(known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_validity_header_name      = 
+(known after apply)
+      + routing_http_request_x_amzn_tls_cipher_suite_header_name              = 
+(known after apply)
+      + routing_http_request_x_amzn_tls_version_header_name                   = 
+(known after apply)
+      + routing_http_response_access_control_allow_credentials_header_value   = 
+(known after apply)
+      + routing_http_response_access_control_allow_headers_header_value       = 
+(known after apply)
+      + routing_http_response_access_control_allow_methods_header_value       = 
+(known after apply)
+      + routing_http_response_access_control_allow_origin_header_value        = 
+(known after apply)
+      + routing_http_response_access_control_expose_headers_header_value      = 
+(known after apply)
+      + routing_http_response_access_control_max_age_header_value             = 
+(known after apply)
+      + routing_http_response_content_security_policy_header_value            = 
+(known after apply)
+      + routing_http_response_server_enabled                                  = 
+(known after apply)
+      + routing_http_response_strict_transport_security_header_value          = 
+(known after apply)
+      + routing_http_response_x_content_type_options_header_value             = 
+(known after apply)
+      + routing_http_response_x_frame_options_header_value                    = 
+(known after apply)
+      + ssl_policy                                                            = 
+(known after apply)
+      + tags_all                                                              = 
+{
+          + "app"        = "book-shop"
+          + "env"        = "dev"
+          + "managed-by" = "terraform"
+        }
+      + tcp_idle_timeout_seconds                                              = 
+(known after apply)
+
+      + default_action {
+          + order            = (known after apply)
+          + target_group_arn = (known after apply)
+          + type             = "forward"
+        }
+
+      + mutual_authentication (known after apply)
+    }
+
+  # aws_lb_target_group.app will be created
+  + resource "aws_lb_target_group" "app" {
+      + arn                                = (known after apply)
+      + arn_suffix                         = (known after apply)
+      + connection_termination             = (known after apply)
+      + deregistration_delay               = "30"
+      + id                                 = (known after apply)
+      + ip_address_type                    = (known after apply)
+      + lambda_multi_value_headers_enabled = false
+      + load_balancer_arns                 = (known after apply)
+      + load_balancing_algorithm_type      = (known after apply)
+      + load_balancing_anomaly_mitigation  = (known after apply)
+      + load_balancing_cross_zone_enabled  = (known after apply)
+      + name                               = "book-shop-app"
+      + name_prefix                        = (known after apply)
+      + port                               = 8080
+      + preserve_client_ip                 = (known after apply)
+      + protocol                           = "HTTP"
+      + protocol_version                   = (known after apply)
+      + proxy_protocol_v2                  = false
+      + region                             = "eu-west-2"
+      + slow_start                         = 0
+      + tags_all                           = {
+          + "app"        = "book-shop"
+          + "env"        = "dev"
+          + "managed-by" = "terraform"
+        }
+      + target_type                        = "ip"
+      + vpc_id                             = "vpc-e3500a5c4abdcac35"
+
+      + health_check {
+          + enabled             = true
+          + healthy_threshold   = 3
+          + interval            = 10
+          + matcher             = (known after apply)
+          + path                = "/health"
+          + port                = "traffic-port"
+          + protocol            = "HTTP"
+          + timeout             = 5
+          + unhealthy_threshold = 2
+        }
+
+      + stickiness (known after apply)
+
+      + target_failover (known after apply)
+
+      + target_group_health (known after apply)
+
+      + target_health_state (known after apply)
+    }
+
+Plan: 3 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + target_group_arn = (known after apply)
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+$ terraform apply tfplan
+aws_lb_target_group.app: Creating...
+aws_lb_target_group.app: Creation complete after 0s [id=arn:aws:elasticloadbalan
+cing:eu-west-2:444455556666:targetgroup/book-shop-app/a13717916e126457]
+aws_lb.shop: Creating...
+aws_lb.shop: Still creating... [00m10s elapsed]
+aws_lb.shop: Still creating... [00m20s elapsed]
+aws_lb.shop: Still creating... [00m30s elapsed]
+aws_lb.shop: Still creating... [00m40s elapsed]
+aws_lb.shop: Still creating... [00m50s elapsed]
+aws_lb.shop: Still creating... [01m00s elapsed]
+aws_lb.shop: Creation complete after 1m0s [id=arn:aws:elasticloadbalancing:eu-we
+st-2:444455556666:loadbalancer/app/book-shop/3fb1738b10ff2017]
+aws_lb_listener.http: Creating...
+aws_lb_listener.http: Creation complete after 0s [id=arn:aws:elasticloadbalancin
+g:eu-west-2:444455556666:listener/app/book-shop/3fb1738b10ff2017/6bd555b30b69bb9
+8]
+
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+target_group_arn = "arn:aws:elasticloadbalancing:eu-west-2:444455556666:targetgr
+oup/book-shop-app/a13717916e126457"
+vpc_id = "vpc-e3500a5c4abdcac35"
+$ aws elbv2 describe-load-balancers --names book-shop --output text \
+>   --query "LoadBalancers[0].[DNSName, Scheme, State.Code]"
+book-shop-1.eu-west-2.elb.amazonaws.com	internet-facing	active
+$ aws elbv2 describe-target-health \
+>   --target-group-arn "$(terraform output -raw target_group_arn)"
+{
+    "TargetHealthDescriptions": []
+}

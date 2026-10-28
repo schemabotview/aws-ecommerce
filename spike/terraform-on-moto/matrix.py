@@ -127,6 +127,17 @@ def run_case(case: Path, work: Path, env: dict, needs: list, port: int, venv: Pa
         if code:
             row.update(apply='FAIL', note=first_error(out)); return row
         row['apply'] = f'ok ({secs:.0f}s)'
+        then = case.with_suffix('.then')  # a second version of the code: an in-place change, applied next
+        if then.exists():
+            (work / 'main.tf').write_text(then.read_text())
+            try:
+                code, out, secs = tf('apply', '-auto-approve', '-input=false', timeout=int(os.environ.get('MATRIX_TIMEOUT', 240)))
+            except subprocess.TimeoutExpired:
+                row.update(apply=row['apply'] + ', change HANG', note='the second apply (the change) is still running after the timeout'); return row
+            (work / 'change.log').write_text(out)
+            if code:
+                row.update(apply=row['apply'] + ', change FAIL', note=first_error(out)); return row
+            row['apply'] += f', change ok ({secs:.0f}s)'
         code, out, _ = tf('plan', '-detailed-exitcode', '-input=false')
         (work / 'replan.log').write_text(out)
         if code == 0:
