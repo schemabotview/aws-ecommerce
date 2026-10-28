@@ -1,0 +1,10 @@
+$ python release_model.py
+ t (s)     all at once  rolling, 1/min      canary 10%
+    20             168              24              17
+    40             336              48              34
+    60             504              72              50
+    80             672             120              67
+   100             840             168              84
+   120            1008             216             101
+failed requests before the alarm: all at once 1008, rolling, 1/min 216, canary 1
+0% 101

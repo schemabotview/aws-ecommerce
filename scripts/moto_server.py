@@ -84,6 +84,10 @@ for AWS behaviour:
   rds-secret      The secret RDS manages for a master user holds THAT user (moto: always "admin",
                   password "P@55w0rd!"), with a generated password; its name's id comes from the
                   seeded random stream (moto used uuid4, so it changed on every recording).
+  accounts        MOTO_ACCOUNT_ID (the step's account) named the account of EVERY request, so a role
+                  session in another account (§9.2's production) still acted in development. It now
+                  names only the account of a key moto did not issue (env.sh's); a session's key acts
+                  in its role's account, as on AWS.
   no-poller       An SQS queue with an enabled Lambda event source mapping: moto received and invoked
                   INSIDE SendMessage, running the function in a Docker container (on AWS a poller does
                   this, apart from the sender). The machine runs no Lambda: the mapping is recorded,
@@ -828,6 +832,21 @@ def _events_test_pattern():
         pattern = EventPattern.load(self._get_param('EventPattern'))
         return json.dumps({'Result': pattern.matches_event(json.loads(self._get_param('Event')))})
     EventsHandler.test_event_pattern = test_event_pattern
+
+
+# ── accounts ─────────────────────────────────────────────────────────────────────────────────────
+
+@patch('accounts')
+def _accounts():
+    from moto.core import DEFAULT_ACCOUNT_ID
+    from moto.core.responses import BaseResponse
+    from moto.iam.models import get_account_id_from
+    original = BaseResponse.get_current_account
+
+    def current_account(self) -> str:
+        found = get_account_id_from(self.get_access_key())
+        return found if found != DEFAULT_ACCOUNT_ID else original(self)
+    BaseResponse.get_current_account = current_account
 
 
 # ── no-poller ────────────────────────────────────────────────────────────────────────────────────

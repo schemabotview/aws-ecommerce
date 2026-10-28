@@ -1,0 +1,1 @@
+{"from": "decouple/08-once", "changes": ["infra/network.tf", "infra/routes.tf", "infra/nat.tf", "infra/endpoint.tf", "infra/modules/network/main.tf", "infra/modules/network/variables.tf", "infra/modules/network/outputs.tf", "infra/alb.tf", "infra/database.tf", "infra/security.tf", "infra/service.tf"], "env": true, "venv": true, "postgres": true}

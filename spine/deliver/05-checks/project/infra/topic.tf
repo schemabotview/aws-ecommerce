@@ -1,0 +1,64 @@
+# One OrderPlaced, many listeners: checkout publishes ONCE to a topic, and
+# SNS copies the message into every queue subscribed to it. Adding a new
+# listener is a subscription; checkout does not change.
+resource "aws_sns_topic" "orders" {
+  name = "book-shop-orders"
+}
+
+output "orders_topic_arn" {
+  value = aws_sns_topic.orders.arn
+}
+
+resource "aws_sqs_queue" "loyalty" {
+  name = "book-shop-loyalty"
+}
+
+resource "aws_sqs_queue" "fraud_check" {
+  name = "book-shop-fraud-check"
+}
+
+locals {
+  listeners = {
+    fulfilment  = aws_sqs_queue.fulfilment
+    loyalty     = aws_sqs_queue.loyalty
+    fraud-check = aws_sqs_queue.fraud_check
+  }
+}
+
+# Each queue lets the topic, and only the topic, put messages in it.
+data "aws_iam_policy_document" "from_topic" {
+  for_each = local.listeners
+  statement {
+    actions   = ["sqs:SendMessage"]
+    resources = [each.value.arn]
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.orders.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "from_topic" {
+  for_each  = local.listeners
+  queue_url = each.value.url
+  policy    = data.aws_iam_policy_document.from_topic[each.key].json
+}
+
+resource "aws_sns_topic_subscription" "listeners" {
+  for_each             = local.listeners
+  topic_arn            = aws_sns_topic.orders.arn
+  protocol             = "sqs"
+  endpoint             = each.value.arn
+  raw_message_delivery = true # the queue gets the event itself, unwrapped
+
+  # Only orders of 500 or more reach the fraud check.
+  filter_policy_scope = each.key == "fraud-check" ? "MessageBody" : null
+  filter_policy = each.key == "fraud-check" ? jsonencode({
+    total = [{ numeric = [">=", 500] }]
+  }) : null
+}

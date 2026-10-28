@@ -1,0 +1,1 @@
+{"from": "deliver/05-checks", "changes": ["infra/returns.tf"], "env": true, "venv": true, "postgres": true, "endpoint": "sqs", "setup": ["aws sqs set-queue-attributes --queue-url $(aws sqs get-queue-url --queue-name book-shop-fulfilment --query QueueUrl --output text) --attributes VisibilityTimeout=60", "aws sqs create-queue --queue-name book-shop-returns"]}

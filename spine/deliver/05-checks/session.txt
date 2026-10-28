@@ -1,0 +1,17 @@
+$ python -m tools.jobs
+check      needs -         account -            
+plan-dev   needs check     account 444455556666 
+apply-dev  needs check     account 444455556666 
+apply-prod needs apply-dev account 111122223333 production
+$ cd infra
+$ terraform fmt -check -recursive && echo "formatted"
+formatted
+$ terraform validate
+Success! The configuration is valid.
+$ terraform plan -detailed-exitcode > /dev/null; echo "plan exit code: $?"
+plan exit code: 0
+$ printf 'locals {\n  a = 1\n  bb = 2\n}\n' > scratch.tf
+$ terraform fmt -check -recursive; echo "fmt exit code: $?"
+scratch.tf
+fmt exit code: 3
+$ rm scratch.tf

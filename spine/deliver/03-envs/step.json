@@ -1,0 +1,1 @@
+{"from": "deliver/02-modules", "changes": ["aws-config", "infra/envs/prod/state/main.tf", "infra/envs/prod/main.tf"], "env": true, "venv": true, "postgres": true}

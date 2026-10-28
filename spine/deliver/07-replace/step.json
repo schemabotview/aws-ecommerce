@@ -1,0 +1,1 @@
+{"from": "deliver/06-drift", "changes": ["infra/topic.tf", "infra/database.tf"], "env": true, "venv": true, "postgres": true, "endpoint": "sqs"}

@@ -1,0 +1,1 @@
+{"from": "deliver/04-pipeline-role", "changes": [".github/workflows/infra.yml", "tools/jobs.py"], "env": true, "venv": true, "postgres": true}

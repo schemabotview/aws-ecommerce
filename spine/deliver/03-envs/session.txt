@@ -1,0 +1,811 @@
+$ cd infra/envs/prod/state
+$ terraform init
+Initializing the backend...
+
+Initializing provider plugins...
+- Finding hashicorp/aws versions matching "~> 6.70"...
+- Installing hashicorp/aws v6.70.0...
+- Installed hashicorp/aws v6.70.0 (signed by HashiCorp)
+
+Terraform has created a lock file .terraform.lock.hcl to record the provider
+selections it made above. Include this file in your version control repository
+so that Terraform can guarantee to make the same selections by default when
+you run "terraform init" in the future.
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+$ terraform apply -auto-approve
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_s3_bucket.state will be created
+  + resource "aws_s3_bucket" "state" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = "book-shop-tfstate-111122223333"
+      + bucket_domain_name          = (known after apply)
+      + bucket_namespace            = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_region               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = "eu-west-2"
+      + request_payer               = (known after apply)
+      + tags_all                    = (known after apply)
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + cors_rule (known after apply)
+
+      + grant (known after apply)
+
+      + lifecycle_rule (known after apply)
+
+      + logging (known after apply)
+
+      + object_lock_configuration (known after apply)
+
+      + replication_configuration (known after apply)
+
+      + server_side_encryption_configuration (known after apply)
+
+      + versioning (known after apply)
+
+      + website (known after apply)
+    }
+
+  # aws_s3_bucket_public_access_block.state will be created
+  + resource "aws_s3_bucket_public_access_block" "state" {
+      + block_public_acls       = true
+      + block_public_policy     = true
+      + bucket                  = (known after apply)
+      + id                      = (known after apply)
+      + ignore_public_acls      = true
+      + region                  = "eu-west-2"
+      + restrict_public_buckets = true
+    }
+
+  # aws_s3_bucket_versioning.state will be created
+  + resource "aws_s3_bucket_versioning" "state" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+      + region = "eu-west-2"
+
+      + versioning_configuration {
+          + mfa_delete = (known after apply)
+          + status     = "Enabled"
+        }
+    }
+
+Plan: 3 to add, 0 to change, 0 to destroy.
+aws_s3_bucket.state: Creating...
+aws_s3_bucket.state: Creation complete after 0s [id=book-shop-tfstate-1111222233
+33]
+aws_s3_bucket_versioning.state: Creating...
+aws_s3_bucket_versioning.state: Creation complete after 2s [id=book-shop-tfstate
+-111122223333]
+aws_s3_bucket_public_access_block.state: Creating...
+aws_s3_bucket_public_access_block.state: Creation complete after 0s [id=book-sho
+p-tfstate-111122223333]
+
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+$ cd ..
+$ terraform init
+Initializing the backend...
+
+Successfully configured the backend "s3"! Terraform will automatically
+use this backend unless the backend configuration changes.
+
+Initializing modules...
+- network in ../../modules/network
+
+Initializing provider plugins...
+- Finding hashicorp/aws versions matching "~> 6.70"...
+- Installing hashicorp/aws v6.70.0...
+- Installed hashicorp/aws v6.70.0 (signed by HashiCorp)
+
+Terraform has created a lock file .terraform.lock.hcl to record the provider
+selections it made above. Include this file in your version control repository
+so that Terraform can guarantee to make the same selections by default when
+you run "terraform init" in the future.
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+$ terraform apply -auto-approve
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # module.network.aws_eip.nat will be created
+  + resource "aws_eip" "nat" {
+      + allocation_id        = (known after apply)
+      + arn                  = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = "vpc"
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + ipam_pool_id         = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + ptr_record           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + region               = "eu-west-2"
+      + tags                 = {
+          + "Name" = "nat-a"
+        }
+      + tags_all             = {
+          + "Name"       = "nat-a"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+        }
+    }
+
+  # module.network.aws_internet_gateway.this will be created
+  + resource "aws_internet_gateway" "this" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + owner_id = (known after apply)
+      + region   = "eu-west-2"
+      + tags     = {
+          + "Name" = "book-shop"
+        }
+      + tags_all = {
+          + "Name"       = "book-shop"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+        }
+      + vpc_id   = (known after apply)
+    }
+
+  # module.network.aws_nat_gateway.a will be created
+  + resource "aws_nat_gateway" "a" {
+      + allocation_id                      = (known after apply)
+      + association_id                     = (known after apply)
+      + auto_provision_zones               = (known after apply)
+      + auto_scaling_ips                   = (known after apply)
+      + availability_mode                  = (known after apply)
+      + connectivity_type                  = "public"
+      + id                                 = (known after apply)
+      + network_interface_id               = (known after apply)
+      + private_ip                         = (known after apply)
+      + public_ip                          = (known after apply)
+      + region                             = "eu-west-2"
+      + regional_nat_gateway_address       = (known after apply)
+      + regional_nat_gateway_auto_mode     = (known after apply)
+      + route_table_id                     = (known after apply)
+      + secondary_allocation_ids           = (known after apply)
+      + secondary_private_ip_address_count = (known after apply)
+      + secondary_private_ip_addresses     = (known after apply)
+      + subnet_id                          = (known after apply)
+      + tags                               = {
+          + "Name" = "nat-a"
+        }
+      + tags_all                           = {
+          + "Name"       = "nat-a"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+        }
+      + vpc_id                             = (known after apply)
+    }
+
+  # module.network.aws_route.private_out will be created
+  + resource "aws_route" "private_out" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + nat_gateway_id         = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + region                 = "eu-west-2"
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+    }
+
+  # module.network.aws_route.public_internet will be created
+  + resource "aws_route" "public_internet" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + gateway_id             = (known after apply)
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + region                 = "eu-west-2"
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+    }
+
+  # module.network.aws_route_table.private will be created
+  + resource "aws_route_table" "private" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + region           = "eu-west-2"
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "private"
+        }
+      + tags_all         = {
+          + "Name"       = "private"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.network.aws_route_table.public will be created
+  + resource "aws_route_table" "public" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + region           = "eu-west-2"
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "public"
+        }
+      + tags_all         = {
+          + "Name"       = "public"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.this["app-a"] will be created
+  + resource "aws_route_table_association" "this" {
+      + id             = (known after apply)
+      + region         = "eu-west-2"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.this["app-b"] will be created
+  + resource "aws_route_table_association" "this" {
+      + id             = (known after apply)
+      + region         = "eu-west-2"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.this["app-c"] will be created
+  + resource "aws_route_table_association" "this" {
+      + id             = (known after apply)
+      + region         = "eu-west-2"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.this["data-a"] will be created
+  + resource "aws_route_table_association" "this" {
+      + id             = (known after apply)
+      + region         = "eu-west-2"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.this["data-b"] will be created
+  + resource "aws_route_table_association" "this" {
+      + id             = (known after apply)
+      + region         = "eu-west-2"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.this["data-c"] will be created
+  + resource "aws_route_table_association" "this" {
+      + id             = (known after apply)
+      + region         = "eu-west-2"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.this["public-a"] will be created
+  + resource "aws_route_table_association" "this" {
+      + id             = (known after apply)
+      + region         = "eu-west-2"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.this["public-b"] will be created
+  + resource "aws_route_table_association" "this" {
+      + id             = (known after apply)
+      + region         = "eu-west-2"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.this["public-c"] will be created
+  + resource "aws_route_table_association" "this" {
+      + id             = (known after apply)
+      + region         = "eu-west-2"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["app-a"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-west-2a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.40.10.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "eu-west-2"
+      + tags                                           = {
+          + "Name" = "app-a"
+          + "tier" = "app"
+        }
+      + tags_all                                       = {
+          + "Name"       = "app-a"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+          + "tier"       = "app"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["app-b"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-west-2b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.40.11.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "eu-west-2"
+      + tags                                           = {
+          + "Name" = "app-b"
+          + "tier" = "app"
+        }
+      + tags_all                                       = {
+          + "Name"       = "app-b"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+          + "tier"       = "app"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["app-c"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-west-2c"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.40.12.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "eu-west-2"
+      + tags                                           = {
+          + "Name" = "app-c"
+          + "tier" = "app"
+        }
+      + tags_all                                       = {
+          + "Name"       = "app-c"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+          + "tier"       = "app"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["data-a"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-west-2a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.40.20.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "eu-west-2"
+      + tags                                           = {
+          + "Name" = "data-a"
+          + "tier" = "data"
+        }
+      + tags_all                                       = {
+          + "Name"       = "data-a"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+          + "tier"       = "data"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["data-b"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-west-2b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.40.21.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "eu-west-2"
+      + tags                                           = {
+          + "Name" = "data-b"
+          + "tier" = "data"
+        }
+      + tags_all                                       = {
+          + "Name"       = "data-b"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+          + "tier"       = "data"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["data-c"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-west-2c"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.40.22.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "eu-west-2"
+      + tags                                           = {
+          + "Name" = "data-c"
+          + "tier" = "data"
+        }
+      + tags_all                                       = {
+          + "Name"       = "data-c"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+          + "tier"       = "data"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["public-a"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-west-2a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.40.0.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "eu-west-2"
+      + tags                                           = {
+          + "Name" = "public-a"
+          + "tier" = "public"
+        }
+      + tags_all                                       = {
+          + "Name"       = "public-a"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+          + "tier"       = "public"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["public-b"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-west-2b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.40.1.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "eu-west-2"
+      + tags                                           = {
+          + "Name" = "public-b"
+          + "tier" = "public"
+        }
+      + tags_all                                       = {
+          + "Name"       = "public-b"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+          + "tier"       = "public"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["public-c"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-west-2c"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.40.2.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "eu-west-2"
+      + tags                                           = {
+          + "Name" = "public-c"
+          + "tier" = "public"
+        }
+      + tags_all                                       = {
+          + "Name"       = "public-c"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+          + "tier"       = "public"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_vpc.this will be created
+  + resource "aws_vpc" "this" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "10.40.0.0/16"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = true
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + region                               = "eu-west-2"
+      + tags                                 = {
+          + "Name" = "book-shop"
+        }
+      + tags_all                             = {
+          + "Name"       = "book-shop"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+        }
+    }
+
+  # module.network.aws_vpc_endpoint.s3 will be created
+  + resource "aws_vpc_endpoint" "s3" {
+      + arn                   = (known after apply)
+      + cidr_blocks           = (known after apply)
+      + dns_entry             = (known after apply)
+      + id                    = (known after apply)
+      + ip_address_type       = (known after apply)
+      + network_interface_ids = (known after apply)
+      + owner_id              = (known after apply)
+      + policy                = (known after apply)
+      + prefix_list_id        = (known after apply)
+      + private_dns_enabled   = (known after apply)
+      + region                = "eu-west-2"
+      + requester_managed     = (known after apply)
+      + route_table_ids       = (known after apply)
+      + security_group_ids    = (known after apply)
+      + service_name          = "com.amazonaws.eu-west-2.s3"
+      + service_region        = (known after apply)
+      + state                 = (known after apply)
+      + subnet_ids            = (known after apply)
+      + tags                  = {
+          + "Name" = "s3"
+        }
+      + tags_all              = {
+          + "Name"       = "s3"
+          + "app"        = "book-shop"
+          + "env"        = "prod"
+          + "managed-by" = "terraform"
+        }
+      + vpc_endpoint_type     = "Gateway"
+      + vpc_id                = (known after apply)
+
+      + dns_options (known after apply)
+
+      + subnet_configuration (known after apply)
+    }
+
+Plan: 27 to add, 0 to change, 0 to destroy.
+module.network.aws_eip.nat: Creating...
+module.network.aws_eip.nat: Creation complete after 1s [id=eipalloc-3f8dd068e30f
+628fe]
+module.network.aws_vpc.this: Creating...
+module.network.aws_vpc.this: Creation complete after 0s [id=vpc-afcde6be290b2269
+3]
+module.network.aws_route_table.private: Creating...
+module.network.aws_route_table.private: Creation complete after 0s [id=rtb-5fef2
+3aad3232196d]
+module.network.aws_route_table.public: Creating...
+module.network.aws_route_table.public: Creation complete after 0s [id=rtb-7bd3b7
+aad9019b3c3]
+module.network.aws_internet_gateway.this: Creating...
+module.network.aws_internet_gateway.this: Creation complete after 0s [id=igw-259
+b879fd253cf518]
+module.network.aws_subnet.this["public-a"]: Creating...
+module.network.aws_subnet.this["public-a"]: Creation complete after 0s [id=subne
+t-cd04477bfab52d26c]
+module.network.aws_subnet.this["app-c"]: Creating...
+module.network.aws_subnet.this["app-c"]: Creation complete after 0s [id=subnet-8
+9f4af4e6362cec47]
+module.network.aws_subnet.this["data-c"]: Creating...
+module.network.aws_subnet.this["data-c"]: Creation complete after 0s [id=subnet-
+a37e49eb5ce2b3e5f]
+module.network.aws_subnet.this["app-b"]: Creating...
+module.network.aws_subnet.this["app-b"]: Creation complete after 0s [id=subnet-0
+0618bb63cb8e5d6d]
+module.network.aws_subnet.this["data-a"]: Creating...
+module.network.aws_subnet.this["data-a"]: Creation complete after 0s [id=subnet-
+d46564ee629260421]
+module.network.aws_subnet.this["data-b"]: Creating...
+module.network.aws_subnet.this["data-b"]: Creation complete after 0s [id=subnet-
+882708a8efe9474a0]
+module.network.aws_subnet.this["app-a"]: Creating...
+module.network.aws_subnet.this["app-a"]: Creation complete after 0s [id=subnet-2
+dba37036e64d26bc]
+module.network.aws_subnet.this["public-b"]: Creating...
+module.network.aws_subnet.this["public-b"]: Creation complete after 0s [id=subne
+t-29ad11d45d56242b6]
+module.network.aws_subnet.this["public-c"]: Creating...
+module.network.aws_subnet.this["public-c"]: Creation complete after 0s [id=subne
+t-786a93debe4623f8f]
+module.network.aws_vpc_endpoint.s3: Creating...
+module.network.aws_vpc_endpoint.s3: Creation complete after 6s [id=vpce-f21f1672
+c1329795e]
+module.network.aws_route.public_internet: Creating...
+module.network.aws_route.public_internet: Creation complete after 0s [id=r-rtb-7
+bd3b7aad9019b3c31080289494]
+module.network.aws_nat_gateway.a: Creating...
+module.network.aws_nat_gateway.a: Creation complete after 0s [id=nat-bc81ca96573
+3cd807]
+module.network.aws_route_table_association.this["data-c"]: Creating...
+module.network.aws_route_table_association.this["data-c"]: Creation complete aft
+er 0s [id=rtbassoc-632c71ce901fa583a]
+module.network.aws_route_table_association.this["app-b"]: Creating...
+module.network.aws_route_table_association.this["app-b"]: Creation complete afte
+r 0s [id=rtbassoc-41adccd4eec49314a]
+module.network.aws_route_table_association.this["public-a"]: Creating...
+module.network.aws_route_table_association.this["public-a"]: Creation complete a
+fter 0s [id=rtbassoc-96497288cdae5d492]
+module.network.aws_route_table_association.this["data-a"]: Creating...
+module.network.aws_route_table_association.this["data-a"]: Creation complete aft
+er 0s [id=rtbassoc-86c9ab2d168f5cdec]
+module.network.aws_route_table_association.this["app-a"]: Creating...
+module.network.aws_route_table_association.this["app-a"]: Creation complete afte
+r 0s [id=rtbassoc-1239367943edb1c2c]
+module.network.aws_route_table_association.this["public-c"]: Creating...
+module.network.aws_route_table_association.this["public-c"]: Creation complete a
+fter 0s [id=rtbassoc-2d9ce69e60da78732]
+module.network.aws_route_table_association.this["app-c"]: Creating...
+module.network.aws_route_table_association.this["app-c"]: Creation complete afte
+r 0s [id=rtbassoc-5ef0e7ce762843576]
+module.network.aws_route_table_association.this["data-b"]: Creating...
+module.network.aws_route_table_association.this["data-b"]: Creation complete aft
+er 0s [id=rtbassoc-a254c531ac4536b53]
+module.network.aws_route_table_association.this["public-b"]: Creating...
+module.network.aws_route_table_association.this["public-b"]: Creation complete a
+fter 0s [id=rtbassoc-97972220599629655]
+module.network.aws_route.private_out: Creating...
+module.network.aws_route.private_out: Creation complete after 0s [id=r-rtb-5fef2
+3aad3232196d1080289494]
+
+Apply complete! Resources: 27 added, 0 changed, 0 destroyed.
+$ aws ec2 describe-vpcs --filters Name=tag:Name,Values=book-shop \
+>   --query 'Vpcs[].[OwnerId, CidrBlock]' --output text
+444455556666	10.20.0.0/16
+$ aws ec2 describe-vpcs --filters Name=tag:Name,Values=book-shop \
+>   --query 'Vpcs[].[OwnerId, CidrBlock]' --output text \
+>   --profile book-shop-prod-admin
+111122223333	10.40.0.0/16
