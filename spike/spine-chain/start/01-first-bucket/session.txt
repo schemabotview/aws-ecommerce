@@ -13,6 +13,14 @@ so that Terraform can guarantee to make the same selections by default when
 you run "terraform init" in the future.
 
 Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
 $ terraform apply -auto-approve
 
 Terraform used the selected providers to generate the following execution
@@ -64,7 +72,7 @@ Terraform will perform the following actions:
 
 Plan: 1 to add, 0 to change, 0 to destroy.
 aws_s3_bucket.catalog: Creating...
-aws_s3_bucket.catalog: Creation complete after 0s [id=book-shop-catalog-111122223333
-]
+aws_s3_bucket.catalog: Creation complete after 0s [id=book-shop-catalog-11112222
+3333]
 
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.

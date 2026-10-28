@@ -1,0 +1,1 @@
+{"from": "start/03-emulator", "changes": ["scripts/make-bucket.sh"], "env": true}

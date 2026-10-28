@@ -1,0 +1,8 @@
+{
+  "_comment": "Per-repo publishing identity, read by @graphlearning/shell's thumb / gen-descriptions scripts.",
+  "concept": "AWS",
+  "site": "https://graphl.in",
+  "appPath": "/aws-ecommerce",
+  "hashtags": "#AWS #Terraform #CloudComputing #TechEducation",
+  "panelBg": "radial-gradient(118% 104% at 70% 34%, #ffb84d 0%, #ff9900 40%, #141a22 100%)"
+}

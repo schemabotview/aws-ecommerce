@@ -26,7 +26,8 @@ When a pinned moto release has one, delete it here: the matrix is the test.
                   and the provider planned a whitespace change forever.
   athena-tags     ListTagsForResource on an untagged workgroup: AWS returns no tags; moto returned 400.
   aas-tags        Application Auto Scaling ListTagsForResource / TagResource / UntagResource.
-  budgets-subs    Budgets DescribeSubscribersForNotification, and List / Tag / UntagResource.
+  budgets-subs    Budgets DescribeSubscribersForNotification, List / Tag / UntagResource, and the
+                  ResourceTags sent with CreateBudget (dropped, so a tagged budget planned a change forever).
   sfn-validate    Step Functions ValidateStateMachineDefinition: answers OK WITHOUT validating
                   (check:aws validates the ASL; the frame never shows this call); and
                   ListStateMachineVersions (moto publishes none, so: none).
@@ -298,6 +299,16 @@ def _budgets_subscribers():
         for key in self._get_param('ResourceTagKeys') or []:
             tags.pop(key, None)
         return '{}'
+    original_create = BudgetsResponse.create_budget
+
+    def create_budget(self):
+        result = original_create(self)
+        tags = self._get_param('ResourceTags') or []
+        if tags:  # tags sent with CreateBudget (the provider's way), which moto dropped
+            arn = f"arn:aws:budgets::{self._get_param('AccountId')}:budget/{self._get_param('Budget')['BudgetName']}"
+            store(self).setdefault(arn, {}).update({t['Key']: t['Value'] for t in tags})
+        return result
+    BudgetsResponse.create_budget = create_budget
     BudgetsResponse.list_tags_for_resource = list_tags_for_resource
     BudgetsResponse.tag_resource = tag_resource
     BudgetsResponse.untag_resource = untag_resource

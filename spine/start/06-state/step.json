@@ -1,0 +1,2 @@
+{"from": "start/05-terraform", "changes": [], "env": true,
+ "setup": ["aws s3api put-bucket-tagging --bucket book-shop-catalog-444455556666 --tagging 'TagSet=[{Key=app,Value=book-shop},{Key=owner,Value=sam}]'"]}

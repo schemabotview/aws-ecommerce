@@ -1,0 +1,1 @@
+{"from": "start/04-script", "changes": [".gitignore", "infra/providers.tf", "infra/s3.tf", "scripts/make-bucket.sh"], "env": true, "capture": ["infra/.terraform.lock.hcl"]}

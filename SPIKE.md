@@ -93,6 +93,12 @@ each gap above was named.
 
 ## 4. The spine (`scripts/spine.py`) — proven on a three-step chain
 
+> **Superseded the same day (owner: "always build on top of previous section, avoid replays").**
+> The derived-state design below (`apply_parent`: re-apply the parent's Terraform on a fresh
+> emulator) was itself a hidden replay. The spine now runs the whole chain against ONE emulator and
+> ONE working copy, each session starting where the previous one ended — see `CLAUDE.md`, "The
+> spine". The proof chain below passes under both designs; the determinism findings stand.
+
 `scripts/spine.py` is python-expense-tracker's cumulative spine (`first` / `from` + `changes` /
 `lab`, every undeclared difference fails) merged with aws-ct's emulator machinery (fresh moto per
 step, frozen clock, endpoint rewrite, pane-width wrapping, IAM enforcement), plus what Terraform

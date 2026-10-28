@@ -1,0 +1,1 @@
+{"from": "start/06-state", "changes": ["infra/bootstrap/main.tf", "infra/backend.tf"], "env": true, "capture": ["infra/bootstrap/.terraform.lock.hcl"]}

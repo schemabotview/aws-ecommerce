@@ -1,0 +1,6 @@
+/* This repo's whole design surface — the token @graphlearning/shell leaves to the repo. Imported
+   AFTER the shell's stylesheet in main.tsx, so it wins the cascade. AWS's orange as --brand: it
+   keeps ≥ 3:1 on the shell's dark --bg (#1a1d23). */
+:root {
+  --brand: #ff9900;
+}

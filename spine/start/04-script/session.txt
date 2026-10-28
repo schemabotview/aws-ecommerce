@@ -1,0 +1,12 @@
+$ bash scripts/make-bucket.sh
+{
+    "Location": "/book-shop-catalog-444455556666"
+}
+made book-shop-catalog-444455556666
+$ bash scripts/make-bucket.sh
+
+aws: [ERROR]: An error occurred (BucketAlreadyOwnedByYou) when calling the Creat
+eBucket operation: Your previous request to create the named bucket succeeded an
+d you already own it.
+$ aws s3 rb s3://book-shop-catalog-444455556666
+remove_bucket: book-shop-catalog-444455556666

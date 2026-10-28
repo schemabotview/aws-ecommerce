@@ -21,6 +21,11 @@ Terraform will perform the following actions:
     }
 
 Plan: 1 to add, 0 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.
 $ terraform apply -auto-approve
 aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-111122223333]
 
@@ -44,8 +49,8 @@ Terraform will perform the following actions:
 
 Plan: 1 to add, 0 to change, 0 to destroy.
 aws_s3_bucket_versioning.catalog: Creating...
-aws_s3_bucket_versioning.catalog: Creation complete after 2s [id=book-shop-catalog-1
-11122223333]
+aws_s3_bucket_versioning.catalog: Creation complete after 1s [id=book-shop-catal
+og-111122223333]
 
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 $ aws s3api get-bucket-versioning --bucket book-shop-catalog-111122223333

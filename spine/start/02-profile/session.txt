@@ -1,0 +1,7 @@
+$ export AWS_CONFIG_FILE=$PWD/aws-config
+$ aws configure list-profiles
+book-shop-dev
+book-shop-prod
+$ aws sts get-caller-identity --profile book-shop-dev
+
+aws: [ERROR]: Error loading SSO Token: Token for book-shop does not exist

@@ -4,3 +4,8 @@ dist/
 __pycache__/
 *.pyc
 .terraform/
+dist-snapshot/
+out/
+*.local
+.DS_Store
+package-lock.json

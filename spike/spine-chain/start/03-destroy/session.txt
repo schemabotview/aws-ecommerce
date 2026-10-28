@@ -1,8 +1,8 @@
 $ cd infra
 $ terraform apply -auto-approve
 aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-111122223333]
-aws_s3_bucket_versioning.catalog: Refreshing state... [id=book-shop-catalog-11112222
-3333]
+aws_s3_bucket_versioning.catalog: Refreshing state... [id=book-shop-catalog-1111
+22223333]
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
@@ -22,14 +22,14 @@ Terraform will perform the following actions:
 
 Plan: 0 to add, 1 to change, 0 to destroy.
 aws_s3_bucket.catalog: Modifying... [id=book-shop-catalog-111122223333]
-aws_s3_bucket.catalog: Modifications complete after 0s [id=book-shop-catalog-1111222
-23333]
+aws_s3_bucket.catalog: Modifications complete after 0s [id=book-shop-catalog-111
+122223333]
 
 Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
 $ terraform destroy -auto-approve
 aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-111122223333]
-aws_s3_bucket_versioning.catalog: Refreshing state... [id=book-shop-catalog-11112222
-3333]
+aws_s3_bucket_versioning.catalog: Refreshing state... [id=book-shop-catalog-1111
+22223333]
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
@@ -39,15 +39,15 @@ Terraform will perform the following actions:
 
   # aws_s3_bucket.catalog will be destroyed
   - resource "aws_s3_bucket" "catalog" {
-      - arn                         = "arn:aws:s3:::book-shop-catalog-111122223333" 
--> null
+      - arn                         = "arn:aws:s3:::book-shop-catalog-1111222233
+33" -> null
       - bucket                      = "book-shop-catalog-111122223333" -> null
-      - bucket_domain_name          = "book-shop-catalog-111122223333.s3.amazonaws.c
-om" -> null
+      - bucket_domain_name          = "book-shop-catalog-111122223333.s3.amazona
+ws.com" -> null
       - bucket_namespace            = "global" -> null
       - bucket_region               = "eu-west-2" -> null
-      - bucket_regional_domain_name = "book-shop-catalog-111122223333.s3.eu-west-2.a
-mazonaws.com" -> null
+      - bucket_regional_domain_name = "book-shop-catalog-111122223333.s3.eu-west
+-2.amazonaws.com" -> null
       - force_destroy               = true -> null
       - hosted_zone_id              = "Z3GKZC51ZF0DB4" -> null
       - id                          = "book-shop-catalog-111122223333" -> null
@@ -58,8 +58,8 @@ mazonaws.com" -> null
         # (4 unchanged attributes hidden)
 
       - grant {
-          - id          = "75aa57f09aa0c8caeab4f8c24e99d10f8e7faeebf76c078efc7c6caea
-54ba06a" -> null
+          - id          = "75aa57f09aa0c8caeab4f8c24e99d10f8e7faeebf76c078efc7c6
+caea54ba06a" -> null
           - permissions = [
               - "FULL_CONTROL",
             ] -> null
@@ -87,7 +87,8 @@ mazonaws.com" -> null
     }
 
 Plan: 0 to add, 0 to change, 2 to destroy.
-aws_s3_bucket_versioning.catalog: Destroying... [id=book-shop-catalog-111122223333]
+aws_s3_bucket_versioning.catalog: Destroying... [id=book-shop-catalog-1111222233
+33]
 aws_s3_bucket_versioning.catalog: Destruction complete after 0s
 aws_s3_bucket.catalog: Destroying... [id=book-shop-catalog-111122223333]
 aws_s3_bucket.catalog: Destruction complete after 0s

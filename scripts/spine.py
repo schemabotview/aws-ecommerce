@@ -17,15 +17,21 @@ it did not declare — so nothing written for the shop is thrown away or edited 
   {"first": true}               starts the chain
   {"from": "start/04-why-not",  continues that step; `changes` lists every path it adds, edits or
    "changes": ["infra/s3.tf"]}  removes (a directory covers everything under it). A declared path
-                                that did not change fails too: the list is the section's diff.
+                                that did not change fails too: the list is the section's diff. `[]`
+                                is a section that only looks (reads state, plans, investigates).
   {"lab": true}                 a standalone lab outside the chain: real output a concept scene shows
 
-THE CLOUD A STEP STARTS FROM IS DERIVED, NEVER LISTED. There is no AWS account behind the course:
-each step runs against a FRESH moto server (the real AWS CLI v2, boto3 and Terraform, pointed at an
-emulator). Before the transcript, the replay applies the PARENT step's Terraform to it, silently,
-root by root (`roots`, inherited down the chain, default ["infra"]) — so a section starts from exactly
-what the section before it declared, and its own `terraform plan` shows only its own change. Each
-root's state is kept where Terraform keeps it (local, or the S3 backend inside the emulator).
+EACH SECTION BUILDS ON THE ONE BEFORE IT — NOTHING IS REPLAYED TO GET THERE. There is no AWS
+account behind the course: the chain runs against ONE emulator (moto, through scripts/moto_server.py)
+and ONE working copy of the project, start to finish. A step's files are laid over the working copy
+(its declared changes; a file it no longer has is removed), and its session runs where the previous
+session left off: the same buckets, the same Terraform state, the same .terraform/ and lock file. So
+the cloud a section starts from is the cloud the previous section's commands really made — never a
+silent re-apply, never a hand-written setup list. Checking one step therefore runs the chain up to
+it (and reports only the steps asked for). The chain is a line: a step has at most one child; a
+"wrong version first, then the fix" is two consecutive steps, the fix building on the failure.
+
+A lab runs alone, on a fresh emulator, after the chain.
 
 What makes a replay deterministic — all of it about the MACHINE, never the commands:
   - Pinned tools from scripts/toolchain.py, in .spine-cache/: AWS CLI v2, Terraform and the AWS
@@ -49,17 +55,16 @@ What makes a replay deterministic — all of it about the MACHINE, never the com
 step.json (other keys, all optional):
   {"venv": true}                create .venv (borrowing boto3 & co.) and start with it activated
   {"env": true}                 `source env.sh` silently first, as a learner's shell would have
-  {"apply": false}              do not apply the parent's Terraform (a step about a fresh account)
-  {"roots": ["infra/bootstrap", "infra"]}   the Terraform roots applied, in order (inherited)
-  {"setup": ["cmd", ...]}       run after the apply, silently: data-plane state (objects, messages)
-  {"account": "111122223333"}   the emulator's account id
-  {"moto": {"VAR": "value"}}    extra emulator settings
-  {"time": "2026-11-02 09:30:00"}  the frozen clock's start ("@…" ticks from there)
+  {"setup": ["cmd", ...]}       run silently before the session: ONLY what happens off screen between
+                                two sections (a colleague's console click), never the shop's own state
+  {"account": "444455556666"}   the emulator's account id (the `first` step's, or a lab's)
+  {"moto": {"VAR": "value"}}    extra emulator settings (the `first` step's, or a lab's)
+  {"time": "2026-11-02 09:30:00"}  the frozen clock for this step (default CLOCK); the emulator reads it too
   {"endpoint": "s3"}            the service whose endpoint a non-`aws` command prints
   {"capture": ["path", ...]}    files the session creates; saved to captured/. A scene may show them, and the
                                 next step's project holds them without declaring them (the lock file)
-  {"columns": 100}              the pane's width: 84 in an IDE terminal (default), 100 in a map side pane
-  {"enforce_iam": true}         after setup, the emulator authorises every request against IAM
+  {"columns": 100}              the pane's width: 80 in an IDE terminal (default), more in a map side pane
+  {"enforce_iam": true}         from this step on, the emulator authorises every request against IAM
   {"volatile": true}            every digit masked in the comparison (timings the frame never quotes)
 """
 import difflib
@@ -86,15 +91,15 @@ PROJECT = 'book-shop'
 PORT = 5000
 ENDPOINT = f'http://localhost:{PORT}'
 CLOCK = '2026-11-02 09:30:00'
-ACCOUNT = '111122223333'
+ACCOUNT = '444455556666'  # development: the course builds in the dev account until Course 9
 REGION = 'eu-west-2'
 SEED = 42
 MARK = '__SPINE_MARK__'
-COLUMNS = 84
+COLUMNS = 80  # the IDE terminal's width (src/scenes/ide.ts EDITOR_COLS)
 REGISTRY: dict = {}  # the local registry's proxy settings, set in main()
 # Never part of a snapshot: what a run creates, not what the learner writes.
 IGNORED = {'__pycache__', '.venv', '.terraform', '.pytest_cache'}
-IGNORED_FILES = re.compile(r'(^|/)terraform\.tfstate(\.backup)?$|\.pyc$|(^|/)\.terraform\.tfstate\.lock\.info$')
+IGNORED_FILES = re.compile(r'(^|/)terraform\.tfstate(\.backup)?$|\.pyc$|(^|/)\.terraform\.tfstate\.lock\.info$|\.tfplan$|(^|/)tfplan$')
 SERVICE_ENDPOINT = {'s3api': 's3', 's3': 's3'}
 # Terraform's own clock (a Go binary: libfaketime cannot reach it).
 TF_ELAPSED = re.compile(r'((?:complete|elapsed|Still [a-z]+\.\.\.) (?:after )?\[?)(\d+m)?\d+s')
@@ -109,16 +114,6 @@ def config_of(step: Path) -> dict:
 def parent_of(step: Path) -> Path | None:
     config = config_of(step)
     return ROOT / config['from'] if config.get('from') else None
-
-
-def inherited(step: Path, key: str, default):
-    """A key a step inherits from its ancestors when it does not set it (`roots`)."""
-    while step is not None:
-        config = config_of(step)
-        if key in config:
-            return config[key]
-        step = parent_of(step)
-    return default
 
 
 def files(step: Path) -> dict[str, bytes]:
@@ -148,9 +143,9 @@ def lineage(step: Path) -> list[str]:
         return [f'{name}: "from" names {config["from"]}, which is not a step']
     if config_of(parent).get('lab'):
         return [f'{name}: "from" names a lab, which is outside the chain']
-    changes = config.get('changes') or []
-    if not changes:
-        return [f'{name}: "from" without "changes" — a step that changes nothing is not a section']
+    if 'changes' not in config:
+        return [f'{name}: "from" without "changes" — list the section diff ([] for a section that only looks)']
+    changes = config['changes']
     under = lambda path, c: path == c or path.startswith(c.rstrip('/') + '/')
     covered = lambda path: any(under(path, c) for c in changes)
     before, after = files(parent), files(step)
@@ -167,14 +162,16 @@ def lineage(step: Path) -> list[str]:
 
 # ── the machine ──────────────────────────────────────────────────────────────────────────────────
 
-def faketime_env(venv: Path, start: str) -> dict:
+def faketime_env(venv: Path, clock: Path) -> dict:
+    """libfaketime reading the time from `clock` on every call — one file the emulator and every
+    command share, rewritten as each step starts (its `time`)."""
     src = next(venv.glob('lib/python3*/site-packages/libfaketime/vendor/libfaketime/src'))
     return {'LD_LIBRARY_PATH': str(src), 'LD_PRELOAD': 'libfaketime.so.1', 'DONT_FAKE_MONOTONIC': '1',
-            'FAKETIME_NO_CACHE': '1', 'FAKETIME_DISABLE_SHM': '1', 'FAKETIME': start}
+            'FAKETIME_NO_CACHE': '1', 'FAKETIME_DISABLE_SHM': '1', 'FAKETIME_TIMESTAMP_FILE': str(clock)}
 
 
-def start_moto(venv: Path, config: dict) -> subprocess.Popen:
-    env = {**os.environ, **faketime_env(venv, config.get('time', CLOCK)), 'MOTO_ACCOUNT_ID': config.get('account', ACCOUNT),
+def start_moto(venv: Path, config: dict, clock: Path) -> subprocess.Popen:
+    env = {**os.environ, **faketime_env(venv, clock), 'MOTO_ACCOUNT_ID': config.get('account', ACCOUNT),
            **config.get('moto', {})}
     # moto, with the gaps the course meets closed (scripts/moto_server.py says which and why)
     server = subprocess.Popen([str(venv / 'bin' / 'python'), str(toolchain.REPO / 'scripts' / 'moto_server.py'),
@@ -211,36 +208,14 @@ def base_env(home: Path, config: dict) -> dict:
         'PIP_DISABLE_PIP_VERSION_CHECK': '1', 'AWS_PAGER': '', 'AWS_CLI_AUTO_PROMPT': 'off',
         # The emulator answers any host name: the Go SDK's virtual-hosted names reach it this way.
         'HTTP_PROXY': f'http://127.0.0.1:{PORT}', 'http_proxy': f'http://127.0.0.1:{PORT}', 'NO_PROXY': '', 'no_proxy': '',
-        # Terraform: the local provider mirror, no update check, no colour, one resource at a time.
+        # Terraform: the local registry, no update check, no colour, one resource at a time. NOT
+        # TF_IN_AUTOMATION — it rewords Terraform's hints, and a learner's terminal does not set it.
         **REGISTRY,
-        'TF_CLI_CONFIG_FILE': str(rc), 'CHECKPOINT_DISABLE': '1', 'TF_IN_AUTOMATION': '1',
+        'TF_CLI_CONFIG_FILE': str(rc), 'CHECKPOINT_DISABLE': '1',
         **{f'TF_CLI_ARGS_{c}': '-no-color' for c in ('init', 'validate', 'output', 'show', 'import', 'refresh')},
         **{f'TF_CLI_ARGS_{c}': '-no-color -parallelism=1' for c in ('plan', 'apply', 'destroy')},
     })
     return env
-
-
-def apply_parent(step: Path, project: Path, env: dict) -> None:
-    """Bring the fresh emulator to where the previous section left the shop: apply the parent's
-    Terraform, root by root, then keep the state and .terraform/ beside this step's own code."""
-    parent = parent_of(step)
-    if parent is None or config_of(step).get('apply') is False:
-        return
-    with tempfile.TemporaryDirectory() as tmp:
-        before = Path(tmp) / PROJECT
-        shutil.copytree(parent / 'project', before)
-        for root in inherited(step, 'roots', ['infra']):
-            work = before / root
-            if not any(work.glob('*.tf')):
-                continue
-            for args in (['init', '-input=false'], ['apply', '-auto-approve', '-input=false']):
-                r = subprocess.run(['terraform', *args], cwd=work, env=env, capture_output=True, text=True)
-                if r.returncode:
-                    raise SystemExit(f'{step.relative_to(ROOT)}: applying {parent.relative_to(ROOT)}/{root} failed:\n{r.stdout}{r.stderr}')
-            for made in ('.terraform', 'terraform.tfstate', '.terraform.lock.hcl'):
-                src, dst = work / made, project / root / made
-                if src.exists() and not dst.exists():
-                    (shutil.copytree if src.is_dir() else shutil.copy)(src, dst)
 
 
 # ── one step ─────────────────────────────────────────────────────────────────────────────────────
@@ -290,62 +265,103 @@ def wrap(text: str, columns: int) -> str:
     return '\n'.join(out)
 
 
-def replay(step: Path) -> tuple[str, dict[str, str]]:
-    config = config_of(step)
-    session = (step / 'session.txt').read_text()
-    columns = config.get('columns', COLUMNS)
-    venv = toolchain.tools()
-    with tempfile.TemporaryDirectory() as tmp:
-        home = Path(tmp) / 'home'
-        project = home / PROJECT
-        home.mkdir()
-        if (step / 'project').exists():
-            shutil.copytree(step / 'project', project, ignore=shutil.ignore_patterns(*IGNORED))
-        else:
-            project.mkdir()
-        env = base_env(home, config)
-        clock = faketime_env(venv, config.get('time', CLOCK))
+def chain() -> list[Path]:
+    """The chain's steps in order, from `first` along `from`; SystemExit if it is not one line."""
+    every = sorted(p.parent for p in ROOT.glob('*/*/session.txt'))
+    firsts = [s for s in every if config_of(s).get('first')]
+    children: dict[Path, list[Path]] = {}
+    for s in every:
+        if parent_of(s):
+            children.setdefault(parent_of(s), []).append(s)
+    forks = {p: c for p, c in children.items() if len(c) > 1}
+    if len(firsts) > 1 or forks:
+        raise SystemExit('✗ the chain is not one line: '
+                         + (f'{len(firsts)} "first" steps' if len(firsts) > 1 else '')
+                         + ''.join(f' {p.relative_to(ROOT)} has {len(c)} children' for p, c in forks.items()))
+    out, step = [], firsts[0] if firsts else None
+    while step is not None:
+        out.append(step)
+        step = (children.get(step) or [None])[0]
+    return out
+
+
+class Machine:
+    """One emulator, one home, one working copy of the project, one shared clock — a learner's
+    machine for the length of the chain (or of one lab)."""
+
+    def __init__(self, config: dict):
+        self.venv = toolchain.tools()
+        self.tmp = tempfile.TemporaryDirectory()
+        self.home = Path(self.tmp.name) / 'home'
+        self.project = self.home / PROJECT
+        self.project.mkdir(parents=True)
+        self.clock = Path(self.tmp.name) / 'clock'
+        self.clock.write_text(CLOCK)
+        self.server = start_moto(self.venv, config, self.clock)
+        self.files: dict[str, bytes] = {}
+
+    def close(self):
+        self.server.kill()
+        self.server.wait()
+        self.tmp.cleanup()
+
+    def lay(self, step: Path) -> None:
+        """Make the working copy's tracked files the step's: write what it has, remove what it no
+        longer has. Everything a run made (state, .terraform/, plans, a venv) stays where it is."""
+        new = files(step)
+        for rel in self.files.keys() - new.keys():
+            (self.project / rel).unlink(missing_ok=True)
+        for rel, data in new.items():
+            target = self.project / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if not target.exists() or target.read_bytes() != data:
+                target.write_bytes(data)
+        self.files = new
+
+    def run(self, step: Path) -> tuple[str, dict[str, str]]:
+        config = config_of(step)
+        columns = config.get('columns', COLUMNS)
+        self.clock.write_text(config.get('time', CLOCK))
+        self.lay(step)
+        env = base_env(self.home, config)
+        clock = faketime_env(self.venv, self.clock)
+        venv = self.project / '.venv'
         if config.get('venv'):
-            subprocess.run([sys.executable, '-m', 'venv', '.venv'], cwd=project, check=True)
-            site = next((project / '.venv' / 'lib').glob('python3*/site-packages'))
-            (site / '_spine_base.pth').write_text(str(next(venv.glob('lib/python3*/site-packages'))) + '\n')
-            env['PATH'] = f"{project / '.venv' / 'bin'}:{env['PATH']}"
-            env['VIRTUAL_ENV'] = str(project / '.venv')
+            if not venv.exists():
+                subprocess.run([sys.executable, '-m', 'venv', '.venv'], cwd=self.project, check=True)
+                site = next((venv / 'lib').glob('python3*/site-packages'))
+                (site / '_spine_base.pth').write_text(str(next(self.venv.glob('lib/python3*/site-packages'))) + '\n')
+            env['PATH'] = f"{venv / 'bin'}:{env['PATH']}"
+            env['VIRTUAL_ENV'] = str(venv)
         prelude = 'source env.sh >/dev/null 2>&1\n' if config.get('env') else ''
-        server = start_moto(venv, config)
-        try:
-            apply_parent(step, project, {**env, 'AWS_ENDPOINT_URL': ENDPOINT, 'AWS_DEFAULT_REGION': REGION,
-                                         'AWS_ACCESS_KEY_ID': 'test', 'AWS_SECRET_ACCESS_KEY': 'test'})
-            for cmd in config.get('setup', []):
-                subprocess.run(['bash', '-c', prelude + cmd], cwd=project, env={**env, **clock}, check=True, capture_output=True)
-            if config.get('enforce_iam'):
-                enforce_iam()
-            state = home / '.spine-state'
-            if prelude:
-                subprocess.run(['bash', '-c', f'cd {project}\n{prelude}export -p > {state}'], env=env, check=True)
-            cwd = project
-            blocks: list[str] = []
-            for first, more in commands(session, columns):
-                cmd = '\n'.join([first, *more])
-                typed = '\n'.join([f'$ {first}', *(f'> {m}' for m in more)])
-                if any(len(t) == columns for t in typed.split('\n')):
-                    raise SystemExit(f'{step}: a typed line exactly {columns} wide reads as wrapped — reword it:\n{typed}')
-                script = f'cd {cwd!s}\n{{ {cmd}\n}} 2>&1\necho "{MARK}$PWD"\n'
-                if state.exists():
-                    script = state.read_text() + '\n' + script
-                r = subprocess.run(['bash', '-c', script + f'export -p > {state}'], env={**env, **clock}, capture_output=True, text=True)
-                output, _, after = r.stdout.partition(MARK)
-                output = re.sub(r'^libfaketime: .*\n(?:tory\n)?', '', output, flags=re.M)
-                if after:
-                    cwd = Path(after.split('\n')[0])
-                blocks.append(typed + (f"\n{real_endpoints(output.rstrip(chr(10)), cmd, config)}" if output.strip() else ''))
-            transcript = '\n'.join(blocks)
-            captured = {n: (project / n).read_text() for n in config.get('capture', [])}
-        finally:
-            server.kill()
-            server.wait()
-        fix = lambda s: s.replace(str(home), SHOWN_HOME).replace(str(Path(tmp).resolve() / 'home'), SHOWN_HOME)
-        return wrap(fix(transcript), columns).rstrip('\n') + '\n', {k: fix(v) for k, v in captured.items()}
+        for cmd in config.get('setup', []):
+            subprocess.run(['bash', '-c', prelude + cmd], cwd=self.project, env={**env, **clock}, check=True, capture_output=True)
+        if config.get('enforce_iam'):
+            enforce_iam()
+        # A section is a new terminal: it starts in the project, with only env.sh sourced.
+        state = self.home / '.spine-state'
+        state.unlink(missing_ok=True)
+        if prelude:
+            subprocess.run(['bash', '-c', f'cd {self.project}\n{prelude}export -p > {state}'], env=env, check=True)
+        cwd = self.project
+        blocks: list[str] = []
+        for first, more in commands((step / 'session.txt').read_text(), columns):
+            cmd = '\n'.join([first, *more])
+            typed = '\n'.join([f'$ {first}', *(f'> {m}' for m in more)])
+            if any(len(t) == columns for t in typed.split('\n')):
+                raise SystemExit(f'{step}: a typed line exactly {columns} wide reads as wrapped — reword it:\n{typed}')
+            script = f'cd {cwd!s}\n{{ {cmd}\n}} 2>&1\necho "{MARK}$PWD"\n'
+            if state.exists():
+                script = state.read_text() + '\n' + script
+            r = subprocess.run(['bash', '-c', script + f'export -p > {state}'], env={**env, **clock}, capture_output=True, text=True)
+            output, _, after = r.stdout.partition(MARK)
+            output = re.sub(r'^libfaketime: .*\n(?:tory\n)?', '', output, flags=re.M)
+            if after:
+                cwd = Path(after.split('\n')[0])
+            blocks.append(typed + (f"\n{real_endpoints(output.rstrip(chr(10)), cmd, config)}" if output.strip() else ''))
+        captured = {n: (self.project / n).read_text() for n in config.get('capture', [])}
+        fix = lambda s: s.replace(str(self.home), SHOWN_HOME).replace(str(self.home.resolve()), SHOWN_HOME)
+        return wrap(fix('\n'.join(blocks)), columns).rstrip('\n') + '\n', {k: fix(v) for k, v in captured.items()}
 
 
 TF_PROGRESS = re.compile(r'^\S+: (Refreshing state\.\.\.|Reading\.\.\.|Read complete|Creating\.\.\.|Creation complete|'
@@ -386,7 +402,7 @@ def main() -> int:
     write = '--write' in sys.argv
     only = [a for a in sys.argv[1:] if not a.startswith('--')]
     every = sorted(p.parent for p in ROOT.glob('*/*/session.txt'))
-    steps = [s for s in every if not only or any(str(s.relative_to(ROOT)).startswith(o) for o in only)]
+    asked = lambda s: not only or any(str(s.relative_to(ROOT)).startswith(o) for o in only)
     problems = 0
     # The chain is checked over EVERY step, whatever was asked for: a filtered run must not hide a
     # parent edited out from under its children.
@@ -396,8 +412,25 @@ def main() -> int:
     if problems and write:
         print('✗ the chain is broken: fix step.json or the snapshots before rewriting transcripts')
         return 1
-    for step in steps:
-        transcript, captured = replay(step)
+    line = chain()
+    last = max((i for i, s in enumerate(line) if asked(s)), default=-1)
+    runs: list[tuple[Path, tuple[str, dict[str, str]]]] = []
+    if last >= 0:
+        machine = Machine(config_of(line[0]))
+        try:
+            for step in line[:last + 1]:  # the chain up to the last step asked for, in order
+                result = machine.run(step)
+                if asked(step):
+                    runs.append((step, result))
+        finally:
+            machine.close()
+    for lab in (s for s in every if config_of(s).get('lab') and asked(s)):
+        machine = Machine(config_of(lab))
+        try:
+            runs.append((lab, machine.run(lab)))
+        finally:
+            machine.close()
+    for step, (transcript, captured) in runs:
         name = step.relative_to(ROOT)
         if write:
             (step / 'session.txt').write_text(transcript)
@@ -417,7 +450,7 @@ def main() -> int:
                 problems += 1
                 print(f'✗ {name}: captured/{file} differs from a real run')
     if not write:
-        print(f"{'✗' if problems else '✓'} {len(steps)} spine step(s) replayed, {problems} problem(s)")
+        print(f"{'✗' if problems else '✓'} {len(runs)} spine step(s) replayed, {problems} problem(s)")
     return 1 if problems else 0
 
 

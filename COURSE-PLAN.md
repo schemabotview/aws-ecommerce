@@ -169,14 +169,14 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | The account and its root user | concept | account → root (locked away) / Identity Center users → roles |
-| 2 | A profile and a first session | `aws configure sso` profile; the login refused offline | CLI → profile → SSO portal → short-lived credentials |
-| 3 | The emulator beside AWS | `env.sh`; `sts get-caller-identity` (emulated) | client → endpoint override → moto, against client → AWS; what each can show |
-| 4 | Why not a script | the CLI creates a bucket; run it again; tag drift | two runs → two answers; no record of what exists |
-| 5 | Terraform: init, plan, apply | `infra/s3.tf`, the first bucket | ◆ side pane: config → plan → apply → API, and state written back |
-| 6 | State | `terraform state show`; edit the tag by hand, plan again | config ↔ state ↔ real resource; a drift found |
-| 7 | State in S3, locked | `infra/bootstrap/`, backend `s3` with `use_lockfile` | two people, one state object, one lock |
-| 8 | Destroy, tags and a budget | default tags; `terraform destroy`; a budget | the meters stopping; a budget is an alarm, not a cap |
+| 1 | The account and its root user | concept | people → Identity Center → a role in each account; each account's own root user, locked away |
+| 2 | A profile and a first session | `aws-config` (two profiles, one sso-session); `get-caller-identity` refused: no token | CLI → profile → sso-session → portal → token (none yet) → role credentials |
+| 3 | The emulator beside AWS | `env.sh`; `sts get-caller-identity` (emulated); an empty account | CLI / boto3 / Terraform → AWS_ENDPOINT_URL → moto or AWS; what the emulator can show |
+| 4 | Why not a script | `scripts/make-bucket.sh` run twice: `BucketAlreadyOwnedByYou`; the bucket removed | two runs, one bucket; a script says what to DO |
+| 5 | Terraform: init, plan, apply | `infra/s3.tf`; `init`, `plan -out`, `apply tfplan` | ◆ side pane: code + state + account → plan → apply → account and state |
+| 6 | State | sam tags the bucket in the console (off screen); `state list`, the tags, `plan` finds the drift | sam → code / state / bucket → refresh → the plan puts it back |
+| 7 | State in S3, locked | `infra/bootstrap/`; `backend.tf` with `use_lockfile`; `init -migrate-state` | two runs, one lock; who keeps whose state |
+| 8 | Destroy, tags and a budget (map frame) | `default_tags`, a $20 budget, the drift removed; `plan -destroy` | the shop's map, first time; a budget is an alarm, not a cap |
 
 **4. `secure` · Lock it down · 8**
 
@@ -315,15 +315,17 @@ python-expense-tracker, with its rules: every step has exactly one of `first`, `
 
 `scripts/spine.py` merges the two existing ones:
 
-- **from python-expense-tracker**: the cumulative chain, `lab`, `volatile`, failure branches (two
-  steps with one `from`), highlights found by text, never typed line numbers.
-- **from aws-ct**: a fresh seeded moto per step, the frozen clock for Python and the CLI, the
-  endpoint rewrite (`localhost:5000` → the regional endpoint in output), wrapping at the pane's
-  width, IAM enforcement after setup.
-- **new**: a step's cloud state is **derived, not listed**. Before the transcript, the replay runs
-  `terraform init` and `terraform apply` of the parent step's code silently against the fresh
-  emulator, so what the section starts from is exactly what the previous section declared. A
-  hand-written `setup` remains only for data-plane state (objects, messages).
+- **from python-expense-tracker**: the cumulative chain, `lab`, `volatile`, highlights found by
+  text, never typed line numbers.
+- **from aws-ct**: seeded moto, the frozen clock for Python and the CLI, the endpoint rewrite
+  (`localhost:5000` → the regional endpoint in output), wrapping at the pane's width, IAM
+  enforcement.
+- **new — each section builds on the one before, nothing is replayed to get there.** The whole
+  chain runs against ONE emulator and ONE working copy of the project: a step's files are laid over
+  the working copy, and its session runs where the previous session left off — the same buckets,
+  state, `.terraform/` and lock file. No hidden re-apply, no setup lists. The chain is a line (a
+  failure and its fix are two consecutive steps). `setup` is only for what happens off screen
+  between two sections (a colleague's console click). Labs run alone.
 
 Terraform-specific replay rules, proven by the spike (`SPIKE.md` §1, §4):
 
@@ -364,10 +366,11 @@ claims and no card shows. Mutate a row and watch it fail before trusting it.
      ECR, ELB, Route 53, CloudFront, WAF, CloudTrail, ACM, Backup, Organizations, internet and
      NAT gateway, Systems Manager, Terraform's mark) and a **dashed group border** (AWS draws AZs
      and subnets dashed), each with a fixture.
-3. **Repo scaffold:** vite + graphl-flow + shell, the IDE frame ported, the map frame on a
-   `SAME_FIT` group, `check-content` / `check-render` / `check:spine` / `check:aws`, `CLAUDE.md`.
-4. **Pilot: Course 3 (`start`) plus one ◆ full scene from Course 5 (the VPC map)** → owner review
-   of both frame kinds and both detour kinds on rendered 4K routes.
+3. **Repo scaffold:** vite + graphl-flow + shell, the IDE frame ported, the map frame on one fit,
+   `check-content` / `check-render` / `check:spine`, `CLAUDE.md`. Done 2026-10-28; `check:aws`
+   (verification levels of code cards) comes with the first course that needs it.
+4. **Pilot: Course 3 (`start`) plus one ◆ full scene from Course 5 (addresses and CIDR)** → owner
+   review of both frame kinds and both detour kinds on rendered 4K routes. Authored 2026-10-28.
 5. Courses 1–2, 4–12 one at a time, each reviewed on its rendered routes, then narrated.
 6. Record all 12 → assemble and publish the one video.
 
