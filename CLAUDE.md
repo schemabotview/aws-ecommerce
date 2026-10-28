@@ -17,8 +17,9 @@ Engine `@graphlearning/graphl-flow` ^0.6.0, shell `@graphlearning/shell` ^1.0.4.
 ## Status
 
 Authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections), Course 4 `secure`
-(8), Course 5 `network` (10), Course 6 `run` (9) and Course 7 `data` (9), one chain: `start/02` → …
-→ `secure/07` → `network/02` → … → `run/08` → `data/02` → … → `data/08`. No narration audio yet.
+(8), Course 5 `network` (10), Course 6 `run` (9), Course 7 `data` (9) and Course 8 `decouple` (9),
+one chain: `start/02` → … → `secure/07` → `network/02` → … → `run/08` → `data/02` → … → `data/08` →
+`decouple/02` → … → `decouple/08`. No narration audio yet.
 
 **graphl-flow 0.6.0 is not on npm yet** (branch `claude/pensive-johnson-ixdglh` of graphl-flow: AWS
 icons, `dashed` groups, `muted` items, `hcl`, folded terminals). Until it is published: build it
@@ -77,7 +78,13 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   run). Each fix answers as AWS's API reference says AWS answers — never what a frame wants.
   When a fix is needed, find the call with `MATRIX_DEBUG=1`, patch, and prove it with the matrix.
 - moto's clock is frozen, so anything it does "after N seconds" never happens: the replay sets
-  `MOTO_ACM_VALIDATION_WAIT=-1` (a DNS-validated certificate is issued at once).
+  `MOTO_ACM_VALIDATION_WAIT=-1` (a DNS-validated certificate is issued at once). A typed `sleep N`
+  moves the shared clock N seconds on instead of waiting (an SQS visibility timeout then really
+  ends, §8.2); the clock goes on from where a step left it (`state/clock`).
+- **moto runs no Lambda and no Step Functions task here.** It records functions, event source mappings
+  and state machines; `no-poller` stops moto invoking a function (in Docker) inside SendMessage.
+  `tools/poll.py` plays the SQS poller and `tools/run_workflow.py` walks the ASL, each with the real
+  handler code, and every frame that uses them says so.
 - `TF_IN_AUTOMATION` is never set: it rewords Terraform's hints, and a learner's terminal lacks it.
 - Ids are seeded from a request's CANONICAL content: idempotency tokens dropped and tags sorted by
   key, because the provider sends a tag map in Go's random order (a seed that saw the order gave
@@ -155,6 +162,11 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 | load balancer | `book-shop`, internet-facing, 3 public subnets; target group `book-shop-app` HTTP 8080 ip, /health every 10 s, 3 in / 2 out, 30 s draining; 80 → 301 HTTPS, 443 TLS13-1-2-2021-06 |
 | DNS / TLS | zone book-shop.example.com, alias A → the ALB; ACM certificate, DNS-validated |
 | payments API | 198.51.100.7 (documentation range) |
+| checkout events | queue `book-shop-fulfilment` (visibility 30 s, 4 d) → DLQ `book-shop-fulfilment-dlq` after 3 receives (14 d); order 999 has no books; function `book-shop-fulfil` (python3.13 arm64, 256 MB, 20 s, role BookShopFulfil), mapping batch 10 / 5 s, ReportBatchItemFailures |
+| fan-out | SNS `book-shop-orders` → fulfilment, `book-shop-loyalty`, `book-shop-fraud-check` (body filter total ≥ 500), raw delivery; orders 6 (c-20, 21.98) and 7 (c-21, 50 × bk-1001, 549.50) |
+| event bus | `book-shop`; rules `uk-vat` (book-shop.checkout, OrderPlaced, country GB) → `book-shop-vat`, `refunds` (book-shop.returns, RefundRequested) → `book-shop-refunds`; samples: order 8 GB, order 9 FR, refund for order 4 |
+| workflow | `book-shop-checkout`: ReserveStock → ChargePayment (retry PaymentTimeout 2 s × 2.0, max 2; catch all → ReleaseStock → OrderFailed) → ShipOrder; functions book-shop-reserve/charge/ship/release (role BookShopCheckoutSteps), state machine role BookShopCheckoutFlow; order 10 times out twice then pays at 6 s, order 11 declined |
+| idempotency | table `book-shop-idempotency` (key, TTL `expires` 7 d), key `fulfil#<order>`; order 12 sent twice |
 | clock | 2026-11-02 09:30:00 UTC (the spine's default) |
 
 Extend this table; never change a value a frame already quotes.

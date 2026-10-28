@@ -1,0 +1,1 @@
+{"from": "decouple/05-fanout", "changes": ["infra/events.tf", "events/samples.json", "events/fr-order.json", "tools/routed.py"], "env": true, "venv": true, "postgres": true, "endpoint": "sqs"}

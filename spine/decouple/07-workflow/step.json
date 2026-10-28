@@ -1,0 +1,1 @@
+{"from": "decouple/06-events", "changes": ["workflows/checkout.asl.json", "functions/checkout/__init__.py", "functions/checkout/steps.py", "infra/workflow.tf", "tools/run_workflow.py"], "env": true, "venv": true, "postgres": true, "endpoint": "sqs"}

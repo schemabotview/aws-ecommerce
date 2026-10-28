@@ -71,7 +71,7 @@ step.json (other keys, all optional):
                                 two sections (a colleague's console click), never the shop's own state
   {"account": "444455556666"}   the emulator's account id (the `first` step's, or a lab's)
   {"moto": {"VAR": "value"}}    extra emulator settings (the `first` step's, or a lab's)
-  {"time": "2026-11-02 09:30:00"}  the frozen clock for this step (default CLOCK); the emulator reads it too
+  {"time": "2026-11-02 09:30:00"}  the frozen clock for this step (default: where the last step left it; CLOCK at first)
   {"endpoint": "s3"}            the service whose endpoint a non-`aws` command prints
   {"capture": ["path", ...]}    files the session creates; saved to captured/. A scene may show them, and the
                                 next step's project holds them without declaring them (the lock file)
@@ -449,6 +449,8 @@ class Machine:
         if database_exists():  # the local PostgreSQL's book_shop database is machine state too
             with open(target / 'postgres.sql', 'w') as out:
                 subprocess.run(['pg_dump', '--no-owner', '--no-privileges', DATABASE], stdout=out, check=True)
+        if self.clock.read_text().strip() != CLOCK:  # a `sleep` moved it: the next step goes on from here
+            (target / 'clock').write_text(self.clock.read_text())
         raw = self.root / 'emulator.pickle'
         emulator('spine-save', raw)
         with open(raw, 'rb') as f, gzip.GzipFile(target / 'emulator.pickle.gz', 'wb', mtime=0) as out:
@@ -459,6 +461,8 @@ class Machine:
         """The machine as it was after `step`, from its recorded state."""
         shutil.rmtree(self.home)
         subprocess.run(['tar', '-C', str(self.root), '-xzf', str(step / 'state' / 'home.tar.gz')], check=True)
+        moved = step / 'state' / 'clock'
+        self.clock.write_text(moved.read_text() if moved.exists() else CLOCK)
         if (step / 'state' / 'postgres.sql').exists():
             toolchain.postgres()  # first: a database left by an earlier session is dropped only if the cluster runs
             drop_database()
@@ -491,7 +495,8 @@ class Machine:
     def run(self, step: Path) -> tuple[str, dict[str, str]]:
         config = config_of(step)
         columns = config.get('columns', COLUMNS)
-        self.clock.write_text(config.get('time', CLOCK))
+        if 'time' in config:  # otherwise the clock goes on from where the last step left it (`sleep`)
+            self.clock.write_text(config['time'])
         self.lay(step)
         env = base_env(self.home, config)
         clock = faketime_env(self.venv, self.clock)

@@ -1,0 +1,1 @@
+{"from": "decouple/04-function", "changes": ["infra/topic.tf", "infra/iam.tf", "infra/task.tf", "book_shop/checkout.py", "tools/checkout.py", "tools/listeners.py"], "env": true, "venv": true, "postgres": true, "endpoint": "sqs"}

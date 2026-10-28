@@ -1,0 +1,1 @@
+{"from": "decouple/07-workflow", "changes": ["infra/tables.tf", "infra/function.tf", "functions/fulfil/handler.py", "events/order-12.json"], "env": true, "venv": true, "postgres": true, "endpoint": "sqs"}

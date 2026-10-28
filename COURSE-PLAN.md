@@ -1,6 +1,6 @@
 # Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–7 (see `CLAUDE.md`, Status).
+**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–8 (see `CLAUDE.md`, Status).
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
@@ -239,14 +239,14 @@ side-pane diagram, or the full scene's subject.
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
 | 1 | ◆ full scene: synchronous against asynchronous | concept | one checkout as a request chain vs as events; what each fails like |
-| 2 | A queue for fulfilment | SQS queue; `checkout.py` sends | producer → queue → consumer; visibility timeout on a timeline |
-| 3 | When a message keeps failing | redrive policy, DLQ | receive count 1 → 2 → 3 → DLQ |
-| 4 | A consumer as a function | `functions/fulfil`, event source mapping | the poller: queue → batch → function → delete / retry |
-| 5 | Fan-out | SNS topic, subscriptions, filter policy | one OrderPlaced → fulfilment, loyalty, fraud (≥ 500 only) |
-| 6 | Routing events | EventBridge bus and rules | bus → rules (pattern) → targets, one event matched |
-| 7 | The payment workflow | `workflows/checkout.asl.json`, Step Functions | the state machine itself: reserve → charge (retry, catch) → ship / release |
-| 8 | Doing it exactly once | idempotency key in DynamoDB | a duplicate delivery stopped at the key |
-| 9 | Choosing the mechanism | concept + the shop's choices | queue / topic / bus / workflow, each placed on the finished checkout |
+| 2 | A queue for fulfilment | `queues.tf` (visibility 30 s); `checkout.py` records the order then sends OrderPlaced; a worker crashes before the delete, `sleep 31`, receive count 2 | producer → queue → consumer; the message by the clock |
+| 3 | When a message keeps failing | redrive policy (maxReceiveCount 3) → `book-shop-fulfilment-dlq`; order 999 (no books) received 3 times, then moved | receive 1 → 2 → 3 → DLQ |
+| 4 | A consumer as a function | `functions/fulfil` (ReportBatchItemFailures), event source mapping (10, 5 s); recorded, not run: `tools/poll.py` plays the poller | queue → poller → function → deleted / left |
+| 5 | Fan-out (map frame) | SNS `book-shop-orders` → fulfilment, loyalty, fraud-check (body filter total ≥ 500); checkout publishes | one OrderPlaced → three copies, one filtered (read from the queues) |
+| 6 | Routing events | EventBridge bus `book-shop`, rules `uk-vat` (country GB) and `refunds` → queues; test-event-pattern on an FR order | events → bus → rules → targets |
+| 7 | The payment workflow | `workflows/checkout.asl.json`, four Lambda steps; recorded, not run: `tools/run_workflow.py` walks it with stand-in payment answers | reserve → charge (retry 2 s, 4 s; catch) → ship / release → OrderFailed |
+| 8 | Doing it exactly once | `book-shop-idempotency` table; the function claims `fulfil#<order>` first; order 12 sent twice | two deliveries → one key → packed / skipped |
+| 9 | ◆ full scene: choosing the mechanism | concept | queue / topic / bus / workflow, each placed on the checkout |
 
 **9. `deliver` · Ship it safely · 8**
 

@@ -50,6 +50,7 @@ export const BUILT: Record<string, string[]> = {
   data: ['catalog', 'state', 'budget', 'iam', 'vpc', ...SUBNETS, 'igw', 'nat-a', 'alb', 'dns', 'cert', 's3-endpoint',
     'ecr', 'watch', 'task-a', 'task-b', 'task-c', 'photos', 'db-a', 'db-b', 'secrets', 'carts'],
 }
+BUILT.decouple = [...BUILT.data, 'queue', 'topic', 'bus', 'fulfil', 'payment']
 export { SUBNETS }
 
 function item(part: Part, state: State): Item {

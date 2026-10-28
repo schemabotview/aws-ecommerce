@@ -42,6 +42,8 @@ When a pinned moto release has one, delete it here: the matrix is the test.
   org-not-in-use  CreatePolicy before the organization exists: AWS answers 400
                   AWSOrganizationsNotInUseException; moto crashed (500), which the provider retries 25
                   times with back-off — a "hang" of minutes, one run in five (the walk order decides).
+  events-test-pattern  EventBridge TestEventPattern: moto answered nothing (not implemented); it now
+                  answers {"Result": true|false} from moto's own pattern matcher, the one its rules use.
   ecr-digest      An image's digest is the sha256 of its manifest's bytes, as AWS (and docker) compute
                   it; moto hashed the concatenated layer digests, so ECR named a different digest
                   from the one the build printed.
@@ -58,6 +60,10 @@ for AWS behaviour:
                   policy, so alex can stand in for ECS here, which AWS would refuse. A presigned URL
                   signed with alex's key is alex's request too; one signed by any other principal is
                   not supported under enforcement (moto's check needs an Authorization header).
+                  Likewise a session of OrganizationAccountAccessRole in any account: AWS Organizations
+                  creates that role, with AdministratorAccess, in every account it creates, and moto
+                  creates no such role (its sessions would be refused for want of one). Course 9 reaches
+                  production through it before the pipeline has a role of its own.
   conditions      A policy statement whose condition does not match does not APPLY (neutral); moto
                   returned DENIED for it — an Allow or a Deny alike. moto evaluated only StringEquals
                   and took any other operator as matched: Bool is added (case-insensitive, as AWS
@@ -83,6 +89,9 @@ for AWS behaviour:
                   this, apart from the sender). The machine runs no Lambda: the mapping is recorded,
                   messages stay in the queue, and `tools/poll.py` plays the poller, on screen as such
                   (§8.4). Machinery, not a fix: AWS does run the function.
+  visible-at      A message is visible again once its visibility timeout HAS elapsed (now >= the end);
+                  moto asked for now > the end, which under the frozen clock means never for a timeout
+                  of 0 (a receive that only looks, §8.5) until a `sleep` moves the clock.
   checkpoints     /moto-api/spine-save and /spine-load write and read everything the emulator holds,
                   so scripts/spine.py can resume the chain after any step (see `save`).
 """
@@ -808,6 +817,19 @@ def _rds_secret():
     MasterUserSecret._generate_secret_name = secret_name
 
 
+# ── events-test-pattern ──────────────────────────────────────────────────────────────────────────
+
+@patch('events-test-pattern')
+def _events_test_pattern():
+    from moto.events.models import EventPattern
+    from moto.events.responses import EventsHandler
+
+    def test_event_pattern(self):
+        pattern = EventPattern.load(self._get_param('EventPattern'))
+        return json.dumps({'Result': pattern.matches_event(json.loads(self._get_param('Event')))})
+    EventsHandler.test_event_pattern = test_event_pattern
+
+
 # ── no-poller ────────────────────────────────────────────────────────────────────────────────────
 
 @patch('no-poller')
@@ -824,9 +846,32 @@ def _no_poller():
     Queue.add_message = add_message
 
 
+# ── visible-at ───────────────────────────────────────────────────────────────────────────────────
+
+@patch('visible-at')
+def _visible_at():
+    from moto.core.utils import unix_time_millis
+    from moto.sqs.models import Message
+    Message.visible = property(lambda self: unix_time_millis() >= self.visible_at)
+
+
 # ── developer-key ────────────────────────────────────────────────────────────────────────────────
 
 DEVELOPER_KEY = 'AKIAIOSFODNN7EXAMPLE'  # env.sh's — the AWS documentation's example key
+
+
+ADMIN_ROLE = ':role/OrganizationAccountAccessRole'
+
+
+def _admin_session(key: str) -> bool:
+    """Is `key` a session of the role Organizations creates in every member account?"""
+    from moto.sts.models import sts_backends
+    for account in list(sts_backends.keys()):
+        for backend in sts_backends[account].values():
+            for role in backend.assumed_roles:
+                if role.access_key_id == key:
+                    return role.role_arn.endswith(ADMIN_ROLE)
+    return False
 
 
 @patch('developer-key')
@@ -840,6 +885,9 @@ def _developer_key():
         # A presigned URL carries its credential in the query string, not a header (moto's enforcement
         # assumed a header and crashed): one signed with alex's key is alex's request.
         if f'X-Amz-Credential={DEVELOPER_KEY}%2F' in self.uri or f'X-Amz-Credential={DEVELOPER_KEY}/' in self.uri:
+            return None
+        key = re.search(r'Credential=([A-Z0-9]+)/', self.headers.get('Authorization') or '')
+        if key and _admin_session(key[1]):
             return None
         return original(self, iam_request_cls, resource)
     ActionAuthenticatorMixin._authenticate_and_authorize_action = authorize
