@@ -84,6 +84,9 @@ for AWS behaviour:
   rds-secret      The secret RDS manages for a master user holds THAT user (moto: always "admin",
                   password "P@55w0rd!"), with a generated password; its name's id comes from the
                   seeded random stream (moto used uuid4, so it changed on every recording).
+  sqs-keep-policy SetQueueAttributes changes only the attributes it names, as on AWS; moto set the
+                  queue's Policy to none whenever Policy was not among them (§9.6's console click
+                  removed the topic's permission to send).
   accounts        MOTO_ACCOUNT_ID (the step's account) named the account of EVERY request, so a role
                   session in another account (§9.2's production) still acted in development. It now
                   names only the account of a key moto did not issue (env.sh's); a session's key acts
@@ -847,6 +850,22 @@ def _accounts():
         found = get_account_id_from(self.get_access_key())
         return found if found != DEFAULT_ACCOUNT_ID else original(self)
     BaseResponse.get_current_account = current_account
+
+
+# ── sqs-keep-policy ──────────────────────────────────────────────────────────────────────────────
+
+@patch('sqs-keep-policy')
+def _sqs_keep_policy():
+    from moto.sqs.models import SQSBackend
+
+    def set_queue_attributes(self, queue_name, attributes):
+        queue = self.get_queue(queue_name)
+        kept = queue.policy
+        queue._set_attributes(attributes)
+        if 'Policy' not in attributes:  # an attribute not named is left as it was
+            queue.policy = kept
+        return queue
+    SQSBackend.set_queue_attributes = set_queue_attributes
 
 
 # ── no-poller ────────────────────────────────────────────────────────────────────────────────────

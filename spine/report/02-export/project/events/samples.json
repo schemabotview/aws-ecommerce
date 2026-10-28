@@ -1,0 +1,11 @@
+[
+  {"EventBusName": "book-shop", "Source": "book-shop.checkout",
+   "DetailType": "OrderPlaced",
+   "Detail": "{\"order\": 8, \"country\": \"GB\", \"total\": 21.98}"},
+  {"EventBusName": "book-shop", "Source": "book-shop.checkout",
+   "DetailType": "OrderPlaced",
+   "Detail": "{\"order\": 9, \"country\": \"FR\", \"total\": 10.99}"},
+  {"EventBusName": "book-shop", "Source": "book-shop.returns",
+   "DetailType": "RefundRequested",
+   "Detail": "{\"order\": 4, \"reason\": \"damaged in the post\"}"}
+]
