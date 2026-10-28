@@ -1,0 +1,1 @@
+{"from": "start/02-versioning", "changes": ["infra/s3.tf"], "env": true, "setup": ["aws s3 cp env.sh s3://book-shop-catalog-111122223333/books/bk-1001.json"]}

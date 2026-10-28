@@ -1,0 +1,54 @@
+$ cd infra
+$ terraform plan
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-111122223333]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_s3_bucket_versioning.catalog will be created
+  + resource "aws_s3_bucket_versioning" "catalog" {
+      + bucket = "book-shop-catalog-111122223333"
+      + id     = (known after apply)
+      + region = "eu-west-2"
+
+      + versioning_configuration {
+          + mfa_delete = (known after apply)
+          + status     = "Enabled"
+        }
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+$ terraform apply -auto-approve
+aws_s3_bucket.catalog: Refreshing state... [id=book-shop-catalog-111122223333]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_s3_bucket_versioning.catalog will be created
+  + resource "aws_s3_bucket_versioning" "catalog" {
+      + bucket = "book-shop-catalog-111122223333"
+      + id     = (known after apply)
+      + region = "eu-west-2"
+
+      + versioning_configuration {
+          + mfa_delete = (known after apply)
+          + status     = "Enabled"
+        }
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+aws_s3_bucket_versioning.catalog: Creating...
+aws_s3_bucket_versioning.catalog: Creation complete after 2s [id=book-shop-catalog-1
+11122223333]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+$ aws s3api get-bucket-versioning --bucket book-shop-catalog-111122223333
+{
+    "Status": "Enabled"
+}

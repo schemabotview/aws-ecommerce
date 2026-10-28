@@ -1,0 +1,1 @@
+{"from": "start/01-first-bucket", "changes": ["infra/s3.tf"], "env": true}

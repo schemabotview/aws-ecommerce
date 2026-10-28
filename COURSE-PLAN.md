@@ -1,6 +1,6 @@
-# Learn AWS by building an online shop with Terraform — plan
+# Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, awaiting owner review (2026-10-28).** Nothing is authored yet.
+**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** No course content is authored yet.
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
@@ -8,7 +8,7 @@ verification levels, the emulator's determinism — and the lessons recorded in 
 
 ## The idea
 
-One application, `shop`, an online shop on AWS. It grows from an empty account to a tested,
+One application, `book-shop`, an online book shop on AWS. It grows from an empty account to a tested,
 containerised web service with an asynchronous checkout, a reporting lake and the controls a
 production system needs — **declared in Terraform from its first resource**. Every AWS service is
 taught **when the shop first needs it**. Background (how a Region is built, how IAM evaluates a
@@ -36,19 +36,19 @@ Why a shop:
 
 ## Packaging for YouTube
 
-**One video: "Learn AWS by building an online shop: full course, beginner to professional"** —
+**One video: "Learn AWS by building a book shop: full course, beginner to professional"** —
 12 courses, 92 sections, ~2 h 30 min, one continuous story. A course is a YouTube chapter group and
 the owner's review unit; a section (90–120 s) is one chapter, titled *concept: what the shop gets*
 ("Security groups: only the load balancer reaches the app"). The video opens with the finished
 shop taking an order (payoff first). Each section can also go out as a Short (`record-reels`).
 
-## The stack (pinned when Course 3 is authored)
+## The stack (pinned by the spike, `SPIKE.md`)
 
 | tool | role |
 | --- | --- |
-| Terraform (one 1.x release) + `hashicorp/aws` (one 6.x release) | every resource. `.terraform.lock.hcl` is committed in the project |
-| moto (server mode, 5.2.x) | the emulated account, fresh per step, seeded ids |
-| AWS CLI v2 (2.38.x) and boto3 | reading state, the data plane, the app's SDK |
+| Terraform 1.17.0 + `hashicorp/aws` 6.70.0 | every resource. `.terraform.lock.hcl` is committed in the project |
+| moto 5.2.5 (server mode, through `scripts/moto_server.py`) | the emulated account, fresh per step; ten gaps closed and ids made order-independent (`SPIKE.md` §3) |
+| AWS CLI v2 2.38.4 and boto3 1.43 | reading state, the data plane, the app's SDK |
 | Python 3.13 | the app and Lambda handlers (3.13 is a Lambda runtime; the course is not a Python course) |
 | PostgreSQL 16 | the orders database's SQL, really run |
 | DuckDB | the lake query, labelled "DuckDB, not Athena" |
@@ -58,20 +58,21 @@ shop taking an order (payoff first). Each section can also go out as a Short (`r
 **No AWS account** is behind the course. Every pane that talks to AWS talks to moto and is
 labelled **emulated**; nothing emulated is presented as AWS's own output.
 
-## The app: `shop`
+## The app: `book-shop`
 
-One name everywhere: the folder, the Python package and the service are `shop`.
-`shop.example.com` in `eu-west-2` (London), production account **111122223333**, development
+One name everywhere: the folder, the project in `pyproject.toml`, the service and the ECS cluster are
+`book-shop`; the importable package is `book_shop` (a Python name cannot contain `-`).
+`book-shop.example.com` in `eu-west-2` (London), production account **111122223333**, development
 **444455556666** (AWS documentation placeholders); public IPs from `203.0.113.0/24` /
 `198.51.100.0/24`. A fixed facts table (prices, traffic, ids) is written into `CLAUDE.md` when
 Course 1 is authored and only ever extended.
 
 ```
-shop/
+book-shop/
   pyproject.toml          the app, its deps, pytest                                    (6)
-  shop/                   the app, Python
-    web.py                HTTP API: products, cart, checkout, /health                  (6 → 8)
-    catalog.py            product pages from S3                                         (6)
+  book_shop/              the app, Python
+    web.py                HTTP API: books, cart, checkout, /health                     (6 → 8)
+    catalog.py            book pages from S3                                            (6)
     cart.py               carts in DynamoDB                                             (7)
     orders.py             orders in PostgreSQL, one transaction                         (7)
     checkout.py           publishes OrderPlaced                                         (8)
@@ -100,7 +101,7 @@ refactor is itself a lesson, and only possible because the spine is cumulative.
 | 3 Start | has an account, a profile, a state bucket and its first tagged bucket, in Terraform |
 | 4 Secure | has a role for the app, policies that are proven to deny, two accounts |
 | 5 Network | has a VPC across three AZs, a load balancer, a name and a certificate |
-| 6 Run | serves product pages from a container on Fargate, scaled and tested |
+| 6 Run | serves book pages from a container on Fargate, scaled and tested |
 | 7 Data | keeps carts, orders and photos; sells the last unit only once |
 | 8 Decouple | takes orders asynchronously: queue, fan-out, a payment workflow |
 | 9 Deliver | ships through a pipeline, dev then prod, with no click in either account |
@@ -141,7 +142,7 @@ the point (a plan's resource list, a route table, a bill).
 
 ## The courses
 
-Columns: **Step** is what the section changes in `shop/` (or the lab it runs). **Picture** is the
+Columns: **Step** is what the section changes in `book-shop/` (or the lab it runs). **Picture** is the
 side-pane diagram, or the full scene's subject.
 
 **1. `intro` · AWS, and what we'll build · 3**
@@ -184,7 +185,7 @@ side-pane diagram, or the full scene's subject.
 | 1 | Principals and authentication | users, roles, federated sessions | who can make a request, and how each proves it |
 | 2 | A role for the app | `iam.tf`: `ShopApp` role, trust policy | trust policy (who may assume) vs permissions policy (what it may do): two arrows |
 | 3 | Assuming the role | `sts assume-role` (emulated) | app → STS → temporary credentials → S3 |
-| 4 | Policy statements | `aws_iam_policy_document`: read products | a statement: effect, action, resource, condition |
+| 4 | Policy statements | `aws_iam_policy_document`: read the catalog | a statement: effect, action, resource, condition |
 | 5 | ◆ full scene: how IAM decides | concept + lab (the denied request under enforcement) | the canonical evaluation flowchart, explicit deny → SCP → resource → identity → session → implicit deny, the lab's path lit |
 | 6 | A request denied, and fixed | moto with IAM enforcement: `AccessDenied`, then allowed | the evaluation path for this request, the failing step lit |
 | 7 | Resource policies and a second account | bucket policy for an auditor in another account | two accounts; both sides must allow |
@@ -209,7 +210,7 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | The app, locally | `shop/web.py`, `catalog.py`: `GET /products/p-1001` from the emulated bucket | request → handler → S3 → response |
+| 1 | The app, locally | `book_shop/web.py`, `catalog.py`: `GET /books/bk-1001` from the emulated bucket | request → handler → S3 → response |
 | 2 | Tests that do not need AWS | `tests/` with `mock_aws` | test → app → boto3 → in-process mock |
 | 3 | ◆ full scene: choosing compute | concept | EC2 / ECS on Fargate / Lambda / EKS: who runs what, on the shared-responsibility stack |
 | 4 | An image | `Dockerfile` | image layers → container; what the image freezes |
@@ -231,7 +232,7 @@ side-pane diagram, or the full scene's subject.
 | 6 | Credentials from Secrets Manager | managed master secret, app reads it | app → role → secret → database; nothing in the image |
 | 7 | Carts in DynamoDB | `cart.py`, partition + sort key | partition key → partitions → item collection |
 | 8 | The last unit in stock | conditional write, transaction | two buyers, one item: one write wins, one `ConditionalCheckFailed` |
-| 9 | A cache for product pages | ElastiCache, cache-aside (lab) | read path / write path; the stale window on a timeline |
+| 9 | A cache for book pages | ElastiCache (`planned`: moto's replication groups are too thin), cache-aside (lab) | read path / write path; the stale window on a timeline |
 
 **8. `decouple` · Decouple the checkout · 9**
 
@@ -324,15 +325,17 @@ python-expense-tracker, with its rules: every step has exactly one of `first`, `
   emulator, so what the section starts from is exactly what the previous section declared. A
   hand-written `setup` remains only for data-plane state (objects, messages).
 
-Terraform-specific replay rules, to be proven in the spike:
+Terraform-specific replay rules, proven by the spike (`SPIKE.md` §1, §4):
 
-- **Providers come from a local mirror** (`.spine-cache/terraform/`): this environment cannot
-  reach `registry.terraform.io`, but `releases.hashicorp.com` serves both Terraform and the
-  provider. Alternatively the owner allows `registry.terraform.io` in the environment's network.
-- **Terraform is a Go binary**, so libfaketime may not freeze its clock: elapsed-time lines
-  ("Creation complete after 1s") are masked like a `volatile` step, everything else is compared.
-- **Output shown is the plan, not the noise**: `-compact-warnings`, `-no-color`, init hidden in
-  setup, long applies folded to the summary line.
+- **`terraform init` is a learner's**: a local stand-in for `registry.terraform.io` serves the ONE
+  pinned provider from HashiCorp's own signed release files, so init says "signed by HashiCorp",
+  writes the full lock file, needs no network, and HashiCorp's next release changes nothing.
+- **Ids do not depend on Terraform's walk order**: moto's random stream is re-seeded from each
+  request's content.
+- **Timing-dependent apply lines** (elapsed counters, "Still creating…", the order of concurrent
+  progress lines) are compared as a set; ids, plans and summaries exactly.
+- **Frames mostly show the plan** (sorted, deterministic, the teaching moment) and fold an apply
+  to its summary line.
 
 ## Verification levels
 
@@ -353,7 +356,7 @@ claims and no card shows. Mutate a row and watch it fail before trusting it.
 ## Build order
 
 1. **Owner review of this plan.**
-2. **Spike (no content):**
+2. **Spike (no content)** — done 2026-10-28, see `SPIKE.md`:
    - Terraform + provider mirror; `terraform apply` on moto for **every resource type this plan
      names** → a support matrix (`applied` / `planned only`) that fixes each section's level.
    - The merged `spine.py`, proven on a three-step chain (bucket → tag change → destroy).
@@ -377,10 +380,12 @@ claims and no card shows. Mutate a row and watch it fail before trusting it.
    on screen.
 5. Canonical diagrams, not list boxes; ◆ detours as side pane or full scene, by the 24px rule.
 
+6. **The app is `book-shop`** (package `book_shop`), an online book shop at
+   `book-shop.example.com`; books are its products (`GET /books/bk-1001`).
+7. **Fargate is the main compute**; EC2 (6.9) and Lambda (8.4) are side-by-side comparisons,
+   drawn beside the map, never inside it.
+8. **92 sections** are kept.
+
 ## Open for the owner
 
-1. **The title and the app's name** (`shop`, `shop.example.com`) — or a more specific shop (books,
-   tea, bikes) to make product data concrete.
-2. **Fargate as the main compute**, EC2 and Lambda as compared alternatives (as planned), or EC2
-   first for the fundamentals.
-3. **92 sections (~2 h 30 min)** — trimming to ~80 would merge Course 2 into Course 1's detours.
+Nothing open. The spike's findings are in `SPIKE.md`.

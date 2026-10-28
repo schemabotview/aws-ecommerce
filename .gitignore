@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.spine-cache/
+__pycache__/
+*.pyc
+.terraform/
