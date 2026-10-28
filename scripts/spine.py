@@ -342,12 +342,34 @@ def checkpoint_keys(line: list[Path]) -> list[str]:
     return out
 
 
+def leftovers() -> None:
+    """Kill what a stopped replay left running: Terraform's providers (from the plugin cache), a
+    Terraform or a shell still in the machine's home, the emulator. Left alive they hold the cached
+    provider open ("text file busy" on the next init) and slow every later run."""
+    roots = (str(toolchain.CACHE / 'terraform'), str(MACHINE), str(toolchain.REPO / 'scripts' / 'moto_server.py'))
+    for proc in Path('/proc').iterdir():
+        if not proc.name.isdigit() or int(proc.name) == os.getpid():
+            continue
+        try:
+            exe = os.readlink(proc / 'exe')
+            cmd = (proc / 'cmdline').read_bytes().replace(b'\0', b' ').decode(errors='replace')
+            cwd = os.readlink(proc / 'cwd')
+        except OSError:
+            continue
+        if exe.startswith(roots[0]) or cwd.startswith(roots[1]) or roots[2] in cmd:
+            try:
+                os.kill(int(proc.name), 9)
+            except OSError:
+                pass
+
+
 class Machine:
     """One emulator, one home, one working copy of the project, one shared clock — a learner's
     machine for the length of the chain (or of one lab)."""
 
     def __init__(self, config: dict):
         self.venv = toolchain.tools()
+        leftovers()
         # A FIXED place, not a temp dir: a checkpoint's home holds absolute paths (the venv's,
         # .terraform's, the shell state's), which are only true again if home is where it was.
         self.root = MACHINE
@@ -363,6 +385,7 @@ class Machine:
     def close(self):
         self.server.kill()
         self.server.wait()
+        leftovers()
         shutil.rmtree(self.root, ignore_errors=True)
 
     def save(self, key: str) -> None:
@@ -569,6 +592,9 @@ def main() -> int:
 
 
 if __name__ == '__main__':
+    # Stopped (SIGTERM, or a timeout), the replay still closes its machine: `finally` kills the emulator.
+    import signal
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))
     with toolchain.exclusive(), Registry() as registry:
         REGISTRY.update(registry.env)
         sys.exit(main())
