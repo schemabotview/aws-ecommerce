@@ -7,6 +7,7 @@ import { decouple } from './decouple'
 import { deliver } from './deliver'
 import { report } from './report'
 import { operate } from './operate'
+import { evolve } from './evolve'
 import type { Course, Section } from './types'
 
 // Course registry, in syllabus order (COURSE-PLAN.md). A course is registered once it is authored.
@@ -20,6 +21,7 @@ export const COURSES: Record<string, Course> = {
   [deliver.id]: deliver,
   [report.id]: report,
   [operate.id]: operate,
+  [evolve.id]: evolve,
 }
 
 export type { Course, Section }

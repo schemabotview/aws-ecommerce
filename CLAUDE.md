@@ -18,11 +18,13 @@ Engine `@graphlearning/graphl-flow` ^0.6.0, shell `@graphlearning/shell` ^1.0.4.
 
 Authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections), Course 4 `secure`
 (8), Course 5 `network` (10), Course 6 `run` (9), Course 7 `data` (9), Course 8 `decouple` (9) and
-Course 9 `deliver` (8), Course 10 `report` (6) and Course 11 `operate` (9), one chain:
+Course 9 `deliver` (8), Course 10 `report` (6), Course 11 `operate` (9) and Course 12 `evolve` (6),
+one chain:
 `start/02` → … → `secure/07` → `network/02` → … → `run/08` → `data/02` → … → `data/08` →
 `decouple/02` → … → `decouple/08` → `deliver/02` → … → `deliver/07` → `report/02` → … →
-`report/05` → `operate/02` → … → `operate/08` (`deliver/08`, `report/05-lag` and Course 12's
-`evolve/*` except `02-cdn` are labs). No narration audio yet.
+`report/05` → `operate/02` → … → `operate/08` → `evolve/02-cdn` → `evolve/05-costs` →
+`evolve/06-adr` (`deliver/08`, `report/05-lag`, `evolve/02-latency`, `03-knee` and `04-bill` are
+labs). No narration audio yet.
 
 **graphl-flow 0.6.0 is on graphl-flow's `main` but not yet on npm** (AWS icons, `dashed` groups,
 `muted` items, `hcl`, folded terminals). Until it is published: build it (`npm pack` there), install that tarball into `node_modules` here without saving, and do not commit
@@ -203,6 +205,11 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 | WAF | web ACL `book-shop` (REGIONAL) on the ALB: `aws-common` (AWSManagedRulesCommonRuleSet, priority 0), `per-address` (1,000 / 5 min per IP, block, priority 1) |
 | backup | vault `book-shop` (our key); plan `book-shop-nightly` (cron 0 3 * * ? *, 35 d) + copy to `arn:aws:backup:eu-west-2:777788889999:backup-vault:book-shop-copies` (90 d); selection DB, carts, stock; role BookShopBackup (AWSBackupServiceRolePolicyForBackup) |
 | incident | 2 November 21:14 (step clock): leaked BookShopApp session `task-1`; inline `AWSRevokeOlderSessions` Deny * if aws:TokenIssueTime < 21:15; applied 21:16 |
+| CDN | CloudFront `book-shop` → the ALB (https-only, TLSv1.2), default certificate; `book-shop-pages` (0 / 60 / 300 s), `/checkout*` → `book-shop-never` (all methods); latency model: Sydney 280 ms to London, 15 ms to an edge, 310 ms without a CDN |
+| knee | one task, 10 ms mean service, seeded 7, 20,000 requests a load: p99 105 ms at 60% busy, 215 at 80%, 670 at 95% |
+| bill | HYPOTHETICAL rates, production, 730 h: 234.19 USD a month (Fargate 73.00, NAT 42.50, RDS 26.28 …); a 1-year commitment on Fargate and RDS saves 22.48 (10%) |
+| October | MADE UP, seeded 21: prod 213.15 USD, dev 99.32; dev passed its 20 USD budget on 7 October; dev NAT 3.22 (4.5×) on 21 and 2.73 (3.8×) on 22 October; cost allocation tags `app`, `env` active |
+| decision | `docs/adr/001-order-platform.md`: stay on RDS PostgreSQL (35 of 40), Aurora Serverless v2 30, DynamoDB only out (reports' SQL); revisit at 10× the orders |
 
 Extend this table; never change a value a frame already quotes.
 

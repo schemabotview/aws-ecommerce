@@ -1,0 +1,1 @@
+{"from": "evolve/02-cdn", "changes": ["infra/costs.tf", "data/spend-october.csv", "tools/spend.py"], "env": true, "venv": true, "postgres": true}

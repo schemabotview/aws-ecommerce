@@ -55,6 +55,7 @@ BUILT.decouple = [...BUILT.data, 'queue', 'topic', 'bus', 'fulfil', 'payment']
 BUILT.deliver = [...BUILT.decouple]
 BUILT.report = [...BUILT.deliver, 'lake', 'glue', 'athena', 'clicks']
 BUILT.operate = [...BUILT.report, 'trail', 'kms', 'waf', 'backup']
+BUILT.evolve = [...BUILT.operate, 'cdn']
 export { SUBNETS }
 
 function item(part: Part, state: State): Item {

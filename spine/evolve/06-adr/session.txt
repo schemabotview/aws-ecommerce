@@ -1,0 +1,4 @@
+$ python -m tools.score docs/adr/001-order-platform.md
+RDS PostgreSQL         35 of 40
+Aurora Serverless v2   30 of 40
+DynamoDB only          out: fails a must

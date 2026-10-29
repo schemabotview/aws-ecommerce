@@ -30,17 +30,13 @@ add tools that fetch binaries; pip packages from `spine/requirements.txt` are th
 
 ## Done and pushed
 
-Courses 3–11 complete (scenes, narration, recorded spine, checks green, shots looked at): 76 sections
+Courses 3–12 complete (scenes, narration, recorded spine, checks green, shots looked at): 82 sections
 render cleanly. See CLAUDE.md for the facts and the patches each course needed.
 
-## Course 12 `evolve` — in progress
+## Courses 1, 2 — next
 
-Recorded: `evolve/02-cdn` (CloudFront in front of the ALB: pages cached ≤ 5 min, checkout never),
-labs `02-latency` (CDN model), `03-knee` (queue simulation), `04-bill` (HYPOTHETICAL rates). Still to
-write: `05-costs` (cost allocation tags + a spend anomaly from a made-up month), `06-adr`
-(docs/adr/001-order-platform.md + a scoring tool), the six scenes, narration, docs.
-
-## Courses 1, 2 — not started
+Course 1 (intro, 3) and Course 2 (cloud, 7) per COURSE-PLAN. §1.1 "the finished shop takes an order"
+can be read from the finished chain; §2.x labs are standalone (`lab: true`).
 
 ## Machine changes made this session (all committed)
 

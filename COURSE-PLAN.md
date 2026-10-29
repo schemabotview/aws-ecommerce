@@ -1,6 +1,6 @@
 # Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–11 (see `CLAUDE.md`, Status).
+**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–12 (see `CLAUDE.md`, Status).
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
@@ -290,12 +290,12 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | A CDN in front | CloudFront distribution, cache policy | shopper → edge (hit) / → origin (miss); latency plot |
-| 2 | ◆ full scene: measuring before tuning | lab (saturation simulation) | the latency knee as utilisation rises, a plot |
-| 3 | The month's bill | lab: hypothetical rate card over the finished infra | where the money goes; what a commitment saves |
-| 4 | Allocating cost | cost tags, budgets per environment | spend by tag; an anomaly found |
-| 5 | A decision record | `docs/adr/001-order-platform.md` | options scored against musts and wants |
-| 6 | ◆ full scene: a Well-Architected review | concept | the finished map judged by the six pillars; where next |
+| 1 | A CDN in front (map frame) | `infra/cdn.tf`: CloudFront → the ALB (HTTPS only), cache policy `book-shop-pages` (≤ 300 s), `/checkout*` never cached (`book-shop-never`); lab `02-latency` (a model) | map: CloudFront at the edge; a page from Sydney by hit ratio |
+| 2 | ◆ full scene: measuring before tuning | lab `03-knee`: one task simulated (10 ms, random arrivals, seeded), median and p99 from 10% to 95% busy | the knee; why the shop scales out at 60% |
+| 3 | The month's bill | lab `04-bill`: HYPOTHETICAL rates × the shop's production quantities: 234.19 USD; a commitment saves 22.48 | the six largest lines; the levers |
+| 4 | Allocating cost | `infra/costs.tf`: cost allocation tags `app`, `env`; `tools/spend.py` over a MADE-UP October (`data/spend-october.csv`): prod 213.15, dev 99.32, dev's budget passed 7 October, dev NAT 4.5× on 21 October | spend by tag; the budget and the anomaly |
+| 5 | A decision record | `docs/adr/001-order-platform.md` (musts, weighted wants), `tools/score.py` computes from it: RDS 35/40, Aurora 30/40, DynamoDB out | musts → wants → record → a reason to revisit |
+| 6 | ◆ full scene: a Well-Architected review (map frame) | concept | the finished map; six pillars, what the shop has and next; the next three steps in order |
 
 **Totals:** 3 + 7 + 8 + 8 + 10 + 9 + 9 + 9 + 8 + 6 + 9 + 6 = **92 sections**, 19 of them ◆ full scenes.
 

@@ -1,0 +1,313 @@
+# MADE UP for the course (seeded): October's daily cost, by service and env,
+# in US dollars, as a Cost Explorer export would list it.
+date,service,env,cost
+2026-10-01,ECS on Fargate,prod,2.27
+2026-10-01,ECS on Fargate,dev,0.82
+2026-10-01,NAT gateway,prod,1.43
+2026-10-01,NAT gateway,dev,0.70
+2026-10-01,RDS,prod,1.15
+2026-10-01,RDS,dev,0.47
+2026-10-01,Load balancer,prod,0.82
+2026-10-01,Load balancer,dev,0.60
+2026-10-01,everything else,prod,1.10
+2026-10-01,everything else,dev,0.48
+2026-10-02,ECS on Fargate,prod,2.21
+2026-10-02,ECS on Fargate,dev,0.78
+2026-10-02,NAT gateway,prod,1.42
+2026-10-02,NAT gateway,dev,0.65
+2026-10-02,RDS,prod,1.26
+2026-10-02,RDS,dev,0.43
+2026-10-02,Load balancer,prod,0.75
+2026-10-02,Load balancer,dev,0.56
+2026-10-02,everything else,prod,1.19
+2026-10-02,everything else,dev,0.52
+2026-10-03,ECS on Fargate,prod,2.54
+2026-10-03,ECS on Fargate,dev,0.81
+2026-10-03,NAT gateway,prod,1.30
+2026-10-03,NAT gateway,dev,0.68
+2026-10-03,RDS,prod,1.20
+2026-10-03,RDS,dev,0.42
+2026-10-03,Load balancer,prod,0.84
+2026-10-03,Load balancer,dev,0.59
+2026-10-03,everything else,prod,1.04
+2026-10-03,everything else,dev,0.53
+2026-10-04,ECS on Fargate,prod,2.26
+2026-10-04,ECS on Fargate,dev,0.85
+2026-10-04,NAT gateway,prod,1.39
+2026-10-04,NAT gateway,dev,0.71
+2026-10-04,RDS,prod,1.17
+2026-10-04,RDS,dev,0.45
+2026-10-04,Load balancer,prod,0.74
+2026-10-04,Load balancer,dev,0.56
+2026-10-04,everything else,prod,1.16
+2026-10-04,everything else,dev,0.48
+2026-10-05,ECS on Fargate,prod,2.51
+2026-10-05,ECS on Fargate,dev,0.76
+2026-10-05,NAT gateway,prod,1.51
+2026-10-05,NAT gateway,dev,0.74
+2026-10-05,RDS,prod,1.25
+2026-10-05,RDS,dev,0.47
+2026-10-05,Load balancer,prod,0.79
+2026-10-05,Load balancer,dev,0.62
+2026-10-05,everything else,prod,1.03
+2026-10-05,everything else,dev,0.50
+2026-10-06,ECS on Fargate,prod,2.53
+2026-10-06,ECS on Fargate,dev,0.76
+2026-10-06,NAT gateway,prod,1.49
+2026-10-06,NAT gateway,dev,0.74
+2026-10-06,RDS,prod,1.18
+2026-10-06,RDS,dev,0.44
+2026-10-06,Load balancer,prod,0.77
+2026-10-06,Load balancer,dev,0.59
+2026-10-06,everything else,prod,1.19
+2026-10-06,everything else,dev,0.49
+2026-10-07,ECS on Fargate,prod,2.22
+2026-10-07,ECS on Fargate,dev,0.75
+2026-10-07,NAT gateway,prod,1.45
+2026-10-07,NAT gateway,dev,0.76
+2026-10-07,RDS,prod,1.20
+2026-10-07,RDS,dev,0.45
+2026-10-07,Load balancer,prod,0.79
+2026-10-07,Load balancer,dev,0.62
+2026-10-07,everything else,prod,1.05
+2026-10-07,everything else,dev,0.51
+2026-10-08,ECS on Fargate,prod,2.42
+2026-10-08,ECS on Fargate,dev,0.82
+2026-10-08,NAT gateway,prod,1.33
+2026-10-08,NAT gateway,dev,0.66
+2026-10-08,RDS,prod,1.17
+2026-10-08,RDS,dev,0.48
+2026-10-08,Load balancer,prod,0.76
+2026-10-08,Load balancer,dev,0.61
+2026-10-08,everything else,prod,1.07
+2026-10-08,everything else,dev,0.47
+2026-10-09,ECS on Fargate,prod,2.23
+2026-10-09,ECS on Fargate,dev,0.84
+2026-10-09,NAT gateway,prod,1.46
+2026-10-09,NAT gateway,dev,0.69
+2026-10-09,RDS,prod,1.24
+2026-10-09,RDS,dev,0.46
+2026-10-09,Load balancer,prod,0.83
+2026-10-09,Load balancer,dev,0.64
+2026-10-09,everything else,prod,1.08
+2026-10-09,everything else,dev,0.54
+2026-10-10,ECS on Fargate,prod,2.58
+2026-10-10,ECS on Fargate,dev,0.81
+2026-10-10,NAT gateway,prod,1.49
+2026-10-10,NAT gateway,dev,0.70
+2026-10-10,RDS,prod,1.18
+2026-10-10,RDS,dev,0.43
+2026-10-10,Load balancer,prod,0.83
+2026-10-10,Load balancer,dev,0.57
+2026-10-10,everything else,prod,1.02
+2026-10-10,everything else,dev,0.52
+2026-10-11,ECS on Fargate,prod,2.51
+2026-10-11,ECS on Fargate,dev,0.80
+2026-10-11,NAT gateway,prod,1.48
+2026-10-11,NAT gateway,dev,0.65
+2026-10-11,RDS,prod,1.15
+2026-10-11,RDS,dev,0.43
+2026-10-11,Load balancer,prod,0.77
+2026-10-11,Load balancer,dev,0.57
+2026-10-11,everything else,prod,1.02
+2026-10-11,everything else,dev,0.49
+2026-10-12,ECS on Fargate,prod,2.55
+2026-10-12,ECS on Fargate,dev,0.86
+2026-10-12,NAT gateway,prod,1.46
+2026-10-12,NAT gateway,dev,0.70
+2026-10-12,RDS,prod,1.15
+2026-10-12,RDS,dev,0.48
+2026-10-12,Load balancer,prod,0.78
+2026-10-12,Load balancer,dev,0.62
+2026-10-12,everything else,prod,1.02
+2026-10-12,everything else,dev,0.48
+2026-10-13,ECS on Fargate,prod,2.53
+2026-10-13,ECS on Fargate,dev,0.84
+2026-10-13,NAT gateway,prod,1.49
+2026-10-13,NAT gateway,dev,0.71
+2026-10-13,RDS,prod,1.19
+2026-10-13,RDS,dev,0.46
+2026-10-13,Load balancer,prod,0.82
+2026-10-13,Load balancer,dev,0.58
+2026-10-13,everything else,prod,1.11
+2026-10-13,everything else,dev,0.48
+2026-10-14,ECS on Fargate,prod,2.50
+2026-10-14,ECS on Fargate,dev,0.74
+2026-10-14,NAT gateway,prod,1.44
+2026-10-14,NAT gateway,dev,0.75
+2026-10-14,RDS,prod,1.11
+2026-10-14,RDS,dev,0.46
+2026-10-14,Load balancer,prod,0.80
+2026-10-14,Load balancer,dev,0.63
+2026-10-14,everything else,prod,1.11
+2026-10-14,everything else,dev,0.48
+2026-10-15,ECS on Fargate,prod,2.36
+2026-10-15,ECS on Fargate,dev,0.86
+2026-10-15,NAT gateway,prod,1.49
+2026-10-15,NAT gateway,dev,0.66
+2026-10-15,RDS,prod,1.12
+2026-10-15,RDS,dev,0.42
+2026-10-15,Load balancer,prod,0.72
+2026-10-15,Load balancer,dev,0.59
+2026-10-15,everything else,prod,1.04
+2026-10-15,everything else,dev,0.53
+2026-10-16,ECS on Fargate,prod,2.46
+2026-10-16,ECS on Fargate,dev,0.75
+2026-10-16,NAT gateway,prod,1.41
+2026-10-16,NAT gateway,dev,0.68
+2026-10-16,RDS,prod,1.20
+2026-10-16,RDS,dev,0.43
+2026-10-16,Load balancer,prod,0.74
+2026-10-16,Load balancer,dev,0.57
+2026-10-16,everything else,prod,1.08
+2026-10-16,everything else,dev,0.52
+2026-10-17,ECS on Fargate,prod,2.42
+2026-10-17,ECS on Fargate,dev,0.74
+2026-10-17,NAT gateway,prod,1.45
+2026-10-17,NAT gateway,dev,0.74
+2026-10-17,RDS,prod,1.25
+2026-10-17,RDS,dev,0.47
+2026-10-17,Load balancer,prod,0.72
+2026-10-17,Load balancer,dev,0.60
+2026-10-17,everything else,prod,1.02
+2026-10-17,everything else,dev,0.52
+2026-10-18,ECS on Fargate,prod,2.28
+2026-10-18,ECS on Fargate,dev,0.83
+2026-10-18,NAT gateway,prod,1.34
+2026-10-18,NAT gateway,dev,0.72
+2026-10-18,RDS,prod,1.16
+2026-10-18,RDS,dev,0.42
+2026-10-18,Load balancer,prod,0.77
+2026-10-18,Load balancer,dev,0.58
+2026-10-18,everything else,prod,1.17
+2026-10-18,everything else,dev,0.48
+2026-10-19,ECS on Fargate,prod,2.40
+2026-10-19,ECS on Fargate,dev,0.81
+2026-10-19,NAT gateway,prod,1.50
+2026-10-19,NAT gateway,dev,0.66
+2026-10-19,RDS,prod,1.22
+2026-10-19,RDS,dev,0.45
+2026-10-19,Load balancer,prod,0.81
+2026-10-19,Load balancer,dev,0.64
+2026-10-19,everything else,prod,1.07
+2026-10-19,everything else,dev,0.52
+2026-10-20,ECS on Fargate,prod,2.41
+2026-10-20,ECS on Fargate,dev,0.81
+2026-10-20,NAT gateway,prod,1.30
+2026-10-20,NAT gateway,dev,0.74
+2026-10-20,RDS,prod,1.29
+2026-10-20,RDS,dev,0.44
+2026-10-20,Load balancer,prod,0.76
+2026-10-20,Load balancer,dev,0.65
+2026-10-20,everything else,prod,1.03
+2026-10-20,everything else,dev,0.47
+2026-10-21,ECS on Fargate,prod,2.24
+2026-10-21,ECS on Fargate,dev,0.84
+2026-10-21,NAT gateway,prod,1.46
+2026-10-21,NAT gateway,dev,3.22
+2026-10-21,RDS,prod,1.22
+2026-10-21,RDS,dev,0.42
+2026-10-21,Load balancer,prod,0.80
+2026-10-21,Load balancer,dev,0.59
+2026-10-21,everything else,prod,1.10
+2026-10-21,everything else,dev,0.49
+2026-10-22,ECS on Fargate,prod,2.36
+2026-10-22,ECS on Fargate,dev,0.76
+2026-10-22,NAT gateway,prod,1.30
+2026-10-22,NAT gateway,dev,2.73
+2026-10-22,RDS,prod,1.15
+2026-10-22,RDS,dev,0.46
+2026-10-22,Load balancer,prod,0.82
+2026-10-22,Load balancer,dev,0.62
+2026-10-22,everything else,prod,1.09
+2026-10-22,everything else,dev,0.48
+2026-10-23,ECS on Fargate,prod,2.36
+2026-10-23,ECS on Fargate,dev,0.80
+2026-10-23,NAT gateway,prod,1.43
+2026-10-23,NAT gateway,dev,0.75
+2026-10-23,RDS,prod,1.12
+2026-10-23,RDS,dev,0.45
+2026-10-23,Load balancer,prod,0.78
+2026-10-23,Load balancer,dev,0.62
+2026-10-23,everything else,prod,1.17
+2026-10-23,everything else,dev,0.52
+2026-10-24,ECS on Fargate,prod,2.45
+2026-10-24,ECS on Fargate,dev,0.83
+2026-10-24,NAT gateway,prod,1.44
+2026-10-24,NAT gateway,dev,0.74
+2026-10-24,RDS,prod,1.24
+2026-10-24,RDS,dev,0.46
+2026-10-24,Load balancer,prod,0.75
+2026-10-24,Load balancer,dev,0.64
+2026-10-24,everything else,prod,1.08
+2026-10-24,everything else,dev,0.51
+2026-10-25,ECS on Fargate,prod,2.52
+2026-10-25,ECS on Fargate,dev,0.86
+2026-10-25,NAT gateway,prod,1.51
+2026-10-25,NAT gateway,dev,0.64
+2026-10-25,RDS,prod,1.16
+2026-10-25,RDS,dev,0.44
+2026-10-25,Load balancer,prod,0.77
+2026-10-25,Load balancer,dev,0.57
+2026-10-25,everything else,prod,1.11
+2026-10-25,everything else,dev,0.47
+2026-10-26,ECS on Fargate,prod,2.32
+2026-10-26,ECS on Fargate,dev,0.86
+2026-10-26,NAT gateway,prod,1.45
+2026-10-26,NAT gateway,dev,0.70
+2026-10-26,RDS,prod,1.12
+2026-10-26,RDS,dev,0.48
+2026-10-26,Load balancer,prod,0.81
+2026-10-26,Load balancer,dev,0.57
+2026-10-26,everything else,prod,1.07
+2026-10-26,everything else,dev,0.51
+2026-10-27,ECS on Fargate,prod,2.47
+2026-10-27,ECS on Fargate,dev,0.77
+2026-10-27,NAT gateway,prod,1.50
+2026-10-27,NAT gateway,dev,0.68
+2026-10-27,RDS,prod,1.15
+2026-10-27,RDS,dev,0.47
+2026-10-27,Load balancer,prod,0.74
+2026-10-27,Load balancer,dev,0.62
+2026-10-27,everything else,prod,1.05
+2026-10-27,everything else,dev,0.51
+2026-10-28,ECS on Fargate,prod,2.31
+2026-10-28,ECS on Fargate,dev,0.78
+2026-10-28,NAT gateway,prod,1.50
+2026-10-28,NAT gateway,dev,0.70
+2026-10-28,RDS,prod,1.19
+2026-10-28,RDS,dev,0.46
+2026-10-28,Load balancer,prod,0.75
+2026-10-28,Load balancer,dev,0.57
+2026-10-28,everything else,prod,1.08
+2026-10-28,everything else,dev,0.48
+2026-10-29,ECS on Fargate,prod,2.28
+2026-10-29,ECS on Fargate,dev,0.86
+2026-10-29,NAT gateway,prod,1.30
+2026-10-29,NAT gateway,dev,0.73
+2026-10-29,RDS,prod,1.28
+2026-10-29,RDS,dev,0.46
+2026-10-29,Load balancer,prod,0.72
+2026-10-29,Load balancer,dev,0.60
+2026-10-29,everything else,prod,1.02
+2026-10-29,everything else,dev,0.51
+2026-10-30,ECS on Fargate,prod,2.48
+2026-10-30,ECS on Fargate,dev,0.77
+2026-10-30,NAT gateway,prod,1.29
+2026-10-30,NAT gateway,dev,0.70
+2026-10-30,RDS,prod,1.12
+2026-10-30,RDS,dev,0.44
+2026-10-30,Load balancer,prod,0.77
+2026-10-30,Load balancer,dev,0.64
+2026-10-30,everything else,prod,1.08
+2026-10-30,everything else,dev,0.47
+2026-10-31,ECS on Fargate,prod,2.51
+2026-10-31,ECS on Fargate,dev,0.84
+2026-10-31,NAT gateway,prod,1.41
+2026-10-31,NAT gateway,dev,0.65
+2026-10-31,RDS,prod,1.14
+2026-10-31,RDS,dev,0.44
+2026-10-31,Load balancer,prod,0.79
+2026-10-31,Load balancer,dev,0.57
+2026-10-31,everything else,prod,1.15
+2026-10-31,everything else,dev,0.53
