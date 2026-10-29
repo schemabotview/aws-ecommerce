@@ -1,3 +1,5 @@
+import { intro } from './intro'
+import { howAwsRuns } from './how-aws-runs'
 import { start } from './start'
 import { secure } from './secure'
 import { network } from './network'
@@ -12,6 +14,8 @@ import type { Course, Section } from './types'
 
 // Course registry, in syllabus order (COURSE-PLAN.md). A course is registered once it is authored.
 export const COURSES: Record<string, Course> = {
+  [intro.id]: intro,
+  [howAwsRuns.id]: howAwsRuns,
   [start.id]: start,
   [secure.id]: secure,
   [network.id]: network,

@@ -1,0 +1,1 @@
+{"from": "evolve/06-adr", "changes": ["tools/listeners.py"], "env": true, "venv": true, "postgres": true}

@@ -1,0 +1,14 @@
+$ aws s3api list-buckets --query Buckets
+[]
+$ python list_buckets.py
+[]
+$ python anatomy.py
+GET https://s3.eu-west-2.amazonaws.com/
+X-Amz-Date: 20261102T093000Z
+X-Amz-Content-SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b78
+52b855
+Authorization: AWS4-HMAC-SHA256
+  Credential=AKIAIOSFODNN7EXAMPLE/20261102/eu-west-2/s3/aws4_request
+  SignedHeaders=host;x-amz-content-sha256;x-amz-date
+  Signature=d9a2b77ce1e091fd74f0182bfdd4af7451954f6b0f18f0b37fb6e0a6275a8888
+answer: 200 0 buckets

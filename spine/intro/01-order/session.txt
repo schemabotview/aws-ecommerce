@@ -1,0 +1,13 @@
+$ export ORDERS_TOPIC_ARN=$(terraform -chdir=infra output \
+>   -raw orders_topic_arn)
+$ python -m book_shop.web > app.log 2>&1 & APP=$!; sleep 1
+$ curl -s 127.0.0.1:8080/books/bk-1001
+{"id": "bk-1001", "title": "Night Trains of Europe", "author": "Ana Lima", "pric
+e": 10.99, "currency": "GBP", "stock": 40}
+$ python -m tools.checkout c-30 bk-1001=1
+order 30008 placed, total 10.99: OrderPlaced published
+$ python -m tools.listeners c-30
+fulfilment   order 30008 (10.99)
+points       order 30008 (10.99)
+fraud-check  -
+$ kill $APP

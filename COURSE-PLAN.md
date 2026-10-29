@@ -1,6 +1,6 @@
 # Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: Courses 3–12 (see `CLAUDE.md`, Status).
+**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: all 12 courses, 92 sections (see `CLAUDE.md`, Status).
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
@@ -149,21 +149,21 @@ side-pane diagram, or the full scene's subject.
 
 | # | Section | Frame | Picture |
 | --- | --- | --- | --- |
-| 1 | The finished shop takes an order | map + terminal | the finished map, one order's path lit end to end; the real `curl` and its 201 |
-| 2 | Owning against renting | concept + lab | the demand day (60 / 240 / 560 req/s) against fixed and elastic capacity, a plot |
-| 3 | What we'll build, course by course | concept | the map growing in 12 stages, each course's addition in its colour |
+| 1 | The finished shop takes an order | map + terminal: step `intro/01-order`, recorded at the END of the chain (after `evolve/06-adr`): the app serves bk-1001, `tools/checkout.py` places order 30008 (10.99), `tools/listeners.py c-30` (fixed: the loyalty queue is `book-shop-points` since §9.7) | the finished map; one order's path; fraud-check filtered it (under 500) |
+| 2 | Owning against renting | concept + lab `intro/02-demand` (a model): 60 / 240 / 560 req/s; owned 6 servers all day (144 server-hours), rented hour by hour at 60% (84) | the day, owned against rented |
+| 3 | What we'll build, course by course | map frame | the finished map; what each course adds |
 
 **2. `how-aws-runs` · How AWS runs a request · 7**
 
 | # | Section | Step | Picture |
 | --- | --- | --- | --- |
-| 1 | ◆ full scene: Regions, AZs and the edge | concept + lab (`describe-availability-zones`) | eu-west-2 → three AZs → data centres; edge locations outside; what fails together |
-| 2 | ◆ full scene: global, Regional and zonal services | concept | IAM / S3 / EC2 placed at their scope on the same Region picture |
-| 3 | Every action is an API call | lab: one `ListBuckets` from the CLI and from boto3 | console, CLI, SDK, Terraform → one HTTPS endpoint → the service |
-| 4 | Anatomy of a request | lab: `--debug` cut to the request | method, endpoint, SigV4 header, body → response; which part each layer adds |
-| 5 | ARNs: every resource has a name | lab: three ARNs printed | the ARN's six fields, one per segment |
-| 6 | ◆ full scene: shared responsibility | concept | the stack from facility to data; the line moves for EC2 / Fargate / Lambda / S3 |
-| 7 | What costs money | lab: the hypothetical rate card applied | meters: time, storage, requests, data out; what keeps charging when "stopped" |
+| 1 | ◆ full scene: Regions, AZs and the edge | lab `01-zones`: describe-availability-zones (2a euw2-az2, 2b euw2-az3, 2c euw2-az1, emulated) | eu-west-2 → three dashed AZs → data centres; edge locations; what fails together |
+| 2 | ◆ full scene: global, Regional and zonal services | concept | IAM / Route 53 / CloudFront; S3 / SQS / Lambda / DynamoDB; an instance and a subnet per zone |
+| 3 | Every action is an API call | lab `03-call`: ListBuckets from the CLI and from boto3 (both `[]`) | console, CLI, SDK, Terraform → one HTTPS endpoint → S3 |
+| 4 | Anatomy of a request | lab `03-call`: `anatomy.py` prints the signed request (frozen clock: the signature is stable) | the parts of a SigV4 request; TLS → SigV4 → IAM → the answer |
+| 5 | ARNs: every resource has a name | lab `05-arns`: three ARNs split into six fields (the emulator's user/moto, said; an AWS-managed policy; the catalog bucket) | the six fields, with the shop's fulfilment queue |
+| 6 | ◆ full scene: shared responsibility | concept | who runs each layer for EC2 / Fargate / Lambda / S3 |
+| 7 | What costs money | lab `07-meters`: HYPOTHETICAL rates, one small server running (24.75), stopped (5.65), terminated (0) | the month by state; the meters and when each runs |
 
 **3. `start` · Start the project · 8**
 

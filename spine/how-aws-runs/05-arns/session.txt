@@ -1,0 +1,5 @@
+$ python arns.py
+partition  service  region     account       resource
+aws        sts      -          444455556666  user/moto
+aws        iam      -          aws           policy/ReadOnlyAccess
+aws        s3       -          -             book-shop-catalog-444455556666

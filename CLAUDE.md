@@ -16,15 +16,15 @@ Engine `@graphlearning/graphl-flow` ^0.6.0, shell `@graphlearning/shell` ^1.0.4.
 
 ## Status
 
-Authored 2026-10-28, awaiting owner review: Course 3 `start` (8 sections), Course 4 `secure`
-(8), Course 5 `network` (10), Course 6 `run` (9), Course 7 `data` (9), Course 8 `decouple` (9) and
-Course 9 `deliver` (8), Course 10 `report` (6), Course 11 `operate` (9) and Course 12 `evolve` (6),
-one chain:
+Authored 2026-10-28/29, awaiting owner review: ALL 12 courses, 92 sections — Course 1 `intro` (3),
+Course 2 `how-aws-runs` (7), 3 `start` (8), 4 `secure` (8), 5 `network` (10), 6 `run` (9), 7 `data`
+(9), 8 `decouple` (9), 9 `deliver` (8), 10 `report` (6), 11 `operate` (9), 12 `evolve` (6). One chain:
 `start/02` → … → `secure/07` → `network/02` → … → `run/08` → `data/02` → … → `data/08` →
-`decouple/02` → … → `decouple/08` → `deliver/02` → … → `deliver/07` → `report/02` → … →
-`report/05` → `operate/02` → … → `operate/08` → `evolve/02-cdn` → `evolve/05-costs` →
-`evolve/06-adr` (`deliver/08`, `report/05-lag`, `evolve/02-latency`, `03-knee` and `04-bill` are
-labs). No narration audio yet.
+`decouple/02` → … → `decouple/08` → `deliver/02` → … → `deliver/07` → `report/02` → … → `report/05`
+→ `operate/02` → … → `operate/08` → `evolve/02-cdn` → `05-costs` → `06-adr` → `intro/01-order` (§1.1
+is recorded LAST: it shows the finished shop). Labs stand alone: `how-aws-runs/*`, `intro/02-demand`,
+`deliver/08`, `report/05-lag`, `evolve/02-latency`, `03-knee`, `04-bill` and the earlier ones. No
+narration audio yet.
 
 **graphl-flow 0.6.0 is on graphl-flow's `main` but not yet on npm** (AWS icons, `dashed` groups,
 `muted` items, `hcl`, folded terminals). Until it is published: build it (`npm pack` there), install that tarball into `node_modules` here without saving, and do not commit

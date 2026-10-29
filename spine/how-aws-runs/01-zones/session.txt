@@ -1,0 +1,5 @@
+$ aws ec2 describe-availability-zones --output text \
+>   --query 'AvailabilityZones[].[ZoneName, ZoneId, ZoneType]'
+eu-west-2a	euw2-az2	availability-zone
+eu-west-2b	euw2-az3	availability-zone
+eu-west-2c	euw2-az1	availability-zone

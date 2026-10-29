@@ -30,13 +30,10 @@ add tools that fetch binaries; pip packages from `spine/requirements.txt` are th
 
 ## Done and pushed
 
-Courses 3–12 complete (scenes, narration, recorded spine, checks green, shots looked at): 82 sections
-render cleanly. See CLAUDE.md for the facts and the patches each course needed.
-
-## Courses 1, 2 — next
-
-Course 1 (intro, 3) and Course 2 (cloud, 7) per COURSE-PLAN. §1.1 "the finished shop takes an order"
-can be read from the finished chain; §2.x labs are standalone (`lab: true`).
+ALL 12 courses, 92 sections, complete (scenes, narration, recorded spine, checks green, shots looked
+at). See CLAUDE.md for the facts and the patches each course needed. Remaining for the owner: review;
+publish graphl-flow 0.6.0 to npm, then commit the lockfile here (CLAUDE.md, Status); narration audio
+(Colab + Chatterbox, CLAUDE.md, Invariants).
 
 ## Machine changes made this session (all committed)
 
