@@ -25,6 +25,8 @@ Course 2 `how-aws-runs` (7), 3 `start` (8), 4 `secure` (8), 5 `network` (10), 6 
 is recorded LAST: it shows the finished shop). Labs stand alone: `how-aws-runs/*`, `intro/02-demand`,
 `deliver/08`, `report/05-lag`, `evolve/02-latency`, `03-knee`, `04-bill` and the earlier ones. No
 narration audio yet.
+The audio manifest `scripts/audio-manifest.json` lists all 92 for the Colab pass: run
+`npm run gen:audio` again after ANY narration edit, or the audio and the text drift apart.
 
 **graphl-flow 0.6.0 is on graphl-flow's `main` but not yet on npm** (AWS icons, `dashed` groups,
 `muted` items, `hcl`, folded terminals). Until it is published: build it (`npm pack` there), install that tarball into `node_modules` here without saving, and do not commit
