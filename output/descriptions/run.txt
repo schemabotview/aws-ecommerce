@@ -1,0 +1,33 @@
+Run a Container App on AWS: Docker Images and ECR, ECS Fargate Task Definitions, Task Roles, Auto Scaling, Graceful Shutdown and EC2 · AWS
+━━━━━━━━━━━━━━━━
+Part of GraphL's AWS series — every section pairs one diagram with the idea it explains, so the picture and the words land together.
+━━━━━━━━━━━━━━━━
+⏱ CHAPTERS
+0:00 The app, locally: an API over the catalog
+1:28 Tests that do not need AWS: the same code, a mock inside the test
+2:55 Choosing compute: who runs which layer
+4:29 An image, and a registry for it: the app, frozen
+6:10 A task definition and its two roles
+7:38 A service on Fargate: three tasks behind the load balancer
+9:00 Scaling: following the evening peak
+10:30 Stateless and graceful: stopping a task without losing a request
+12:02 The same app on EC2: what Fargate takes off your hands
+━━━━━━━━━━━━━━━━
+▶ AWS — THE SERIES
+① AWS for Beginners: What We'll Build, Renting Against Owning Servers, and the Whole Architecture → https://graphl.in/aws-ecommerce/#/intro
+② How AWS Works: Regions and Availability Zones, Every Action an API Call, SigV4 Signing, ARNs and What Costs Money → https://graphl.in/aws-ecommerce/#/how-aws-runs
+③ Terraform on AWS for Beginners: Profiles and Sessions, init/plan/apply, State and Drift, an S3 Backend, Tags and a Budget → https://graphl.in/aws-ecommerce/#/start
+④ AWS IAM Explained: Roles and Trust Policies, Temporary Credentials, Policy Evaluation, Resource Policies, Two Accounts and SCPs → https://graphl.in/aws-ecommerce/#/secure
+⑤ AWS VPC Explained: CIDR and Subnets, Route Tables, Internet and NAT Gateways, Security Groups against NACLs, a Load Balancer, Route 53, ACM and Endpoints → https://graphl.in/aws-ecommerce/#/network
+⑥ Run a Container App on AWS: Docker Images and ECR, ECS Fargate Task Definitions, Task Roles, Auto Scaling, Graceful Shutdown and EC2  ◀ this video → https://graphl.in/aws-ecommerce/#/run
+⑦ AWS Data Stores Explained: S3 Versioning and Presigned URLs, RDS PostgreSQL Multi-AZ, Transactions, Secrets Manager, DynamoDB and Caching → https://graphl.in/aws-ecommerce/#/data
+⑧ AWS Messaging Explained: SQS and Dead-Letter Queues, Lambda Consumers, SNS Fan-out, EventBridge Rules, Step Functions and Idempotency → https://graphl.in/aws-ecommerce/#/decouple
+⑨ Terraform in Production: Modules, Two Accounts, a GitHub Actions Pipeline, OIDC Roles, Drift and Import, Replacement and Safe Releases → https://graphl.in/aws-ecommerce/#/deliver
+⑩ Build a Data Lake on AWS with Terraform: Parquet Partitions, a Glue Catalog, Athena Queries, Kinesis Streams, and Lake Against Warehouse → https://graphl.in/aws-ecommerce/#/report
+⑪ Operating on AWS: Logs, Metrics and Traces, SLOs and Burn-Rate Alarms, CloudTrail, KMS Envelope Encryption, WAF, Backups, an Incident and DR → https://graphl.in/aws-ecommerce/#/operate
+⑫ AWS Cost and Performance: CloudFront Caching, Finding the Knee, the Month's Bill, Cost Allocation Tags, a Decision Record and Well-Architected → https://graphl.in/aws-ecommerce/#/evolve
+━━━━━━━━━━━━━━━━
+🔗 Watch interactively on GraphL → https://graphl.in/aws-ecommerce/#/run
+🌐 More concepts → https://graphl.in
+━━━━━━━━━━━━━━━━
+#AWS #Terraform #CloudComputing #TechEducation

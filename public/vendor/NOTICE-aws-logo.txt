@@ -1,0 +1,35 @@
+public/vendor/aws-logo.png — the AWS mark used on the film thumbnail
+====================================================================
+
+WHAT IT IS
+  A 2000x1125 RGBA PNG: the "aws" wordmark and the Amazon smile, inside an orange cloud outline,
+  on a white fill. Used by scripts/thumb-film.mjs for `--mark aws`, embedded AS SUPPLIED —
+  never recoloured, re-traced, re-proportioned or otherwise altered.
+
+WHERE IT CAME FROM
+  Supplied by the repo owner on 2026-10-29. The origin was not recorded at the time.
+
+  TO BE COMPLETED BY THE OWNER before this is published anywhere:
+    source URL      : ................................................................
+    licence / terms : ................................................................
+    permission      : ................................................................
+
+WHY THIS FILE EXISTS
+  "AWS", the Amazon smile and the AWS logo are Amazon's trademarks. Naming AWS in text to say
+  accurately what a course is about is ordinary nominative use. Putting Amazon's LOGO on the cover
+  of a video is a different act: it is the kind of use that can suggest Amazon produced or endorsed
+  the course, and Amazon reserves it. Get that permission in writing before publishing under it.
+
+  TWO THINGS WORTH CHECKING FIRST
+
+  1. This is probably not Amazon's own lockup. Amazon publishes the "aws" wordmark with the smile
+     beneath it. The orange cloud ring around it in this file is a third-party decoration: it is
+     common on stock and icon sites, but a stylised presentation of someone's mark is HARDER to
+     justify than the unaltered official one, not easier. If an AWS mark is going on the cover,
+     the file to vendor here is the official asset from Amazon's own brand resources.
+
+  2. A stock-site file carries the stock site's licence too, which is a separate permission from
+     Amazon's and may not cover a monetised channel.
+
+  `--mark book` (public/favicon.svg, this repo's own mark) needs none of this and is what ships
+  until the boxes above are filled in. See output/thumbnails/README.md.

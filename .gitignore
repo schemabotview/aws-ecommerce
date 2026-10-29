@@ -8,3 +8,6 @@ dist-snapshot/
 out/
 *.local
 .DS_Store
+segments/
+.tmp/
+images/

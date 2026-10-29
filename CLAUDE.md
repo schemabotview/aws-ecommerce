@@ -23,10 +23,16 @@ Course 2 `how-aws-runs` (7), 3 `start` (8), 4 `secure` (8), 5 `network` (10), 6 
 `decouple/02` → … → `decouple/08` → `deliver/02` → … → `deliver/07` → `report/02` → … → `report/05`
 → `operate/02` → … → `operate/08` → `evolve/02-cdn` → `05-costs` → `06-adr` → `intro/01-order` (§1.1
 is recorded LAST: it shows the finished shop). Labs stand alone: `how-aws-runs/*`, `intro/02-demand`,
-`deliver/08`, `report/05-lag`, `evolve/02-latency`, `03-knee`, `04-bill` and the earlier ones. No
-narration audio yet.
+`deliver/08`, `report/05-lag`, `evolve/02-latency`, `03-knee`, `04-bill` and the earlier ones.
 The audio manifest `scripts/audio-manifest.json` lists all 92 for the Colab pass: run
 `npm run gen:audio` again after ANY narration edit, or the audio and the text drift apart.
+
+**Recorded and packaged 2026-10-29.** All 92 wavs are in `public/audio/` (Colab + Chatterbox,
+pushed to `main` as it generated them) and all 92 sections are captured at 3840x2160: twelve course
+videos in `scripts/out/<course>.mp4` (2 h 17 min in total) and the single film,
+`scripts/out/film.mp4`, 2:16:37. Covers and descriptions are in `output/`. The segment cache
+`scripts/segments/` is what makes re-recording ONE section cheap - keep it; `scripts/.tmp/` is
+intermediates and can be deleted.
 
 **`package-lock.json` is committed** and pins graphl-flow 0.6.0 and shell 1.0.4 from npm. The scenes
 need graphl-flow ≥ 0.6.0 (AWS icons, `dashed` groups, `muted` items, `hcl`, folded terminals): on 0.5
@@ -43,6 +49,12 @@ npm run check:spine              # every step recorded, current, untouched — r
 python3 scripts/spine.py --record network/06   # record a step: runs ONLY it, from its parent's state
 python3 scripts/spine.py --replay  # deliberate, after a tool upgrade: the whole chain from the start
 npm run shots -- <slug-prefix>   # 4K PNGs in out/shots/ — then LOOK
+
+npm run record:all               # every course at 4K, under caffeinate; waits for Colab's wavs
+npm run film                     # the 92 segments → scripts/out/film.mp4 + film.txt (chapters)
+npm run gen:desc                 # a YouTube description per course → scripts/out/<course>.txt
+npm run thumb:film               # the film's cover → output/thumbnails/film.png
+npm run thumb:courses            # one cover per course → output/thumbnails/NN-<course>.png
 python3 spike/terraform-on-moto/matrix.py [case…]   # Terraform × moto support matrix
 ```
 

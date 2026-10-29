@@ -16,7 +16,10 @@
     "record:reels": "graphl-record-reels",
     "gen:audio": "graphl-gen-audio",
     "gen:desc": "graphl-gen-desc",
-    "thumb": "graphl-thumb"
+    "thumb": "graphl-thumb",
+    "film": "node scripts/film.mjs",
+    "thumb:film": "node scripts/thumb-film.mjs",
+    "thumb:courses": "node scripts/thumb-courses.mjs"
   },
   "dependencies": {
     "@graphlearning/graphl-flow": "^0.6.0",

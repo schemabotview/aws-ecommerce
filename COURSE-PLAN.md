@@ -37,10 +37,27 @@ Why a shop:
 ## Packaging for YouTube
 
 **One video: "Learn AWS by building a book shop: full course, beginner to professional"** —
-12 courses, 92 sections, ~2 h 30 min, one continuous story. A course is a YouTube chapter group and
+12 courses, 92 sections, **2:16:37**, one continuous story. A course is a YouTube chapter group and
 the owner's review unit; a section (90–120 s) is one chapter, titled *concept: what the shop gets*
 ("Security groups: only the load balancer reaches the app"). The video opens with the finished
 shop taking an order (payoff first). Each section can also go out as a Short (`record-reels`).
+
+Built 2026-10-29, all of it from the recorded segments (`npm run film`, `gen:desc`, `thumb:film`,
+`thumb:courses`):
+
+| what | where |
+| --- | --- |
+| the film, 3840×2160, 92 chapters | `scripts/out/film.mp4` (662 MB) |
+| its description + chapter list | `scripts/out/film.txt`, copied to `output/film-description.txt` |
+| the twelve course videos | `scripts/out/<course>.mp4` — 2 h 17 min in total |
+| a description per course | `scripts/out/<course>.txt` (search-first titles: `scripts/titles.json`) |
+| covers | `output/thumbnails/` — `film.png` and `01-intro.png` … `12-evolve.png` |
+
+The film is a stream COPY of the segments (one encoder path, so no second generation), then one
+linear `loudnorm` pass over the audio alone: the narration lands at −18.25 LUFS and peaks at
++0.42 dBTP, which is 4 dB under YouTube's −14 target (YouTube only ever attenuates) and clips
+through AAC. After the pass: −14.46 LUFS, −0.75 dBTP. Chapter offsets are accumulated from each
+segment's PROBED duration, never from wav arithmetic, so they cannot drift from the film.
 
 ## The stack (pinned by the spike, `SPIKE.md`)
 

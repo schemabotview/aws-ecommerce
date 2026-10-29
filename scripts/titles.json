@@ -1,0 +1,15 @@
+{
+  "_comment": "Curated publish titles (YouTube title + thumbnail header) per course, keyed by course id. Search-first: what someone would actually type, never 'Course 4'. One entry per course in src/content/index.ts. Terraform is named wherever the course really teaches it — that, and the one shop being built across all 12, is what separates this series from aws-ct's.",
+  "intro": "AWS for Beginners: What We'll Build, Renting Against Owning Servers, and the Whole Architecture",
+  "how-aws-runs": "How AWS Works: Regions and Availability Zones, Every Action an API Call, SigV4 Signing, ARNs and What Costs Money",
+  "start": "Terraform on AWS for Beginners: Profiles and Sessions, init/plan/apply, State and Drift, an S3 Backend, Tags and a Budget",
+  "secure": "AWS IAM Explained: Roles and Trust Policies, Temporary Credentials, Policy Evaluation, Resource Policies, Two Accounts and SCPs",
+  "network": "AWS VPC Explained: CIDR and Subnets, Route Tables, Internet and NAT Gateways, Security Groups against NACLs, a Load Balancer, Route 53, ACM and Endpoints",
+  "run": "Run a Container App on AWS: Docker Images and ECR, ECS Fargate Task Definitions, Task Roles, Auto Scaling, Graceful Shutdown and EC2",
+  "data": "AWS Data Stores Explained: S3 Versioning and Presigned URLs, RDS PostgreSQL Multi-AZ, Transactions, Secrets Manager, DynamoDB and Caching",
+  "decouple": "AWS Messaging Explained: SQS and Dead-Letter Queues, Lambda Consumers, SNS Fan-out, EventBridge Rules, Step Functions and Idempotency",
+  "deliver": "Terraform in Production: Modules, Two Accounts, a GitHub Actions Pipeline, OIDC Roles, Drift and Import, Replacement and Safe Releases",
+  "report": "Build a Data Lake on AWS with Terraform: Parquet Partitions, a Glue Catalog, Athena Queries, Kinesis Streams, and Lake Against Warehouse",
+  "operate": "Operating on AWS: Logs, Metrics and Traces, SLOs and Burn-Rate Alarms, CloudTrail, KMS Envelope Encryption, WAF, Backups, an Incident and DR",
+  "evolve": "AWS Cost and Performance: CloudFront Caching, Finding the Knee, the Month's Bill, Cost Allocation Tags, a Decision Record and Well-Architected"
+}
