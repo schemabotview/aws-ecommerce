@@ -28,10 +28,10 @@ narration audio yet.
 The audio manifest `scripts/audio-manifest.json` lists all 92 for the Colab pass: run
 `npm run gen:audio` again after ANY narration edit, or the audio and the text drift apart.
 
-**graphl-flow 0.6.0 is on graphl-flow's `main` but not yet on npm** (AWS icons, `dashed` groups,
-`muted` items, `hcl`, folded terminals). Until it is published: build it (`npm pack` there), install that tarball into `node_modules` here without saving, and do not commit
-a lockfile (`package-lock.json` is gitignored for exactly this reason — remove that line when
-0.6.0 is published, and commit the lockfile).
+**`package-lock.json` is committed** and pins graphl-flow 0.6.0 and shell 1.0.4 from npm. The scenes
+need graphl-flow ≥ 0.6.0 (AWS icons, `dashed` groups, `muted` items, `hcl`, folded terminals): on 0.5
+a section throws `Cannot read properties of undefined (reading 'replace')` inside the engine. Use
+`npm ci`.
 
 ## Commands
 
