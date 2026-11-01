@@ -62,33 +62,7 @@ npm run thumb:courses            # one cover per course → output/thumbnails/NN
 python3 spike/terraform-on-moto/matrix.py [case…]   # Terraform × moto support matrix
 ```
 
-## Spine — each section builds on the one before
-
-`spine/<course>/<NN-step>/` = `project/` + `session.txt` + `step.json` (`first` / `from` + `changes` /
-`lab`; see `scripts/spine.py`'s docstring for every key).
-
-- **One emulator, one working copy, the whole chain.** A step's files are laid over the working copy
-  and its session runs where the previous one left off. No hidden re-apply, no setup lists that
-  rebuild earlier state. If a section needs something, an earlier section's commands made it.
-- **`setup` is only for what happens off screen between two sections** (sam's console click in
-  §3.6) — never the shop's own state.
-- **The chain is a line.** A failure and its fix are two consecutive steps.
-- **`changes` is the section's diff**, checked both ways; `[]` is a section that only looks. A file a
-  step's session writes and captures (the lock file) may appear in the next step undeclared.
-- **Recorded once, never replayed.** `--record` runs a step ONCE, from its parent's recorded state,
-  and commits the machine's state after it in `state/` (home.tar.gz: working copy and Terraform's
-  files; emulator.pickle.gz: everything moto holds; recorded.json: the step's key and the hash of the
-  transcript it wrote). The check runs nothing: a key that no longer matches means the step or one
-  before it was edited (re-record it and everything after it, in order); a transcript that no longer
-  matches its hash was edited by hand. The key hashes the steps (step.json, files, typed commands),
-  NOT `scripts/`, so improving the machine forces no re-record. A re-record that differs from the
-  file only where `masked()` allows leaves the file alone. `--replay` re-runs everything from scratch
-  and compares: use it after upgrading moto, Terraform, the CLI or the patch layer, not to author.
-  One recording at a time (port 5000, a machine lock).
-- The spine records 80 columns (`spine.py` wraps there); every frame's terminal draws 72: `ide.ts`
-  `terminalRows` joins each row the spine wrapped and wraps the line again at 72, so the spine is untouched.
-
-## The machine (all in `scripts/`, all in SPIKE.md)
+## Toolchain: the machine (all in `scripts/`, all in SPIKE.md)
 
 - `toolchain.py` pins Terraform, the AWS provider, AWS CLI, moto/boto3; checksums verified.
 - `registry.py` answers `registry.terraform.io` locally from HashiCorp's signed files: `init` prints
@@ -157,6 +131,34 @@ python3 spike/terraform-on-moto/matrix.py [case…]   # Terraform × moto suppor
   running (`leftovers()`); orphaned providers once made runs 3–4× slower.
 - A replay's restore starts PostgreSQL before dropping/creating `book_shop`. moto_server.py's
   patch list (its docstring) also has `visible-at` and `events-test-pattern`.
+
+## Spine
+
+Each section builds on the one before.
+
+`spine/<course>/<NN-step>/` = `project/` + `session.txt` + `step.json` (`first` / `from` + `changes` /
+`lab`; see `scripts/spine.py`'s docstring for every key).
+
+- **One emulator, one working copy, the whole chain.** A step's files are laid over the working copy
+  and its session runs where the previous one left off. No hidden re-apply, no setup lists that
+  rebuild earlier state. If a section needs something, an earlier section's commands made it.
+- **`setup` is only for what happens off screen between two sections** (sam's console click in
+  §3.6) — never the shop's own state.
+- **The chain is a line.** A failure and its fix are two consecutive steps.
+- **`changes` is the section's diff**, checked both ways; `[]` is a section that only looks. A file a
+  step's session writes and captures (the lock file) may appear in the next step undeclared.
+- **Recorded once, never replayed.** `--record` runs a step ONCE, from its parent's recorded state,
+  and commits the machine's state after it in `state/` (home.tar.gz: working copy and Terraform's
+  files; emulator.pickle.gz: everything moto holds; recorded.json: the step's key and the hash of the
+  transcript it wrote). The check runs nothing: a key that no longer matches means the step or one
+  before it was edited (re-record it and everything after it, in order); a transcript that no longer
+  matches its hash was edited by hand. The key hashes the steps (step.json, files, typed commands),
+  NOT `scripts/`, so improving the machine forces no re-record. A re-record that differs from the
+  file only where `masked()` allows leaves the file alone. `--replay` re-runs everything from scratch
+  and compares: use it after upgrading moto, Terraform, the CLI or the patch layer, not to author.
+  One recording at a time (port 5000, a machine lock).
+- The spine records 80 columns (`spine.py` wraps there); every frame's terminal draws 72: `ide.ts`
+  `terminalRows` joins each row the spine wrapped and wraps the line again at 72, so the spine is untouched.
 
 ## Frames
 
