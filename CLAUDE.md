@@ -1,19 +1,19 @@
 # CLAUDE.md — aws-ecommerce
 
-> Workspace invariants live in the workspace `CLAUDE.md`. This file is only what is true here.
+> Workspace rules, pipeline and standard commands: `../CLAUDE.md`. Source of truth:
+> `COURSE-PLAN.md` (courses, sections, frames, the spine, and the frozen **Facts** table that frames
+> quote). This file is only what is true HERE.
 
-## What this repo is
+## Identity
 
-A GraphL concept app: **learn AWS by building a book shop, declared in Terraform**. A **section** is
-`(scene, narration)`: one full-screen 16:9 frame, one chapter of the video. It replaces `aws-ct`
-(re-authored from scratch; nothing carried over but its method).
-
-- **`COURSE-PLAN.md` is the source of truth**: courses, sections, frames, the spine. Change it first.
-- **`SPIKE.md`** is why the machine is built the way it is (Terraform on moto, the registry stand-in,
-  the moto patch layer, determinism). Read it before touching `scripts/`.
-
-Engine `@graphlearning/graphl-flow` 0.11.0, shell `@graphlearning/shell` 1.1.0, pinned exactly (frame v2,
-COURSE-PLAN "Decided (2026-11-08)").
+| | |
+|---|---|
+| teaches | AWS, by building a book shop, `book-shop`, declared in Terraform: an empty account → a networked, containerised shop with an asynchronous checkout, a reporting lake and production controls |
+| cast | alex (developer), sam (teammate) — see COURSE-PLAN, "Facts" |
+| reference repo | **python-expense-tracker** (IDE frame, checks). Replaces `aws-ct` (re-authored from scratch; nothing carried over but its method) |
+| engine / shell | graphl-flow 0.11.0, shell 1.1.0, pinned exactly (frame v2, COURSE-PLAN "Decided (2026-11-08)"). **`package-lock.json` is committed**: use `npm ci`. |
+| toolchain | `scripts/toolchain.py` pins Terraform, the AWS provider, AWS CLI, moto/boto3 (checksums verified) and fetches them into `.spine-cache/` (gitignored) on first use; Docker and PostgreSQL 16 are started by the toolchain. **`SPIKE.md`** is why the machine is built this way (Terraform on moto, the registry stand-in, the moto patch layer, determinism): read it before touching `scripts/` |
+| frames | IDE (`src/scenes/ide.ts`), map (`src/scenes/map.ts`), ◆ full scenes |
 
 ## Status
 
@@ -29,40 +29,40 @@ The audio manifest `scripts/audio-manifest.json` lists all 92 for the Colab pass
 `npm run gen:audio` again after ANY narration edit, or the audio and the text drift apart.
 
 **Recorded and packaged 2026-10-29.** All 92 wavs are in `public/audio/` (Colab + Chatterbox,
-pushed to `main` as it generated them) and all 92 sections are captured at 3840x2160: twelve course
+pushed to `main` as it generated them) and all 92 sections are captured at 3840×2160: twelve course
 videos in `scripts/out/<course>.mp4` (2 h 17 min in total) and the single film,
 `scripts/out/film.mp4`, 2:16:37. Covers and descriptions are in `output/`. The segment cache
 `scripts/segments/` is what makes re-recording ONE section cheap - keep it; `scripts/.tmp/` is
 intermediates and can be deleted.
 
-**`package-lock.json` is committed** and pins graphl-flow 0.6.0 and shell 1.0.4 from npm. The scenes
-need graphl-flow ≥ 0.6.0 (AWS icons, `dashed` groups, `muted` items, `hcl`, folded terminals): on 0.5
-a section throws `Cannot read properties of undefined (reading 'replace')` inside the engine. Use
-`npm ci`.
+| # | course | sections | status |
+|---|---|---|---|
+| 1 | `intro` | 3 | authored, narrated, recorded 4K (§1.1 recorded last) |
+| 2 | `how-aws-runs` | 7 | authored, narrated, recorded 4K |
+| 3 | `start` | 8 | authored, narrated, recorded 4K (pilot) |
+| 4 | `secure` | 8 | authored, narrated, recorded 4K |
+| 5 | `network` | 10 | authored, narrated, recorded 4K |
+| 6 | `run` | 9 | authored, narrated, recorded 4K |
+| 7 | `data` | 9 | authored, narrated, recorded 4K |
+| 8 | `decouple` | 9 | authored, narrated, recorded 4K |
+| 9 | `deliver` | 8 | authored, narrated, recorded 4K |
+| 10 | `report` | 6 | authored, narrated, recorded 4K |
+| 11 | `operate` | 9 | authored, narrated, recorded 4K |
+| 12 | `evolve` | 6 | authored, narrated, recorded 4K |
 
 ## Commands
 
 ```sh
-npm run dev                      # the app, :5173
-npx tsc --noEmit && npm run build
-npm run check                    # check-content + check-render (every section at 3840×2160)
 npm run check:spine              # every step recorded, current, untouched — runs NOTHING (< 1 s)
 python3 scripts/spine.py --record network/06   # record a step: runs ONLY it, from its parent's state
 python3 scripts/spine.py --replay  # deliberate, after a tool upgrade: the whole chain from the start
 npm run shots -- <slug-prefix>   # 4K PNGs in out/shots/ — then LOOK
 
-npm run record:all               # every course at 4K, under caffeinate; waits for Colab's wavs
-npm run film                     # the 92 segments → scripts/out/film.mp4 + film.txt (chapters)
-npm run gen:desc                 # a YouTube description per course → scripts/out/<course>.txt
-npm run thumb:film               # the film's cover → output/thumbnails/film.png
 npm run thumb:courses            # one cover per course → output/thumbnails/NN-<course>.png
 python3 spike/terraform-on-moto/matrix.py [case…]   # Terraform × moto support matrix
 ```
 
-Checks are a floor, not proof. Every frame of the pilot passed a check at some point while reading
-badly (tangled arrows, a half-empty side pane): capture and look.
-
-## The spine — each section builds on the one before
+## Spine — each section builds on the one before
 
 `spine/<course>/<NN-step>/` = `project/` + `session.txt` + `step.json` (`first` / `from` + `changes` /
 `lab`; see `scripts/spine.py`'s docstring for every key).
@@ -148,13 +148,15 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 - Each typed command is its own shell process: `$!` and a background job do not survive to the next
   line — `cmd & APP=$!` on one line. A quoted string cannot span typed lines either.
 - A recorded state pickles every moto backend in one go; what cannot travel (locks, `cryptography`
-  keys and certificates) has a reducer in `_Pickler`. A new service that will not pickle fails the
-  save with its traceback.
+  keys and certificates) has a reducer in `_Pickler` (it also handles `WeakValueDictionary` and
+  `defaultdict(lambda: …)`). A new service that will not pickle fails the save with its traceback.
 - **A Terraform "hang" is usually moto answering 500**, which the provider retries 25 times with
   back-off. Find the call with `TF_LOG=DEBUG`, moto's traceback by sending its stderr to a file, and
   check the CONFIG first: the org lab's policy had no dependency on the organization, a race that
   fails on AWS too (`org-not-in-use` now answers as AWS does). A stopped recording kills what it left
   running (`leftovers()`); orphaned providers once made runs 3–4× slower.
+- A replay's restore starts PostgreSQL before dropping/creating `book_shop`. moto_server.py's
+  patch list (its docstring) also has `visible-at` and `events-test-pattern`.
 
 ## Frames
 
@@ -195,63 +197,6 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   arrows do not cross, a group's heading is never crossed (check-render), an edge label never sits on
   a node. Tables only where rows of data are the point.
 
-## Facts (frozen: frames quote them)
-
-| fact | value |
-| --- | --- |
-| app | `book-shop` (package `book_shop`), `book-shop.example.com`, books `GET /books/bk-1001` |
-| Region | `eu-west-2` (London), AZs a/b/c |
-| accounts | development **444455556666** (the course builds here until Course 9), production **111122223333**, audit **777788889999** (role `Auditor`), management **123456789012** |
-| organization | root → OU Security (audit), OU Workloads (SCP `LondonOnly`: deny outside eu-west-2 except iam/organizations/sts) → OU Prod (prod), OU Dev (dev) |
-| app role | **BookShopApp**, trusted by `ecs-tasks.amazonaws.com`; inline policy `book-shop-app`: ReadBooks (s3:GetObject `books/*`), ListBooks (s3:ListBucket on the bucket); session `task-1` via `tools/as-app.sh` |
-| app | `book_shop` (standard library HTTP + boto3), port 8080, `/health`, `/books/<id>`; image `book-shop` 1.0.0 → 1.1.0 (graceful SIGTERM), python:3.13-slim pinned by digest, `requirements.txt` locked; ECR `book-shop` (immutable tags) |
-| ECS | cluster `book-shop`, service `book-shop` (Fargate, desired 3, app subnets, sg app, target group book-shop-app), task definition `book-shop` 0.5 vCPU / 1 GiB X86_64, execution role BookShopExecution, task role BookShopApp, log group `/book-shop/app` (30 d), stopTimeout 30; scaling 3–12 at 60% CPU, cooldowns 60/300 |
-| data | catalog versioned (old versions 30 d), HttpsOnly; bk-1001 price 12.99 → 10.99; uploads bucket `book-shop-uploads-444455556666` (private, CORS from book-shop.example.com, presigned PUT 300 s, `reviews/bk-1001/r-77.jpg`, 676 bytes); RDS `book-shop-orders` PostgreSQL 16.9 db.t4g.micro Multi-AZ (2a primary, 2b standby), user `shop`, managed secret; secret `book-shop/payments-api-key` (value by hand); DynamoDB `book-shop-carts` (customer + book, TTL `expires`), `book-shop-stock` (book); local orders: books bk-1001 (40) and bk-1002 (1, "A Field Guide to Rain", 8.50) |
-| peak model | one task = 100 req/s at full CPU, 2 min to start, alarm after 3 min above target; 120 → 420 req/s 17:45–18:00: CPU peaks 87%, settles at 7 tasks |
-| catalog | `books/bk-1001.json`: "Night Trains of Europe", Ana Lima, 12.99 GBP, stock 40; bucket policy AuditorReads (GetObject, ListBucket for the Auditor role) |
-| people | **alex** (developer), **sam** (teammate); Identity Center session `book-shop`, portal `https://book-shop-example.awsapps.com/start`; roles BookShopDeveloper (dev), BookShopReadOnly (prod) |
-| buckets | `book-shop-catalog-444455556666`; state `book-shop-tfstate-444455556666`, key `book-shop/terraform.tfstate`, `use_lockfile` |
-| tags | default: `app = book-shop`, `env = dev`, `managed-by = terraform` |
-| budget | `book-shop-dev-monthly`, 20 USD, 80% forecast → alex@book-shop.example.com |
-| VPC | `book-shop` 10.20.0.0/16; public 10.20.0–2.0/24, app 10.20.10–12.0/24, data 10.20.20–22.0/24; the account's default VPC 172.31.0.0/16 is not used |
-| routes | tables `public` (local, 0.0.0.0/0 → igw) and `private` (local, 0.0.0.0/0 → nat-a, S3 prefix list → gateway endpoint) |
-| NAT | ONE, `nat-a` in public-a (dev: a cost trade; production one per AZ) |
-| security groups | `alb` 443, 80 from anywhere → `app` 8080 from alb → `db` 5432 from app; NACL `data`: 5432 in from 10.20.8.0/21, 1024–65535 out |
-| load balancer | `book-shop`, internet-facing, 3 public subnets; target group `book-shop-app` HTTP 8080 ip, /health every 10 s, 3 in / 2 out, 30 s draining; 80 → 301 HTTPS, 443 TLS13-1-2-2021-06 |
-| DNS / TLS | zone book-shop.example.com, alias A → the ALB; ACM certificate, DNS-validated |
-| payments API | 198.51.100.7 (documentation range) |
-| checkout events | queue `book-shop-fulfilment` (visibility 30 s, 4 d) → DLQ `book-shop-fulfilment-dlq` after 3 receives (14 d); order 999 has no books; function `book-shop-fulfil` (python3.13 arm64, 256 MB, 20 s, role BookShopFulfil), mapping batch 10 / 5 s, ReportBatchItemFailures |
-| fan-out | SNS `book-shop-orders` → fulfilment, `book-shop-loyalty`, `book-shop-fraud-check` (body filter total ≥ 500), raw delivery; orders 6 (c-20, 21.98) and 7 (c-21, 50 × bk-1001, 549.50) |
-| event bus | `book-shop`; rules `uk-vat` (book-shop.checkout, OrderPlaced, country GB) → `book-shop-vat`, `refunds` (book-shop.returns, RefundRequested) → `book-shop-refunds`; samples: order 8 GB, order 9 FR, refund for order 4 |
-| workflow | `book-shop-checkout`: ReserveStock → ChargePayment (retry PaymentTimeout 2 s × 2.0, max 2; catch all → ReleaseStock → OrderFailed) → ShipOrder; functions book-shop-reserve/charge/ship/release (role BookShopCheckoutSteps), state machine role BookShopCheckoutFlow; order 10 times out twice then pays at 6 s, order 11 declined |
-| idempotency | table `book-shop-idempotency` (key, TTL `expires` 7 d), key `fulfil#<order>`; order 12 sent twice |
-| clock | 2026-11-02 09:30:00 UTC (the spine's default) |
-| modules | `infra/modules/network` (inputs `name`, `cidr`; 27 resources moved, plan 0 / 0 / 0), `infra/modules/pipeline` |
-| production | account 111122223333, root `infra/envs/prod`, VPC 10.40.0.0/16, state `book-shop-tfstate-111122223333` (made by `infra/envs/prod/state`, local state), reached through OrganizationAccountAccessRole (profile `book-shop-prod-admin`; sessions not evaluated) |
-| pipeline | repository `book-shop-example/book-shop`; GitHub OIDC provider `token.actions.githubusercontent.com` (audience `sts.amazonaws.com`) and role **BookShopPipeline** in both accounts: dev trusts `main` and pull requests, prod only `environment:production`; permissions: the shop's services and roles named `BookShop*`; `.github/workflows/infra.yml` jobs check, plan-dev, apply-dev, apply-prod (environment `production`); not run on GitHub |
-| drift | sam (off screen): fulfilment visibility 30 → 60 s, `book-shop-returns` made by hand (4 d); the plan puts 30 back and imports returns (max size 1 MiB → 256 KiB) |
-| replacement | `book-shop-loyalty` → `book-shop-points`: queue, queue policy and subscription `create_before_destroy`, the subscription `depends_on` the policy; orders DB `prevent_destroy` (`plan -replace` refused) |
-| release model | 1.2.0 fails 2% of requests, alarm after 2 min, 420 req/s: failed requests all at once 1008, rolling (1 task of 7 a minute) 216, canary (10%) 101 — a model, labelled |
-| lake | bucket `book-shop-lake-444455556666` (private); `order_history/dt=<day>/orders.parquet`, schema order_id int32, customer, book, quantity int32, price decimal(8,2), placed timestamp UTC, zstd; orders get `placed` (migration 002) |
-| September | MADE UP, seeded 12: 30,000 orders (1,000 a day, 400 customers, books bk-2001 … bk-2020, 1–3 lines), 2,048,716.45 GBP, 60,179 order lines, 30 files, 588 KiB |
-| catalog | Glue database `book_shop_lake`, table `order_history` (EXTERNAL, Parquet, partition key `dt`, projection `date` yyyy-MM-dd from 2026-09-01) |
-| Athena | workgroup `book-shop-reports` (results `athena-results/`, 1 GiB scan cutoff); the emulator records queries, never runs them; DuckDB runs `reports/yesterday.sql` over a copy (`lake/`): top bk-2018 199 copies 5,104.35 GBP, files read 1/30 |
-| clicks | Kinesis `book-shop-clicks`, 2 shards, 24 h; 1,000 made-up clicks from 50 sessions (seed 10): 596 / 404, none split; lag model: 600 clicks/s per consumer, peak 1,600/s at 18:30, 2 shards up to 400 s behind, 4 shards none |
-| evening | MADE UP, seeded 11: 1 November 18:00–18:59, 200 requests a minute, payments down 18:20–18:34 → 12,000 requests, 396 errors, worst 18:22 (33 of 200); metrics `BookShop/Requests`, `BookShop/Errors5xx` |
-| SLO | 99.5% of requests over 30 days; alarms `book-shop-burn-fast` (0.072, 5 min, 14.4×) and `book-shop-burn-slow` (0.03, 1 h, 6×) → SNS `book-shop-alerts` → alex@book-shop.example.com; last night: fast ALARM 18:20, 18:25, 18:30; the hour 3.3%, 6.6× |
-| trail | `book-shop-audit`, multi-Region, global events, log file validation → `book-shop-trail-444455556666` |
-| key | KMS `alias/book-shop-data` (rotation, 30-day deletion window; the account administers, BookShopApp uses); lake SSE-KMS with a bucket key; envelope: 256-bit data key, 67 bytes of data, 96 bytes of encrypted key |
-| WAF | web ACL `book-shop` (REGIONAL) on the ALB: `aws-common` (AWSManagedRulesCommonRuleSet, priority 0), `per-address` (1,000 / 5 min per IP, block, priority 1) |
-| backup | vault `book-shop` (our key); plan `book-shop-nightly` (cron 0 3 * * ? *, 35 d) + copy to `arn:aws:backup:eu-west-2:777788889999:backup-vault:book-shop-copies` (90 d); selection DB, carts, stock; role BookShopBackup (AWSBackupServiceRolePolicyForBackup) |
-| incident | 2 November 21:14 (step clock): leaked BookShopApp session `task-1`; inline `AWSRevokeOlderSessions` Deny * if aws:TokenIssueTime < 21:15; applied 21:16 |
-| CDN | CloudFront `book-shop` → the ALB (https-only, TLSv1.2), default certificate; `book-shop-pages` (0 / 60 / 300 s), `/checkout*` → `book-shop-never` (all methods); latency model: Sydney 280 ms to London, 15 ms to an edge, 310 ms without a CDN |
-| knee | one task, 10 ms mean service, seeded 7, 20,000 requests a load: p99 105 ms at 60% busy, 215 at 80%, 670 at 95% |
-| bill | HYPOTHETICAL rates, production, 730 h: 234.19 USD a month (Fargate 73.00, NAT 42.50, RDS 26.28 …); a 1-year commitment on Fargate and RDS saves 22.48 (10%) |
-| October | MADE UP, seeded 21: prod 213.15 USD, dev 99.32; dev passed its 20 USD budget on 7 October; dev NAT 3.22 (4.5×) on 21 and 2.73 (3.8×) on 22 October; cost allocation tags `app`, `env` active |
-| decision | `docs/adr/001-order-platform.md`: stay on RDS PostgreSQL (35 of 40), Aurora Serverless v2 30, DynamoDB only out (reports' SQL); revisit at 10× the orders |
-
-Extend this table; never change a value a frame already quotes.
-
 ## Narration
 
 Flowing prose, 90–120 s, walking the frame; ends with a one-line bridge. Written for the speech
@@ -260,8 +205,18 @@ digit by digit in groups, prices as words. Never reads code aloud character by c
 
 ## Invariants
 
-- Never write `x`/`y`; scenes are declarative.
-- Stylesheets in order: graphl-flow, shell, `./theme.css` last.
-- No `file:` installs committed.
-- Narration: `.tts` → `.wav` via Colab + Chatterbox only. Audio at `public/audio/<course>/<id>.wav`.
 - Every emulated pane says so; nothing emulated is presented as AWS's own output.
+- Do not publish engine releases, open moto PRs or create PRs without the owner's approval. No model
+  names in commits.
+- Do not add tools that fetch binaries (downloading actionlint was refused by the permission
+  classifier); pip packages from `spine/requirements.txt` are the only route.
+
+## Gotchas
+
+- Never `pkill -f` (it matches its own shell). Kill recorder PIDs by
+  `ps -eo pid,args | awk '$2 ~ /python3/ && $3=="scripts/spine.py" {print $1}' | xargs -r kill`,
+  then `python3 -c "import sys;sys.path.insert(0,'scripts');import spine;spine.leftovers()"`.
+- Recording is slow (Terraform refreshes ~120 resources): run `--record` in the background, several
+  steps in ONE invocation (`--record deliver/06 deliver/07`), and do other work meanwhile.
+- Checks are a floor: every frame of the pilot passed a check at some point while reading badly
+  (tangled arrows, a half-empty side pane).

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// Combine every recorded section into the single YouTube film (COURSE-PLAN §"Packaging for
-// YouTube"): one video, all 12 courses, no break in the middle.
+// Combine every recorded section into the single YouTube film (COURSE-PLAN §"Packaging"): one video, all 12 courses, no break in the middle.
 //
 // The segments under scripts/segments/ are all produced by one encoder path (same SPS/PPS, 30fps
 // CFR, 90k timescale, AAC 44.1k mono), so the concat is a stream copy — no re-encode, no quality

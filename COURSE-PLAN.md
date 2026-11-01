@@ -1,13 +1,15 @@
 # Learn AWS by building a book shop with Terraform — plan
 
-**Status: v1 plan, reviewed by the owner (2026-10-28); spike done (`SPIKE.md`).** Authored: all 12 courses, 92 sections (see `CLAUDE.md`, Status).
+**Plan status:** v1, reviewed by the owner 2026-10-28; spike done (`SPIKE.md`). All 12 courses (92
+sections) authored 2026-10-28/29, narrated, recorded and cut into the film 2026-10-29. Shared rules
+(section shape, ◆ detours, packaging, build order) are in `../CLAUDE.md`; this plan states only what
+is specific to AWS.
 
 This repo replaces `aws-ct`. It is re-authored from scratch, not migrated: no scene, spine step
 or wav is carried over. What is kept from `aws-ct` is its *method* — the fixed facts, the
 verification levels, the emulator's determinism — and the lessons recorded in its `CLAUDE.md`.
 
 ## The idea
-
 One application, `book-shop`, an online book shop on AWS. It grows from an empty account to a tested,
 containerised web service with an asynchronous checkout, a reporting lake and the controls a
 production system needs — **declared in Terraform from its first resource**. Every AWS service is
@@ -34,9 +36,8 @@ Why a shop:
 | side panes of list boxes and tables | **canonical diagrams**: AWS architecture maps, packet paths, policy-evaluation charts, state machines, sequences drawn as flows. Tables only where the data is the point |
 | `@graphlearning/flow` 2.2 / shell 0.14 | `@graphlearning/graphl-flow` ^0.5 / `@graphlearning/shell` ^1.0 |
 
-## Packaging for YouTube
-
-**One video: "Learn AWS by building a book shop: full course, beginner to professional"** —
+## Packaging
+**One film: "Learn AWS by building a book shop: full course, beginner to professional"** —
 12 courses, 92 sections, **2:16:37**, one continuous story. A course is a YouTube chapter group and
 the owner's review unit; a section (90–120 s) is one chapter, titled *concept: what the shop gets*
 ("Security groups: only the load balancer reaches the app"). The video opens with the finished
@@ -59,8 +60,7 @@ linear `loudnorm` pass over the audio alone: the narration lands at −18.25 LUF
 through AAC. After the pass: −14.46 LUFS, −0.75 dBTP. Chapter offsets are accumulated from each
 segment's PROBED duration, never from wav arithmetic, so they cannot drift from the film.
 
-## The stack (pinned by the spike, `SPIKE.md`)
-
+## Stack and pins (pinned by the spike, `SPIKE.md`)
 | tool | role |
 | --- | --- |
 | Terraform 1.17.0 + `hashicorp/aws` 6.70.0 | every resource. `.terraform.lock.hcl` is committed in the project |
@@ -76,7 +76,6 @@ segment's PROBED duration, never from wav arithmetic, so they cannot drift from 
 labelled **emulated**; nothing emulated is presented as AWS's own output.
 
 ## The app: `book-shop`
-
 One name everywhere: the folder, the project in `pyproject.toml`, the service and the ECS cluster are
 `book-shop`; the importable package is `book_shop` (a Python name cannot contain `-`).
 `book-shop.example.com` in `eu-west-2` (London), production account **111122223333**, development
@@ -126,8 +125,63 @@ refactor is itself a lesson, and only possible because the spine is cumulative.
 | 11 Operate | is observed, audited, encrypted, backed up and recoverable |
 | 12 Evolve | is cached at the edge, right-sized, priced and reviewed |
 
-## Frames
+## Facts
+Frozen: frames quote them. Extend this table; never change a value a frame already quotes.
 
+| fact | value |
+| --- | --- |
+| app | `book-shop` (package `book_shop`), `book-shop.example.com`, books `GET /books/bk-1001` |
+| Region | `eu-west-2` (London), AZs a/b/c |
+| accounts | development **444455556666** (the course builds here until Course 9), production **111122223333**, audit **777788889999** (role `Auditor`), management **123456789012** |
+| organization | root → OU Security (audit), OU Workloads (SCP `LondonOnly`: deny outside eu-west-2 except iam/organizations/sts) → OU Prod (prod), OU Dev (dev) |
+| app role | **BookShopApp**, trusted by `ecs-tasks.amazonaws.com`; inline policy `book-shop-app`: ReadBooks (s3:GetObject `books/*`), ListBooks (s3:ListBucket on the bucket); session `task-1` via `tools/as-app.sh` |
+| app | `book_shop` (standard library HTTP + boto3), port 8080, `/health`, `/books/<id>`; image `book-shop` 1.0.0 → 1.1.0 (graceful SIGTERM), python:3.13-slim pinned by digest, `requirements.txt` locked; ECR `book-shop` (immutable tags) |
+| ECS | cluster `book-shop`, service `book-shop` (Fargate, desired 3, app subnets, sg app, target group book-shop-app), task definition `book-shop` 0.5 vCPU / 1 GiB X86_64, execution role BookShopExecution, task role BookShopApp, log group `/book-shop/app` (30 d), stopTimeout 30; scaling 3–12 at 60% CPU, cooldowns 60/300 |
+| data | catalog versioned (old versions 30 d), HttpsOnly; bk-1001 price 12.99 → 10.99; uploads bucket `book-shop-uploads-444455556666` (private, CORS from book-shop.example.com, presigned PUT 300 s, `reviews/bk-1001/r-77.jpg`, 676 bytes); RDS `book-shop-orders` PostgreSQL 16.9 db.t4g.micro Multi-AZ (2a primary, 2b standby), user `shop`, managed secret; secret `book-shop/payments-api-key` (value by hand); DynamoDB `book-shop-carts` (customer + book, TTL `expires`), `book-shop-stock` (book); local orders: books bk-1001 (40) and bk-1002 (1, "A Field Guide to Rain", 8.50) |
+| peak model | one task = 100 req/s at full CPU, 2 min to start, alarm after 3 min above target; 120 → 420 req/s 17:45–18:00: CPU peaks 87%, settles at 7 tasks |
+| catalog | `books/bk-1001.json`: "Night Trains of Europe", Ana Lima, 12.99 GBP, stock 40; bucket policy AuditorReads (GetObject, ListBucket for the Auditor role) |
+| people | **alex** (developer), **sam** (teammate); Identity Center session `book-shop`, portal `https://book-shop-example.awsapps.com/start`; roles BookShopDeveloper (dev), BookShopReadOnly (prod) |
+| buckets | `book-shop-catalog-444455556666`; state `book-shop-tfstate-444455556666`, key `book-shop/terraform.tfstate`, `use_lockfile` |
+| tags | default: `app = book-shop`, `env = dev`, `managed-by = terraform` |
+| budget | `book-shop-dev-monthly`, 20 USD, 80% forecast → alex@book-shop.example.com |
+| VPC | `book-shop` 10.20.0.0/16; public 10.20.0–2.0/24, app 10.20.10–12.0/24, data 10.20.20–22.0/24; the account's default VPC 172.31.0.0/16 is not used |
+| routes | tables `public` (local, 0.0.0.0/0 → igw) and `private` (local, 0.0.0.0/0 → nat-a, S3 prefix list → gateway endpoint) |
+| NAT | ONE, `nat-a` in public-a (dev: a cost trade; production one per AZ) |
+| security groups | `alb` 443, 80 from anywhere → `app` 8080 from alb → `db` 5432 from app; NACL `data`: 5432 in from 10.20.8.0/21, 1024–65535 out |
+| load balancer | `book-shop`, internet-facing, 3 public subnets; target group `book-shop-app` HTTP 8080 ip, /health every 10 s, 3 in / 2 out, 30 s draining; 80 → 301 HTTPS, 443 TLS13-1-2-2021-06 |
+| DNS / TLS | zone book-shop.example.com, alias A → the ALB; ACM certificate, DNS-validated |
+| payments API | 198.51.100.7 (documentation range) |
+| checkout events | queue `book-shop-fulfilment` (visibility 30 s, 4 d) → DLQ `book-shop-fulfilment-dlq` after 3 receives (14 d); order 999 has no books; function `book-shop-fulfil` (python3.13 arm64, 256 MB, 20 s, role BookShopFulfil), mapping batch 10 / 5 s, ReportBatchItemFailures |
+| fan-out | SNS `book-shop-orders` → fulfilment, `book-shop-loyalty`, `book-shop-fraud-check` (body filter total ≥ 500), raw delivery; orders 6 (c-20, 21.98) and 7 (c-21, 50 × bk-1001, 549.50) |
+| event bus | `book-shop`; rules `uk-vat` (book-shop.checkout, OrderPlaced, country GB) → `book-shop-vat`, `refunds` (book-shop.returns, RefundRequested) → `book-shop-refunds`; samples: order 8 GB, order 9 FR, refund for order 4 |
+| workflow | `book-shop-checkout`: ReserveStock → ChargePayment (retry PaymentTimeout 2 s × 2.0, max 2; catch all → ReleaseStock → OrderFailed) → ShipOrder; functions book-shop-reserve/charge/ship/release (role BookShopCheckoutSteps), state machine role BookShopCheckoutFlow; order 10 times out twice then pays at 6 s, order 11 declined |
+| idempotency | table `book-shop-idempotency` (key, TTL `expires` 7 d), key `fulfil#<order>`; order 12 sent twice |
+| clock | 2026-11-02 09:30:00 UTC (the spine's default) |
+| modules | `infra/modules/network` (inputs `name`, `cidr`; 27 resources moved, plan 0 / 0 / 0), `infra/modules/pipeline` |
+| production | account 111122223333, root `infra/envs/prod`, VPC 10.40.0.0/16, state `book-shop-tfstate-111122223333` (made by `infra/envs/prod/state`, local state), reached through OrganizationAccountAccessRole (profile `book-shop-prod-admin`; sessions not evaluated) |
+| pipeline | repository `book-shop-example/book-shop`; GitHub OIDC provider `token.actions.githubusercontent.com` (audience `sts.amazonaws.com`) and role **BookShopPipeline** in both accounts: dev trusts `main` and pull requests, prod only `environment:production`; permissions: the shop's services and roles named `BookShop*`; `.github/workflows/infra.yml` jobs check, plan-dev, apply-dev, apply-prod (environment `production`); not run on GitHub |
+| drift | sam (off screen): fulfilment visibility 30 → 60 s, `book-shop-returns` made by hand (4 d); the plan puts 30 back and imports returns (max size 1 MiB → 256 KiB) |
+| replacement | `book-shop-loyalty` → `book-shop-points`: queue, queue policy and subscription `create_before_destroy`, the subscription `depends_on` the policy; orders DB `prevent_destroy` (`plan -replace` refused) |
+| release model | 1.2.0 fails 2% of requests, alarm after 2 min, 420 req/s: failed requests all at once 1008, rolling (1 task of 7 a minute) 216, canary (10%) 101 — a model, labelled |
+| lake | bucket `book-shop-lake-444455556666` (private); `order_history/dt=<day>/orders.parquet`, schema order_id int32, customer, book, quantity int32, price decimal(8,2), placed timestamp UTC, zstd; orders get `placed` (migration 002) |
+| September | MADE UP, seeded 12: 30,000 orders (1,000 a day, 400 customers, books bk-2001 … bk-2020, 1–3 lines), 2,048,716.45 GBP, 60,179 order lines, 30 files, 588 KiB |
+| catalog | Glue database `book_shop_lake`, table `order_history` (EXTERNAL, Parquet, partition key `dt`, projection `date` yyyy-MM-dd from 2026-09-01) |
+| Athena | workgroup `book-shop-reports` (results `athena-results/`, 1 GiB scan cutoff); the emulator records queries, never runs them; DuckDB runs `reports/yesterday.sql` over a copy (`lake/`): top bk-2018 199 copies 5,104.35 GBP, files read 1/30 |
+| clicks | Kinesis `book-shop-clicks`, 2 shards, 24 h; 1,000 made-up clicks from 50 sessions (seed 10): 596 / 404, none split; lag model: 600 clicks/s per consumer, peak 1,600/s at 18:30, 2 shards up to 400 s behind, 4 shards none |
+| evening | MADE UP, seeded 11: 1 November 18:00–18:59, 200 requests a minute, payments down 18:20–18:34 → 12,000 requests, 396 errors, worst 18:22 (33 of 200); metrics `BookShop/Requests`, `BookShop/Errors5xx` |
+| SLO | 99.5% of requests over 30 days; alarms `book-shop-burn-fast` (0.072, 5 min, 14.4×) and `book-shop-burn-slow` (0.03, 1 h, 6×) → SNS `book-shop-alerts` → alex@book-shop.example.com; last night: fast ALARM 18:20, 18:25, 18:30; the hour 3.3%, 6.6× |
+| trail | `book-shop-audit`, multi-Region, global events, log file validation → `book-shop-trail-444455556666` |
+| key | KMS `alias/book-shop-data` (rotation, 30-day deletion window; the account administers, BookShopApp uses); lake SSE-KMS with a bucket key; envelope: 256-bit data key, 67 bytes of data, 96 bytes of encrypted key |
+| WAF | web ACL `book-shop` (REGIONAL) on the ALB: `aws-common` (AWSManagedRulesCommonRuleSet, priority 0), `per-address` (1,000 / 5 min per IP, block, priority 1) |
+| backup | vault `book-shop` (our key); plan `book-shop-nightly` (cron 0 3 * * ? *, 35 d) + copy to `arn:aws:backup:eu-west-2:777788889999:backup-vault:book-shop-copies` (90 d); selection DB, carts, stock; role BookShopBackup (AWSBackupServiceRolePolicyForBackup) |
+| incident | 2 November 21:14 (step clock): leaked BookShopApp session `task-1`; inline `AWSRevokeOlderSessions` Deny * if aws:TokenIssueTime < 21:15; applied 21:16 |
+| CDN | CloudFront `book-shop` → the ALB (https-only, TLSv1.2), default certificate; `book-shop-pages` (0 / 60 / 300 s), `/checkout*` → `book-shop-never` (all methods); latency model: Sydney 280 ms to London, 15 ms to an edge, 310 ms without a CDN |
+| knee | one task, 10 ms mean service, seeded 7, 20,000 requests a load: p99 105 ms at 60% busy, 215 at 80%, 670 at 95% |
+| bill | HYPOTHETICAL rates, production, 730 h: 234.19 USD a month (Fargate 73.00, NAT 42.50, RDS 26.28 …); a 1-year commitment on Fargate and RDS saves 22.48 (10%) |
+| October | MADE UP, seeded 21: prod 213.15 USD, dev 99.32; dev passed its 20 USD budget on 7 October; dev NAT 3.22 (4.5×) on 21 and 2.73 (3.8×) on 22 October; cost allocation tags `app`, `env` active |
+| decision | `docs/adr/001-order-platform.md`: stay on RDS PostgreSQL (35 of 40), Aurora Serverless v2 30, DynamoDB only out (reports' SQL); revisit at 10× the orders |
+
+## Frames
 Every section is one full-screen 16:9 frame and one narration, no slide. Four kinds:
 
 1. **Map frame** — the shop's **architecture map**, drawn the canonical AWS way: the account,
@@ -144,21 +198,67 @@ Every section is one full-screen 16:9 frame and one narration, no slide. Four ki
    output inside it (a lab's run, or a plan) so it stays proof, then the next section returns.
 4. **Concept frame** — the few places with no command and no detour (Course 1).
 
-Detours (◆) come in the same two kinds as python-expense-tracker:
-
-- **◆ side pane:** a small picture of the code on screen (the trust arrow of a role, a route
-  table's longest-prefix match, a visibility timeout). It stays in the IDE or map frame, so the
-  proof stays visible beside it.
-- **◆ full scene:** a canonical big picture. **Rule: if it cannot fit the side pane at ≥ 24px
-  body text in the 4K frame, it is a full scene. When in doubt, full scene.**
-
 What counts as a *diagram*: an architecture map, a packet or request path, a flowchart with one
 path lit, a state machine, a sequence drawn as a flow of numbered steps, a tree (org, partitions),
 a plot. A box holding a bulleted list is not a diagram. A table is used only where rows of data are
 the point (a plan's resource list, a route table, a bill).
 
-## The courses
+## The spine
+`spine/<course>/<NN-step>/` = `project/` + `session.txt` + `step.json`, as in
+python-expense-tracker, with its rules: every step has exactly one of `first`, `from` + `changes`
+(the section's real diff, checked: an undeclared change or a declared non-change fails), or `lab`.
 
+`scripts/spine.py` merges the two existing ones:
+
+- **from python-expense-tracker**: the cumulative chain, `lab`, `volatile`, highlights found by
+  text, never typed line numbers.
+- **from aws-ct**: seeded moto, the frozen clock for Python and the CLI, the endpoint rewrite
+  (`localhost:5000` → the regional endpoint in output), wrapping at the pane's width, IAM
+  enforcement.
+- **new — each section builds on the one before, nothing is replayed to get there.** The whole
+  chain runs against ONE emulator and ONE working copy of the project: a step's files are laid over
+  the working copy, and its session runs where the previous session left off — the same buckets,
+  state, `.terraform/` and lock file. No hidden re-apply, no setup lists. The chain is a line (a
+  failure and its fix are two consecutive steps). `setup` is only for what happens off screen
+  between two sections (a colleague's console click). Labs run alone.
+- **new — recorded once, never replayed.** A step runs once, when it is authored, from its
+  parent's recorded state; the machine's state after it is committed beside it (`state/`), so the
+  next section starts from it without re-running anything before it. The check runs nothing: it
+  proves each record still belongs to its step and each transcript is the recording's.
+
+Terraform-specific replay rules, proven by the spike (`SPIKE.md` §1, §4):
+
+- **`terraform init` is a learner's**: a local stand-in for `registry.terraform.io` serves the ONE
+  pinned provider from HashiCorp's own signed release files, so init says "signed by HashiCorp",
+  writes the full lock file, needs no network, and HashiCorp's next release changes nothing.
+- **Ids do not depend on Terraform's walk order**: moto's random stream is re-seeded from each
+  request's content.
+- **Timing-dependent apply lines** (elapsed counters, "Still creating…", the order of concurrent
+  progress lines) are compared as a set; ids, plans and summaries exactly.
+- **Frames mostly show the plan** (sorted, deterministic, the teaching moment) and fold an apply
+  to its summary line.
+
+## Verification levels
+Carried from `aws-ct` (`check:aws`), with Terraform replacing CloudFormation:
+
+| level | means | checked by |
+| --- | --- | --- |
+| `runs locally` | real Python or SQL, really run | the replay; SQL in PostgreSQL 16 |
+| `emulated` | applied to moto, not AWS | the replay (`terraform apply` + the CLI reading it back) |
+| `planned` | declared, validated, planned against moto, **not applied** (moto lacks the resource) | `terraform validate`, tflint, `plan` in the replay; the frame says "planned, not applied" |
+| `model-checked` | a request or policy checked against AWS's models | botocore ParamValidator, parliament, actionlint |
+| `doc-cited` | AWS documentation says so | `// source:` URL in the scene |
+| `illustrative` | made up, realistic, unchecked | counted, so it stays visible |
+
+Hidden verifications (`verify/<course>/*.py`, moto with IAM enforcement) assert what a picture
+claims and no card shows. Mutate a row and watch it fail before trusting it.
+
+## How a section teaches
+Differences from the shared shape: a failure's real output is the AWS kind (the `AccessDenied`,
+the plan that replaces a database). Acronyms are spelled for the speech engine (`CLAUDE.md`,
+"Narration"). A ◆ detour returns to the shop.
+
+## The courses
 Columns: **Step** is what the section changes in `book-shop/` (or the lab it runs). **Picture** is the
 side-pane diagram, or the full scene's subject.
 
@@ -316,102 +416,37 @@ side-pane diagram, or the full scene's subject.
 
 **Totals:** 3 + 7 + 8 + 8 + 10 + 9 + 9 + 9 + 8 + 6 + 9 + 6 = **92 sections**, 19 of them ◆ full scenes.
 
-## How a section teaches
-
-Objective → mental model (the picture) → the change and its real result → a failure or
-alternative → bridge. One step per section; a failure is its own step with real output (the
-`AccessDenied`, the plan that replaces a database). Narration explains and never reads code aloud;
-acronyms are spelled for the speech engine ("A W S", "V P C", "I A M"…). A ◆ detour is ≤ 120 s
-and returns to the shop.
-
-## The spine
-
-`spine/<course>/<NN-step>/` = `project/` + `session.txt` + `step.json`, as in
-python-expense-tracker, with its rules: every step has exactly one of `first`, `from` + `changes`
-(the section's real diff, checked: an undeclared change or a declared non-change fails), or `lab`.
-
-`scripts/spine.py` merges the two existing ones:
-
-- **from python-expense-tracker**: the cumulative chain, `lab`, `volatile`, highlights found by
-  text, never typed line numbers.
-- **from aws-ct**: seeded moto, the frozen clock for Python and the CLI, the endpoint rewrite
-  (`localhost:5000` → the regional endpoint in output), wrapping at the pane's width, IAM
-  enforcement.
-- **new — each section builds on the one before, nothing is replayed to get there.** The whole
-  chain runs against ONE emulator and ONE working copy of the project: a step's files are laid over
-  the working copy, and its session runs where the previous session left off — the same buckets,
-  state, `.terraform/` and lock file. No hidden re-apply, no setup lists. The chain is a line (a
-  failure and its fix are two consecutive steps). `setup` is only for what happens off screen
-  between two sections (a colleague's console click). Labs run alone.
-- **new — recorded once, never replayed.** A step runs once, when it is authored, from its
-  parent's recorded state; the machine's state after it is committed beside it (`state/`), so the
-  next section starts from it without re-running anything before it. The check runs nothing: it
-  proves each record still belongs to its step and each transcript is the recording's.
-
-Terraform-specific replay rules, proven by the spike (`SPIKE.md` §1, §4):
-
-- **`terraform init` is a learner's**: a local stand-in for `registry.terraform.io` serves the ONE
-  pinned provider from HashiCorp's own signed release files, so init says "signed by HashiCorp",
-  writes the full lock file, needs no network, and HashiCorp's next release changes nothing.
-- **Ids do not depend on Terraform's walk order**: moto's random stream is re-seeded from each
-  request's content.
-- **Timing-dependent apply lines** (elapsed counters, "Still creating…", the order of concurrent
-  progress lines) are compared as a set; ids, plans and summaries exactly.
-- **Frames mostly show the plan** (sorted, deterministic, the teaching moment) and fold an apply
-  to its summary line.
-
-## Verification levels
-
-Carried from `aws-ct` (`check:aws`), with Terraform replacing CloudFormation:
-
-| level | means | checked by |
-| --- | --- | --- |
-| `runs locally` | real Python or SQL, really run | the replay; SQL in PostgreSQL 16 |
-| `emulated` | applied to moto, not AWS | the replay (`terraform apply` + the CLI reading it back) |
-| `planned` | declared, validated, planned against moto, **not applied** (moto lacks the resource) | `terraform validate`, tflint, `plan` in the replay; the frame says "planned, not applied" |
-| `model-checked` | a request or policy checked against AWS's models | botocore ParamValidator, parliament, actionlint |
-| `doc-cited` | AWS documentation says so | `// source:` URL in the scene |
-| `illustrative` | made up, realistic, unchecked | counted, so it stays visible |
-
-Hidden verifications (`verify/<course>/*.py`, moto with IAM enforcement) assert what a picture
-claims and no card shows. Mutate a row and watch it fail before trusting it.
-
-## Build order
-
-1. **Owner review of this plan.**
-2. **Spike (no content)** — done 2026-10-28, see `SPIKE.md`:
-   - Terraform + provider mirror; `terraform apply` on moto for **every resource type this plan
-     names** → a support matrix (`applied` / `planned only`) that fixes each section's level.
-   - The merged `spine.py`, proven on a three-step chain (bucket → tag change → destroy).
-   - Engine work in `graphl-flow` (a minor release): the missing AWS icon keys (ECS / Fargate,
-     ECR, ELB, Route 53, CloudFront, WAF, CloudTrail, ACM, Backup, Organizations, internet and
-     NAT gateway, Systems Manager, Terraform's mark) and a **dashed group border** (AWS draws AZs
-     and subnets dashed), each with a fixture.
-3. **Repo scaffold:** vite + graphl-flow + shell, the IDE frame ported, the map frame on one fit,
-   `check-content` / `check-render` / `check:spine`, `CLAUDE.md`. Done 2026-10-28; `check:aws`
-   (verification levels of code cards) comes with the first course that needs it.
-4. **Pilot: Course 3 (`start`) plus one ◆ full scene from Course 5 (addresses and CIDR)** → owner
-   review of both frame kinds and both detour kinds on rendered 4K routes. Authored 2026-10-28.
-5. Courses 1–2, 4–12 one at a time, each reviewed on its rendered routes, then narrated.
-6. Record all 12 → assemble and publish the one video.
-
 ## Decisions (resolved with the owner, 2026-10-28)
-
 1. **A new repo, `aws-ecommerce`, re-authored from scratch.** `aws-ct`'s 105 wavs are discarded.
 2. **Terraform** for all infrastructure, from the first resource.
 3. **12 courses.**
 4. **No AWS account.** moto is the account; what it cannot do is `planned` or `doc-cited`, said
    on screen.
 5. Canonical diagrams, not list boxes; ◆ detours as side pane or full scene, by the 24px rule.
-
 6. **The app is `book-shop`** (package `book_shop`), an online book shop at
    `book-shop.example.com`; books are its products (`GET /books/bk-1001`).
 7. **Fargate is the main compute**; EC2 (6.9) and Lambda (8.4) are side-by-side comparisons,
    drawn beside the map, never inside it.
 8. **92 sections** are kept.
+9. Build order as run:
+   1. **Owner review of this plan.**
+   2. **Spike (no content)** — done 2026-10-28, see `SPIKE.md`:
+      - Terraform + provider mirror; `terraform apply` on moto for **every resource type this plan
+        names** → a support matrix (`applied` / `planned only`) that fixes each section's level.
+      - The merged `spine.py`, proven on a three-step chain (bucket → tag change → destroy).
+      - Engine work in `graphl-flow` (a minor release): the missing AWS icon keys (ECS / Fargate,
+        ECR, ELB, Route 53, CloudFront, WAF, CloudTrail, ACM, Backup, Organizations, internet and
+        NAT gateway, Systems Manager, Terraform's mark) and a **dashed group border** (AWS draws AZs
+        and subnets dashed), each with a fixture.
+   3. **Repo scaffold:** vite + graphl-flow + shell, the IDE frame ported, the map frame on one fit,
+      `check-content` / `check-render` / `check:spine`, `CLAUDE.md`. Done 2026-10-28; `check:aws`
+      (verification levels of code cards) comes with the first course that needs it.
+   4. **Pilot: Course 3 (`start`) plus one ◆ full scene from Course 5 (addresses and CIDR)** → owner
+      review of both frame kinds and both detour kinds on rendered 4K routes. Authored 2026-10-28.
+   5. Courses 1–2, 4–12 one at a time, each reviewed on its rendered routes, then narrated.
+   6. Record all 12 → assemble and publish the one video.
 
-## Open for the owner
-
+## Open
 Nothing open. The spike's findings are in `SPIKE.md`.
 
 ## Decided (2026-11-08): frame v2
