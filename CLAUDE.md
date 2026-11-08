@@ -12,7 +12,8 @@ A GraphL concept app: **learn AWS by building a book shop, declared in Terraform
 - **`SPIKE.md`** is why the machine is built the way it is (Terraform on moto, the registry stand-in,
   the moto patch layer, determinism). Read it before touching `scripts/`.
 
-Engine `@graphlearning/graphl-flow` ^0.6.0, shell `@graphlearning/shell` ^1.0.4.
+Engine `@graphlearning/graphl-flow` 0.11.0, shell `@graphlearning/shell` 1.1.0, pinned exactly (frame v2,
+COURSE-PLAN "Decided (2026-11-08)").
 
 ## Status
 
@@ -156,7 +157,11 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 
 ## Frames
 
-- **IDE frame** (`src/scenes/ide.ts`): python-expense-tracker's template. Fixed columns; the
+- **2026-11-08: frame v2, piloted on Course 5 `network`**; the other courses are NOT yet ported and fail
+  check-content (strict side pane, editors that do not fit). `node scripts/check-render.mjs <course>`.
+- **IDE frame v2** (`src/scenes/ide.ts`, `grid.ts`): editor over an 80-column terminal (760) | side pane 574,
+  no explorer, on the shared 1344 × 756 grid. Side pane STRICT (≤ 2 parts; with two, one a group or plot).
+  Formerly: python-expense-tracker's template. Fixed columns; the
   terminal shows ≤ `TERMINAL_ROWS` rows — fold with `keep` (lines found by TEXT, never numbers).
   **Every side pane is a diagram** (an edge, plot or table; check-content fails a list) and fills
   ≥ 2/3 of its height (check-render).

@@ -58,35 +58,28 @@ for (const [id, scene] of Object.entries(SCENES)) {
   const sideEdges = edges.filter((e) => paneOf(e.from) === 'side' && paneOf(e.to) === 'side')
   if (!sideEdges.length && !side.some((n) => n.type === 'table' || n.type === 'plot'))
     problems.push(`scene ${id}  the side pane holds no edge, plot or table — it must carry a diagram, not a list`)
-  // --- 5. the editor and terminal hold what they show -------------------------------------------
-  // Rows as graphl-flow draws them (Code.tsx codeRows): every line, or the `show` ranges with each
-  // skipped run folded to one row. graphl-flow drops a template literal's common indent; spine files
-  // have none.
-  const editor = all.find(({ node }) => node.id === 'editor')?.node
-  const term = all.find(({ node }) => node.id === 'terminal')?.node
-  if (editor) {
-    const lines = editor.code.split('\n')
-    const keep = editor.show && new Set(editor.show.flatMap(([a, b]) => Array.from({ length: b - a + 1 }, (_, i) => a + i)))
-    // A kept line is a row; each RUN of skipped lines is one fold row.
-    const rows = keep ? lines.filter((_, i) => keep.has(i + 1) || i === 0 || keep.has(i)).length : lines.length
-    if (rows > IDE.EDITOR_ROWS) problems.push(`scene ${id}  the editor shows ${rows} rows; it holds ${IDE.EDITOR_ROWS} — fold with show`)
-    const shown = lines.filter((_, i) => !keep || keep.has(i + 1))
-    const wide = shown.find((l) => l.length > IDE.EDITOR_COLS)
-    if (wide) problems.push(`scene ${id}  a line is ${wide.length} columns; the editor holds ${IDE.EDITOR_COLS} — "${wide.slice(0, 40)}…"`)
-  }
-  if (term) {
-    const lines = term.code.split('\n')
-    // Rows as drawn: a kept line is a row, and each RUN of skipped lines folds to one row.
-    const keep = term.show && new Set(term.show.flatMap(([a, b]) => Array.from({ length: b - a + 1 }, (_, i) => a + i)))
-    const rows = keep ? lines.filter((_, i) => keep.has(i + 1) || (!keep.has(i + 1) && (i === 0 || keep.has(i)))).length : lines.length
-    if (rows > IDE.TERMINAL_ROWS) problems.push(`scene ${id}  the terminal shows ${rows} rows; it holds ${IDE.TERMINAL_ROWS} — keep fewer lines`)
-    const wide = lines.find((l) => l.replace(/^! /, '').length > IDE.EDITOR_COLS)  // the replay wraps at 80: a wider one is not a spine transcript
-    if (wide) problems.push(`scene ${id}  a terminal line is longer than ${IDE.EDITOR_COLS} columns — "${wide.slice(0, 40)}…"`)
-  }
+  // (5, the editor and terminal holding their rows: frame v2's ideFrame records what does not fit in
+  // FRAME_PROBLEMS, reported below with the file's name.)
+  // --- 7. the strict side pane (frame v2, linux-admin's rule): at most two parts, and with two, one is a
+  // diagram (a group or a plot) — never two tables, never a table and a note.
+  const parts = scene.nodes.find((n) => n.id === 'side').children
+  const diagram = (n) => n.type === 'group' || n.type === 'plot'
+  if (parts.length > 2) problems.push(`scene ${id}  the side pane has ${parts.length} parts (${parts.map((n) => n.type).join(', ')}) — one diagram and at most one table`)
+  else if (parts.length === 2 && !parts.some(diagram)) problems.push(`scene ${id}  the side pane is ${parts.map((n) => n.type).join(' + ')} — with two parts, one is a diagram (group or plot)`)
   for (const n of side)
     if (n.type === 'item' && (n.bullets?.length ?? 0) > MAX_CAPTION_BULLETS)
       problems.push(`scene ${id}  '${n.id}' has ${n.bullets.length} bullets — a side-pane list is a caption (≤ ${MAX_CAPTION_BULLETS}); draw the rest`)
 }
+
+// --- 5. frame v2: what ideFrame could not fit, by file
+for (const p of new Set(IDE.FRAME_PROBLEMS)) problems.push(`ide frame  ${p}`)
+
+// --- 8. a show range runs forwards inside its code (linux-admin: an anchor that matched an earlier
+// line inverted a range, and a console silently dropped rows with every other check green)
+for (const [id, scene] of Object.entries(SCENES))
+  for (const { node } of nodesOf(scene))
+    if (node.type === 'code' && node.show)
+      for (const [a, b] of node.show) if (!(a >= 1 && a <= b && b <= node.code.split('\n').length)) problems.push(`scene ${id}  '${node.id}' show range [${a}, ${b}] is empty or outside its lines`)
 
 // --- 6. every section has its narration wav, once its course has any -----------------------------
 // public/audio/<course>/<section-id>.wav. Gated PER COURSE on that course having at least one wav:

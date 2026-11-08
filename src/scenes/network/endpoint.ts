@@ -15,23 +15,27 @@ export const networkEndpoint: SceneModel = ideFrame({
   session,
   keep: ['$ terraform apply tfplan', 'Apply complete!', ['$ python tools/which_route.py app-a', 'goes to vpce']],
   side: [
-    { type: 'item', id: 'task', icon: 'fargate', title: 'a task, app-a', sub: 'GetObject on the catalog bucket', stack: true, muted: true },
     {
-      type: 'group', id: 'paths', bare: true, dir: 'row', children: [
+      type: 'group', id: 'flow', title: 'two paths to S3', tone: 'ingest', children: [
+        { type: 'item', id: 'task', icon: 'fargate', title: 'a task, app-a', sub: 'GetObject on the catalog bucket', stack: true, muted: true },
         {
-          type: 'group', id: 'via-nat', tone: 'consume', children: [
-            { type: 'item', id: 'nat', icon: 'natgateway', title: 'before: NAT gateway', sub: 'charged per GB', stack: true },
-            { type: 'item', id: 'igw', icon: 'igw', title: 'internet gateway', stack: true },
+          type: 'group', id: 'paths', bare: true, dir: 'row', children: [
+            {
+              type: 'group', id: 'via-nat', tone: 'consume', children: [
+                { type: 'item', id: 'nat', icon: 'natgateway', title: 'before: NAT gateway', sub: 'charged per GB' },
+                { type: 'item', id: 'igw', icon: 'igw', title: 'internet gateway' },
+              ],
+            },
+            {
+              type: 'group', id: 'via-ep', tone: 'ingest', children: [
+                { type: 'item', id: 'vpce', icon: 'vpcendpoint', title: 'now: gateway endpoint', sub: 'no charge' },
+              ],
+            },
           ],
         },
-        {
-          type: 'group', id: 'via-ep', tone: 'ingest', children: [
-            { type: 'item', id: 'vpce', icon: 'vpcendpoint', title: 'now: gateway endpoint', sub: 'no charge', stack: true },
-          ],
-        },
+        { type: 'item', id: 's3', icon: 's3', title: 'S3', sub: 'book-shop-catalog-444455556666', stack: true },
       ],
     },
-    { type: 'item', id: 's3', icon: 's3', title: 'S3', sub: 'book-shop-catalog-444455556666', stack: true },
     {
       type: 'table', id: 'rt', title: 'route table: private', tone: 'source', columns: ['destination', 'target'], rows: [
         ['10.20.0.0/16', 'local'],

@@ -33,7 +33,10 @@ const ICON_MIN_PX = +(process.env.ICON_MIN_PX ?? 32)
 const SIDE_FILL = +(process.env.SIDE_FILL ?? 2 / 3)
 
 const { COURSES, SCENES } = await loadRegistry()
+// `node scripts/check-render.mjs network` checks only these slugs (or slug prefixes: a course).
+const asked = process.argv.slice(2)
 const sections = Object.values(COURSES).flatMap((c) => c.sections.map((s) => ({ slug: `${c.id}-${s.id}`, section: s, scene: SCENES[s.scene] })))
+  .filter(({ slug }) => !asked.length || asked.some((a) => slug.startsWith(a)))
 
 const problems = []
 const ide = []
@@ -193,12 +196,20 @@ try {
       // --- the IDE template -----------------------------------------------------------------------------
       let panes = null
       if (ide) {
-        panes = Object.fromEntries(['explorer', 'editor', 'terminal', 'side'].map((p) => [p, node(p) && Object.values(R(node(p))).map((v) => Math.round(v))]))
+        panes = Object.fromEntries(['workbench', 'side'] /* frame v2: the editor/terminal divider moves with the transcript */.map((p) => [p, node(p) && Object.values(R(node(p))).map((v) => Math.round(v))]))
         const pane = R(node('side'))
         const leaves = [...node('side').querySelectorAll(LEAVES)].map(R)
         const top = Math.min(...leaves.map((r) => r.y)), bottom = Math.max(...leaves.map((r) => r.y + r.h))
         const fill = leaves.length ? (bottom - top) / pane.h : 0
         if (fill < limits.fill) out.push(`the side pane's content spans ${Math.round(fill * 100)}% of its height (< ${Math.round(limits.fill * 100)}%) — fill the column with the diagram`)
+        // ...and stays INSIDE it: the pane has a fixed height, and frame v2's first build of §5.6 and §5.10
+        // pushed a table off the frame's bottom with every other check green (linux-admin found the same).
+        const inside = [...node('side').querySelectorAll('[data-id]')].map(R)
+        if (inside.some((r) => r.y + r.h > pane.y + pane.h + 1 || r.x + r.w > pane.x + pane.w + 1)) out.push('the side pane runs outside its column — cut it to fit')
+        for (const id of ['editor', 'terminal']) {
+          const e = node(id), r = e && R(e)
+          if (r && e.scrollHeight > e.clientHeight + 1) out.push(`the ${id} holds more rows than it shows`)
+        }
       }
       return { problems: [...new Set(out)], panes }
     }, [{ body: BODY_MIN_PX, icon: ICON_MIN_PX, fill: SIDE_FILL }, icons, section.focus, isIde(scene)])
@@ -220,7 +231,7 @@ try {
 const [ref] = ide
 for (const { slug, panes, fit } of ide.slice(1)) {
   if (fit !== ref.fit) problems.push(`${slug}  fit ${fit} differs from ${ref.slug}'s ${ref.fit} — an IDE frame must not change the zoom`)
-  for (const pane of ['explorer', 'editor', 'terminal', 'side']) {
+  for (const pane of ['workbench', 'side'] /* frame v2: the editor/terminal divider moves with the transcript */) {
     const a = ref.panes[pane], b = panes[pane]
     if (!a || !b || a.some((v, i) => v !== b[i])) problems.push(`${slug}  the ${pane} pane is at [${b}], not [${a}] as in ${ref.slug}`)
   }

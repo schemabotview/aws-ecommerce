@@ -45,4 +45,5 @@ export function nodesOf(scene) {
 }
 
 /** An IDE frame is one built by src/scenes/ide.ts: it has the template's fixed explorer and side ids. */
-export const isIde = (scene) => nodesOf(scene).some(({ node }) => node.id === 'explorer') && nodesOf(scene).some(({ node }) => node.id === 'side')
+// frame v2 draws no explorer: the workbench and the side pane identify an IDE frame
+export const isIde = (scene) => nodesOf(scene).some(({ node }) => node.id === 'workbench') && nodesOf(scene).some(({ node }) => node.id === 'side')

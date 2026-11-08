@@ -413,3 +413,21 @@ claims and no card shows. Mutate a row and watch it fail before trusting it.
 ## Open for the owner
 
 Nothing open. The spike's findings are in `SPIKE.md`.
+
+## Decided (2026-11-08): frame v2
+
+The v1 IDE frame was its own 1736 × 976 grid (≈ 2.0× at 4K) with side panes of three to five parts.
+python-expense-tracker, typescript-diagram-engine, linux-admin and data-science-house-prices moved to
+graphl-flow 0.10's shared grid (1344 × 756 at a 1% margin, ≈ 2.8× at 4K); this course follows: engine
+0.11.0, shell 1.1.0.
+
+- **IDE frame v2**: editor over terminal (760: the spine records at 80 columns, so the terminal keeps
+  them; the editor soft-wraps at ~74) | side pane 574. No explorer: the 130px it would get cannot hold
+  `.terraform.lock.hcl`, and no narration points at it. The terminal takes the rows it shows (kept
+  lines plus folds), the editor the rest; what does not fit is reported by check-content, by file.
+- **The side pane is STRICT**: at most two parts, and with two, one is a diagram (a group or a plot)
+  and the other at most one table.
+- **Map frames are unchanged for now** (the map is a fixed 1150 × 1040 diagram with an 80-column side;
+  a larger map needs a redesign — owner's decision).
+
+Piloted on Course 5 `network` (owner review pending). Narration edited for v2: none.

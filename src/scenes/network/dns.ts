@@ -13,17 +13,17 @@ export const networkDns: SceneModel = ideFrame({
   tree: netTree(9, { active: 'infra/dns.tf', fresh: ['infra/dns.tf'] }),
   editor: {
     file: 'infra/dns.tf', code,
-    show: [[lineOf(code, '# A certificate'), lineOf(code, 'validation_method') + 1], [lineOf(code, '# The name itself'), lineOf(code, 'evaluate_target_health') + 2]],
+    show: [[lineOf(code, 'resource "aws_acm_certificate" "shop"'), lineOf(code, 'validation_method')], [lineOf(code, 'resource "aws_route53_record" "shop"'), lineOf(code, 'evaluate_target_health') + 2]],
     highlight: [lineOf(code, 'alias {'), lineOf(code, 'name                   =')],
   },
   session,
-  keep: ['Plan: 6 to add, 1 to change', ['$ aws route53 list-resource-record-sets', 'CNAME'], ['$ aws elbv2 describe-listeners', 'forward']],
+  keep: [['$ aws route53 list-resource-record-sets', 'CNAME'], ['$ aws elbv2 describe-listeners', 'forward']],
   side: [
     {
       type: 'group', id: 'resolve', title: 'Finding book-shop.example.com', tone: 'source', children: [
         { type: 'item', id: 'resolver', icon: 'search', title: 'the shopper\'s resolver', stack: true },
         { type: 'item', id: 'com', icon: 'globe', title: '.com, then example.com', sub: 'delegate to Route 53\'s name servers', stack: true },
-        { type: 'item', id: 'zone', icon: 'route53', title: 'the hosted zone', sub: 'A (alias) → the load balancer', stack: true },
+        { type: 'item', id: 'zone', icon: 'route53', title: 'the hosted zone', sub: 'A (alias) → the load balancer; a CNAME proves to ACM we own the name', stack: true },
       ],
     },
     {
@@ -31,13 +31,6 @@ export const networkDns: SceneModel = ideFrame({
         { type: 'item', id: 'b', icon: 'screen', title: 'browser', stack: true },
         { type: 'item', id: 'lb', icon: 'alb', title: 'load balancer', sub: 'certificate from ACM', stack: true },
         { type: 'item', id: 't', icon: 'fargate', title: 'task', stack: true, muted: true },
-      ],
-    },
-    {
-      type: 'table', id: 'zone-records', title: 'In the hosted zone', tone: 'source', columns: ['record', 'what for'], rows: [
-        ['A (alias)', 'book-shop.example.com → the load balancer'],
-        ['CNAME', 'ACM\'s proof that we own the name'],
-        ['NS, SOA', 'every zone has them: who answers for it'],
       ],
     },
   ],

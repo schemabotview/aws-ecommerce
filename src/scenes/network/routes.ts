@@ -20,6 +20,7 @@ export const networkRoutes: SceneModel = ideFrame({
           type: 'group', id: 'who', bare: true, spread: true, children: [
             { type: 'item', id: 'pub', icon: 'publicsubnet', title: 'public-a, b, c', stack: true },
             { type: 'item', id: 'priv', icon: 'privatesubnet', title: 'app-a … data-c', sub: 'six subnets', stack: true },
+            { type: 'item', id: 'island', icon: 'network', title: 'only local: an island', sub: 'nothing in or out yet; doors are routes, added on purpose', stack: true, muted: true },
           ],
         },
         {
@@ -37,19 +38,9 @@ export const networkRoutes: SceneModel = ideFrame({
         { cells: ['data-b', '10.20.11.4 (app-b)', 'local'], tone: 'ingest' },
       ],
     },
-    {
-      type: 'group', id: 'how', title: 'How the router picks, as which_route.py does', tone: 'ingest', dir: 'row', children: [
-        { type: 'item', id: 'step1', icon: 'privatesubnet', title: 'the subnet', sub: 'answers to one table', stack: true },
-        { type: 'item', id: 'step2', icon: 'router', title: 'its route table', sub: 'every route that contains the address', stack: true },
-        { type: 'item', id: 'step3', icon: 'check', title: 'the longest prefix', sub: '/24 beats /16 beats /0', stack: true },
-      ],
-    },
-    { type: 'note', id: 'only-local', tone: 'source', text: 'A brand-new VPC is an island: every subnet reaches every other, and nothing reaches out or in. Doors are routes, added on purpose.' },
   ],
   edges: [
     { from: 'pub', to: 'rt-public' },
     { from: 'priv', to: 'rt-private' },
-    { from: 'step1', to: 'step2' },
-    { from: 'step2', to: 'step3' },
   ],
 })

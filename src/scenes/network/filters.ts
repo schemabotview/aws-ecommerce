@@ -13,7 +13,7 @@ export const networkFilters: SceneModel = ideFrame({
   tree: netTree(6, { active: 'infra/security.tf', fresh: ['infra/security.tf', 'tools/sg_rules.py'] }),
   editor: {
     file: 'infra/security.tf', code,
-    show: [[1, lineOf(code, 'resource "aws_security_group"') - 2], [lineOf(code, '# A network ACL'), lineOf(code, '# A network ACL') + 1]],
+    show: [[lineOf(code, 'ingress = {'), lineOf(code, 'db_app')], [lineOf(code, '# A network ACL'), lineOf(code, '# A network ACL') + 1]],
     highlight: [lineOf(code, 'app_alb'), lineOf(code, 'db_app')],
   },
   session,
@@ -21,10 +21,10 @@ export const networkFilters: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'chain', title: 'The chain: who may start a connection to whom', tone: 'source', children: [
-        { type: 'item', id: 'anyone', icon: 'globe', title: 'anyone', stack: true },
-        { type: 'item', id: 'alb', icon: 'alb', title: 'alb', sub: 'accepts 443, 80', stack: true },
-        { type: 'item', id: 'app', icon: 'fargate', title: 'app', sub: 'accepts 8080 from the alb group', stack: true },
-        { type: 'item', id: 'db', icon: 'rds', title: 'db', sub: 'accepts 5432 from the app group', stack: true },
+        { type: 'item', id: 'anyone', icon: 'globe', title: 'anyone' },
+        { type: 'item', id: 'alb', icon: 'alb', title: 'alb', sub: 'accepts 443, 80' },
+        { type: 'item', id: 'app', icon: 'fargate', title: 'app', sub: 'accepts 8080 from the alb group' },
+        { type: 'item', id: 'db', icon: 'rds', title: 'db', sub: 'accepts 5432 from the app group' },
       ],
     },
     {
@@ -32,6 +32,7 @@ export const networkFilters: SceneModel = ideFrame({
         ['on', 'a network interface', 'a subnet'],
         ['rules', 'allow only', 'allow and deny, in order'],
         ['the reply', 'let back out', 'needs its own rule'],
+        ['here', 'alb, app, db', 'the data subnets'],
       ],
     },
   ],

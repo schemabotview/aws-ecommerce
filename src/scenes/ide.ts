@@ -1,35 +1,28 @@
-import type { Code, Edge, Group, SceneModel, SceneNode, Tree, TreeEntry } from '@graphlearning/graphl-flow'
-import { SCENE_ASPECT } from '@graphlearning/shell'
+import type { Code, Edge, Group, SceneModel, SceneNode, TreeEntry } from '@graphlearning/graphl-flow'
+import { FRAME_H, GAP, SIDE_W, WORK_W } from './grid'
 
-// The IDE frame — python-expense-tracker's template, ported unchanged in shape, so every pane sits at
-// the same pixels in every section and a viewer always knows where to look:
+// IDE frame v2 (python-expense-tracker's frame v2 on graphl-flow 0.10's shared grid, grid.ts):
 //
-//   explorer (EXPLORER_W) | editor (EDITOR_W × EDITOR_H)    | side pane (SIDE_W, fixed)
-//                         | terminal docked under it (TERMINAL_H)
+//   editor (the rows the terminal leaves)   | side pane 574 (STRICT: one diagram, at most one table)
+//   terminal docked under it (its rows)     |
 //
-// Every column is a FIXED width, so content wider than its column overflows (check-render fails it)
-// instead of moving the frame; heights are floors, with check-content holding the editor and the
-// terminal to the rows they fit. graphl-flow's fit is a pure function of the natural box, so equal
-// boxes mean equal zoom — check-render asserts every IDE section lands on the same fit.
+// No explorer (grid.ts says why); `tree` is kept in the call so a scene still names its files.
 //
-// Sizes as measured in python-expense-tracker (graphl-flow 0.3+, 15px/1.6 Plex Mono, 9.0px advance,
-// 24px rows): an 80-column editor is 720 + 49 gutter + 16 padding + 2 border = 787; a code pane's
-// chrome (tab bar, body padding, borders) is 51. The terminal is the same 80 columns — the width
-// scripts/spine.py wraps every transcript at (COLUMNS), so a wrapped line here is a wrapped line there.
+// 1344 × 756 at a 1% margin. The editor and terminal share ROWS rows: the terminal takes exactly the
+// rows it shows (kept lines plus one row per fold, at least MIN_TERMINAL), the editor the rest, so only
+// the divider moves. The terminal is 80 columns, as the spine recorded it; the editor soft-wraps past
+// ~77. A terminal or a shown range that does not fit is RECORDED in FRAME_PROBLEMS (check-content fails
+// it, naming the file) and drawn anyway: a throw would take the whole app down with one section.
 
 const ROW = 24
 const CHROME = 51
-export const EXPLORER_W = 280
+export { FRAME_H, SIDE_W, WORK_W }
 export const EDITOR_COLS = 80
-export const EDITOR_W = 787
-export const EDITOR_ROWS = 23
-export const EDITOR_H = EDITOR_ROWS * ROW + CHROME
-export const SIDE_W = 649
-const GAP = 10
-export const FRAME_W = EXPLORER_W + EDITOR_W + SIDE_W + 2 * GAP
-export const FRAME_H = Math.round(FRAME_W / SCENE_ASPECT)
-export const TERMINAL_H = FRAME_H - GAP - EDITOR_H
-export const TERMINAL_ROWS = Math.floor((TERMINAL_H - CHROME) / ROW)
+const EDITOR_WRAP = 74 // measured: 760 − borders, gutter and padding leaves ~74 columns of 9px
+export const ROWS = Math.floor((FRAME_H - GAP - 2 * CHROME) / ROW)
+export const MIN_TERMINAL = 6
+export const MIN_EDITOR = 8
+const editorH = (rows: number) => rows * ROW + CHROME
 
 export const trim = (text: string) => text.replace(/\n+$/, '')
 
@@ -114,23 +107,79 @@ export interface IdeFrame {
 export const IDE_IDS = { explorer: 'explorer', editor: 'editor', terminal: 'terminal', side: 'side' } as const
 export const PROJECT = 'book-shop'
 
-export function ideFrame({ tree, editor, session, keep, side, edges = [] }: IdeFrame): SceneModel {
-  const explorer: Tree = { type: 'tree', id: IDE_IDS.explorer, title: PROJECT, entries: tree, fill: true, w: EXPLORER_W }
-  const code: Code = {
-    type: 'code', id: IDE_IDS.editor, filename: editor.file, lang: editor.lang ?? langOf(editor.file), code: trim(editor.code),
-    show: editor.show, highlight: editor.highlight, tone: 'ingest', fill: true, w: EDITOR_W, minH: EDITOR_H,
+/** Rows one line takes in the editor: graphl-flow soft-wraps with CSS `pre-wrap`, which breaks at the
+ *  last space that fits (a word longer than the row breaks anywhere), so count it the same way. */
+function wrappedRows(line: string, cols = EDITOR_WRAP): number {
+  let rows = 1, rest = line
+  while (rest.length > cols) {
+    const at = rest.lastIndexOf(' ', cols)
+    rest = rest.slice(at > 0 ? at + 1 : cols)
+    rows++
   }
+  return rows
+}
+const rowsOf = (lines: string[], a: number, b: number) => lines.slice(a - 1, b).reduce((n, l) => n + wrappedRows(l), 0)
+
+/** Rows a set of shown ranges takes: each line (wrapped at `wrap`), plus one fold row per skipped run. */
+function rowsShown(lines: string[], ranges: [number, number][], rows = rowsOf): number {
+  let n = 0, next = 1
+  for (const [a, b] of ranges) { if (a > next) n++; n += rows(lines, a, b); next = b + 1 }
+  return n + (next <= lines.length ? 1 : 0)
+}
+
+const merge = (rs: [number, number][]) => [...rs].sort((x, y) => x[0] - y[0]).reduce<[number, number][]>((out, [a, b]) => {
+  const last = out[out.length - 1]
+  if (last && a <= last[1] + 1) last[1] = Math.max(last[1], b); else out.push([a, b])
+  return out
+}, [])
+
+/** Ranges grown, a line at a time, until the editor is full; throws if they do not fit to begin with. */
+function grow(code: string, ranges: [number, number][], room: number): [number, number][] | undefined {
+  const lines = trim(code).split('\n')
+  if (rowsOf(lines, 1, lines.length) <= room) return undefined
+  let r = merge(ranges.map(([a, b]) => [a, b] as [number, number]))
+  if (rowsShown(lines, r) > room) throw new Error(`the shown ranges take ${rowsShown(lines, r)} rows; the editor holds ${room}`)
+  for (let grew = true; grew;) {
+    grew = false
+    for (let i = 0; i < r.length && !grew; i++) for (const side of [1, 0] as const) {
+      const t = r.map(([a, b]) => [a, b] as [number, number])
+      if (side === 1 && t[i][1] < lines.length) t[i][1]++
+      else if (side === 0 && t[i][0] > 1) t[i][0]--
+      else continue
+      const m = merge(t)
+      if (rowsShown(lines, m) <= room) { r = m; grew = true; break }
+    }
+  }
+  return r
+}
+
+/** Frames that could not hold their content; check-content reports every one. */
+export const FRAME_PROBLEMS: string[] = []
+
+export function ideFrame({ editor, session, keep, side, edges = [] }: IdeFrame): SceneModel {
+  const file = editor.file
   const rows = terminal(session)
+  const tlines = rows.split('\n')
+  const tshow = keep && keepLines(rows, keep)
+  const flat = (_: string[], a: number, b: number) => b - a + 1
+  const termRows = tshow ? rowsShown(tlines, tshow, flat) : tlines.length
+  if (termRows > ROWS - MIN_EDITOR) FRAME_PROBLEMS.push(`${file}: the terminal shows ${termRows} rows; it holds at most ${ROWS - MIN_EDITOR} — keep fewer lines`)
+  const editorRows = ROWS - Math.min(ROWS - MIN_EDITOR, Math.max(MIN_TERMINAL, termRows))
+  const code = trim(editor.code)
+  const hl = editor.highlight ?? []
+  const want: [number, number][] = editor.show ?? (hl.length ? [[Math.min(...hl), Math.max(...hl)]] : [[1, 1]])
+  let show: [number, number][] | undefined
+  try { show = grow(code, want, editorRows) } catch (e) { FRAME_PROBLEMS.push(`${file}: ${(e as Error).message}`); show = want }
+  const ed: Code = {
+    type: 'code', id: IDE_IDS.editor, filename: file, lang: editor.lang ?? langOf(file), code, highlight: hl, wrap: true,
+    tone: 'ingest', fill: true, w: WORK_W, minH: editorH(editorRows), ...(show && { show }),
+  }
   const term: Code = {
     type: 'code', id: IDE_IDS.terminal, terminal: true, filename: `terminal — ${PROJECT}`, code: rows,
-    show: keep && keepLines(rows, keep), fill: true, w: EDITOR_W, minH: TERMINAL_H,
+    show: tshow, fill: true, w: WORK_W, minH: FRAME_H - GAP - editorH(editorRows),
   }
-  const pane: Group = { type: 'group', id: IDE_IDS.side, bare: true, w: SIDE_W, minH: FRAME_H, children: side }
-  return {
-    dir: 'row',
-    nodes: [explorer, { type: 'group', id: 'workbench', bare: true, children: [code, term] }, pane],
-    edges,
-  }
+  const pane: Group = { type: 'group', id: IDE_IDS.side, bare: true, spread: true, w: SIDE_W, h: FRAME_H, children: side }
+  return { dir: 'row', padding: 0.01, nodes: [{ type: 'group', id: 'workbench', bare: true, children: [ed, term] }, pane], edges }
 }
 
 /** The 1-based number of the first line of `code` containing `text`, searching from line `from`. */
