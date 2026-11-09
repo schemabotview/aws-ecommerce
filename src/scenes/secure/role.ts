@@ -13,7 +13,7 @@ export const secureRole: SceneModel = ideFrame({
   tree: secureTree(2, { active: 'infra/iam.tf', fresh: ['infra/iam.tf'] }),
   editor: { file: 'infra/iam.tf', code, highlight: linesFrom(code, 'data "aws_iam_policy_document" "app_trust"', 'assume_role_policy') },
   session,
-  keep: ['Apply complete!', ['$ aws iam get-role', "t'"], '"Service": "ecs-tasks.amazonaws.com"', ['$ aws iam list-role-policies', '"PolicyNames"']],
+  keep: [['$ aws iam get-role', "t'"], '"Service": "ecs-tasks.amazonaws.com"', ['$ aws iam list-role-policies', '"PolicyNames"']],
   side: [
     {
       type: 'group', id: 'two', title: 'One role, two questions', tone: 'source', children: [
@@ -23,11 +23,11 @@ export const secureRole: SceneModel = ideFrame({
       ],
     },
     {
-      type: 'table', id: 'policies', title: 'Two policies', tone: 'ingest', columns: ['', 'trust policy', 'permissions policy'], rows: [
-        ['answers', 'who may become the role', 'what the role may do'],
-        ['names', 'a principal', 'actions and resources'],
+      type: 'table', id: 'policies', title: 'Two policies', tone: 'ingest', columns: ['', 'trust', 'permissions'], rows: [
+        ['answers', 'who may be it', 'what it may do'],
+        ['names', 'a principal', 'actions, resources'],
         ['how many', 'exactly one', 'any number'],
-        { cells: ['BookShopApp has', 'ECS tasks', 'none yet: denied everything'], tone: 'consume' },
+        { cells: ['BookShopApp', 'ECS tasks', 'none: all denied'], tone: 'consume' },
       ],
     },
   ],

@@ -18,20 +18,25 @@ export const secureResourcePolicy: SceneModel = ideFrame({
   keep: ['will be created', 'Apply complete!', ['$ aws s3api get-bucket-policy', '--query Policy'], '"AWS": "arn:aws:iam::777788889999:role/Auditor"', '"Sid": "AuditorReads"'],
   side: [
     {
-      type: 'group', id: 'accounts', bare: true, dir: 'row', children: [
-        {
-          type: 'group', id: 'audit', icon: 'account', title: 'Account 777788889999', sub: 'audit: not the shop\'s', children: [
-            { type: 'item', id: 'people', icon: 'users', title: 'the auditors', sub: 'sign in to their own account', stack: true },
-            { type: 'item', id: 'auditor', icon: 'iamrole', title: 'Auditor', sub: 'role', stack: true },
-            { type: 'item', id: 'id-policy', icon: 'permissions', title: 'its identity policy', sub: 'must allow reading the catalog', stack: true },
-          ],
-        },
-        {
-          type: 'group', id: 'dev', icon: 'account', title: 'Account 444455556666', sub: 'development: the shop\'s', tone: 'ingest', children: [
-            { type: 'item', id: 'bucket', icon: 'bucket', title: 'the catalog bucket', sub: 'book-shop-catalog-…', stack: true },
-            { type: 'item', id: 'bucket-policy', icon: 'permissions', title: 'its bucket policy', sub: 'AuditorReads: applied here', stack: true },
-          ],
-        },
+      type: 'group', id: 'diagram', bare: true, children: [
+      {
+        type: 'group', id: 'accounts', bare: true, dir: 'row', children: [
+          {
+            type: 'group', id: 'audit', icon: 'account', title: 'Account 777788889999', sub: 'audit: not the shop\'s', children: [
+              { type: 'item', id: 'people', icon: 'users', title: 'the auditors', sub: 'sign in to their own account' },
+              { type: 'item', id: 'auditor', icon: 'iamrole', title: 'Auditor', sub: 'role' },
+              { type: 'item', id: 'id-policy', icon: 'permissions', title: 'its identity policy', sub: 'must allow reading the catalog' },
+            ],
+          },
+          {
+            type: 'group', id: 'dev', icon: 'account', title: 'Account 444455556666', sub: 'development: the shop\'s', tone: 'ingest', children: [
+              { type: 'item', id: 'bucket', icon: 'bucket', title: 'the catalog bucket', sub: 'book-shop-catalog-…' },
+              { type: 'item', id: 'bucket-policy', icon: 'permissions', title: 'its bucket policy', sub: 'AuditorReads: applied here' },
+            ],
+          },
+        ],
+      },
+        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the emulator stores the bucket policy and returns it, but evaluates neither resource policies nor a second account. The both-sides rule is AWS\'s documented logic.' },
       ],
     },
     {
@@ -40,10 +45,8 @@ export const secureResourcePolicy: SceneModel = ideFrame({
         ['names a principal', 'never', 'always'],
         ['one account', 'enough alone', 'enough alone'],
         { cells: ['across accounts', 'must allow', 'must allow too'], tone: 'ingest' },
-        ['the shop\'s so far', 'BookShopApp\'s', 'AuditorReads'],
       ],
     },
-    { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the emulator stores the bucket policy and returns it, but evaluates neither resource policies nor a second account. The both-sides rule is AWS\'s documented logic.' },
   ],
   edges: [
     { from: 'people', to: 'auditor', label: 'assume' },

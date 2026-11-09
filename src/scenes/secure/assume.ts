@@ -18,10 +18,10 @@ export const secureAssume: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'steps', title: 'Becoming the role', tone: 'source', children: [
-        { type: 'item', id: 'caller', icon: 'ecstask', title: 'ECS, for a task', sub: 'here alex stands in: emulated', stack: true },
-        { type: 'item', id: 'sts', icon: 'sts', title: 'STS: AssumeRole', sub: 'checks the trust policy (on AWS)', stack: true },
-        { type: 'item', id: 'creds', icon: 'key', title: 'temporary credentials', sub: 'ASIA… + session token, 1 hour', stack: true },
-        { type: 'item', id: 's3', icon: 's3', title: 'S3: GetObject', sub: 'AccessDenied: no permissions yet', stack: true, tone: 'consume' },
+        { type: 'item', id: 'caller', icon: 'ecstask', title: 'ECS, for a task', sub: 'here alex stands in: emulated' },
+        { type: 'item', id: 'sts', icon: 'sts', title: 'STS: AssumeRole', sub: 'checks the trust policy (on AWS)' },
+        { type: 'item', id: 'creds', icon: 'key', title: 'temporary credentials', sub: 'ASIA… + session token, 1 hour' },
+        { type: 'item', id: 's3', icon: 's3', title: 'S3: GetObject', sub: 'AccessDenied: no permissions yet', tone: 'consume' },
       ],
     },
     {

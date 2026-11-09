@@ -32,7 +32,6 @@ export const secureDenied: SceneModel = ideFrame({
         },
       ],
     },
-    { type: 'note', id: 'mistake', tone: 'consume', text: 'The usual mistake: …/books/* as ListBucket\'s resource. It names objects, so no listing ever matches it.' },
     {
       type: 'table', id: 'on', title: 'What an S3 action acts on', tone: 'ingest', columns: ['action', 'resource ARN'], rows: [
         ['s3:GetObject', 'arn:aws:s3:::bucket/key'],
