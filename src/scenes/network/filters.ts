@@ -29,10 +29,10 @@ export const networkFilters: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'compare', title: 'Security group or network ACL', tone: 'ingest', columns: ['', 'security group', 'network ACL'], rows: [
-        ['on', 'a network interface', 'a subnet'],
-        ['rules', 'allow only', 'allow and deny, in order'],
-        ['the reply', 'let back out', 'needs its own rule'],
-        ['here', 'alb, app, db', 'the data subnets'],
+        ['on', 'an interface', 'a subnet'],
+        ['rules', 'allow only', 'allow, deny, ordered'],
+        ['reply', 'let back out', 'its own rule'],
+        ['here', 'alb, app, db', '3 data subnets'],
       ],
     },
   ],

@@ -20,7 +20,7 @@ export const networkRoutes: SceneModel = ideFrame({
           type: 'group', id: 'who', bare: true, spread: true, children: [
             { type: 'item', id: 'pub', icon: 'publicsubnet', title: 'public-a, b, c', stack: true },
             { type: 'item', id: 'priv', icon: 'privatesubnet', title: 'app-a … data-c', sub: 'six subnets', stack: true },
-            { type: 'item', id: 'island', icon: 'network', title: 'only local: an island', sub: 'nothing in or out yet; doors are routes, added on purpose', stack: true, muted: true },
+            { type: 'item', id: 'island', icon: 'network', title: 'only local: an island', sub: 'no way in or out yet', stack: true, muted: true },
           ],
         },
         {
