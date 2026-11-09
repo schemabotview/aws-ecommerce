@@ -22,17 +22,21 @@ export const evolveCosts: SceneModel = ideFrame({
   keep: [['$ aws ce list-cost-allocation-tags', 'env\tActive'], ['$ python -m tools.spend', `unusual: ${unusual.at(-1)?.[1] ?? '?'}`]],
   side: [
     {
-      type: 'plot', id: 'by-env', compact: true, title: 'October by env tag (made up)',
-      x: { labels: envs.map((m) => m[1]), label: 'env' }, y: { min: 0, max: 250, step: 50, label: 'USD' },
-      series: [{ kind: 'bar', points: envs.map((m, i) => [i, Number(m[2])]), tone: 'store' }],
+      type: 'group', id: 'diagram', bare: true, children: [
+        {
+          type: 'plot', id: 'by-env', compact: true, title: 'October by env tag (made up)',
+          x: { labels: envs.map((m) => m[1]), label: 'env' }, y: { min: 0, max: 250, step: 50, label: 'USD' },
+          series: [{ kind: 'bar', points: envs.map((m, i) => [i, Number(m[2])]), tone: 'store' }],
+        },
+        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the tags are activated and read back; the emulator keeps no bill. October\'s spend is made up, in the shape of a Cost Explorer export.' },
+      ],
     },
     {
       type: 'table', id: 'found', title: 'What the tags made visible', tone: 'ingest', columns: ['day', 'what', 'cost'], rows: [
-        ['October', 'the bill, split by env', envs.map((m) => `${m[1]} ${m[2]}`).join(', ')],
-        { cells: [passed[1], `dev passed its ${passed[0]} USD budget`, 'an email to alex'], tone: 'consume' },
-        ...unusual.map((m) => ({ cells: [m[1], `${m[2]}, ${m[3]}`, `${m[4]} against ${m[5]} (${m[6]}×)`], tone: 'consume' as const })),
+        ['October', 'split by env', envs.map((m) => `${m[1]} ${m[2]}`).join(', ')],
+        { cells: [passed[1], `dev > ${passed[0]} USD budget`, 'email to alex'], tone: 'consume' },
+        ...unusual.map((m) => ({ cells: [m[1], `${m[2]}, ${m[3]}`, `${m[4]} (${m[6]}×)`], tone: 'consume' as const })),
       ],
     },
-    { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the tags are activated and read back; the emulator keeps no bill. October\'s spend is made up, in the shape of a Cost Explorer export.' },
   ],
 })
