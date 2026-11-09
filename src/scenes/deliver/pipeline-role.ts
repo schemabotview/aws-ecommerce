@@ -23,10 +23,11 @@ export const deliverPipelineRole: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'exchange', title: 'A job gets credentials, with no stored key', tone: 'source', children: [
-        { type: 'item', id: 'job', icon: 'githubactions', title: 'a workflow job', sub: 'asks GitHub for a token', stack: true },
-        { type: 'item', id: 'token', icon: 'key', title: 'an OIDC token, signed by GitHub', sub: 'sub: repo:…:environment:production', stack: true },
-        { type: 'item', id: 'sts', icon: 'sts', title: 'STS AssumeRoleWithWebIdentity', sub: 'signature, audience, subject checked', stack: true },
-        { type: 'item', id: 'role', icon: 'iamrole', title: 'BookShopPipeline', sub: 'credentials for one hour', stack: true, tone: 'ingest' },
+        { type: 'item', id: 'job', icon: 'githubactions', title: 'a workflow job', sub: 'asks GitHub for a token' },
+        { type: 'item', id: 'token', icon: 'key', title: 'an OIDC token, signed by GitHub', sub: 'sub: repo:…:environment:production' },
+        { type: 'item', id: 'sts', icon: 'sts', title: 'STS AssumeRoleWithWebIdentity', sub: 'signature, audience, subject checked' },
+        { type: 'item', id: 'role', icon: 'iamrole', title: 'BookShopPipeline', sub: 'credentials for one hour', tone: 'ingest' },
+        { type: 'note', id: 'stored', tone: 'consume', text: 'Emulated: the emulator stores the provider and the trust policy; it does not check tokens. The exchange is GitHub\'s and AWS\'s documentation.' },
       ],
     },
     {
@@ -35,7 +36,6 @@ export const deliverPipelineRole: SceneModel = ideFrame({
         { cells: ['prod 111122223333', 'the production environment only'], tone: 'consume' },
       ],
     },
-    { type: 'note', id: 'stored', tone: 'consume', text: 'Emulated: the emulator stores the provider and the trust policy; it does not check tokens. The exchange is GitHub\'s and AWS\'s documentation.' },
   ],
   edges: [
     { from: 'job', to: 'token' },

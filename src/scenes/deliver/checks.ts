@@ -20,10 +20,10 @@ export const deliverChecks: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'gate', title: 'The gate, as the workflow declares it', tone: 'source', children: [
-        { type: 'item', id: 'pr', icon: 'githubactions', title: 'pull request', sub: 'check, then plan-dev', stack: true },
-        { type: 'item', id: 'review', icon: 'users', title: 'review and merge', sub: 'a person reads the plan', stack: true },
-        { type: 'item', id: 'dev', icon: 'terraform', title: 'apply-dev', sub: 'on main, after check', stack: true },
-        { type: 'item', id: 'prod', icon: 'terraform', title: 'apply-prod', sub: 'after apply-dev, and an approval', stack: true, tone: 'serve' },
+        { type: 'item', id: 'pr', icon: 'githubactions', title: 'pull request', sub: 'check, then plan-dev' },
+        { type: 'item', id: 'review', icon: 'users', title: 'review and merge', sub: 'a person reads the plan' },
+        { type: 'item', id: 'dev', icon: 'terraform', title: 'apply-dev', sub: 'on main, after check' },
+        { type: 'item', id: 'prod', icon: 'terraform', title: 'apply-prod', sub: 'after apply-dev, and an approval', tone: 'serve' },
       ],
     },
     {

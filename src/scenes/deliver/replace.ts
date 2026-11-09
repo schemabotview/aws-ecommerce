@@ -48,30 +48,31 @@ export const deliverReplace: SceneModel = ideFrame({
     'Apply complete!', '$ terraform plan -replace=aws_db_instance.orders', 'Error: Instance cannot be destroyed'],
   side: [
     {
-      type: 'group', id: 'orders', bare: true, dir: 'row', children: [
-        {
-          type: 'group', id: 'destroy-first', title: '-/+ the default', tone: 'consume', children: [
-            { type: 'item', id: 'd-old', icon: 'sqs', title: 'old queue removed', stack: true },
-            { type: 'item', id: 'd-gap', icon: 'clock', title: 'nothing there', sub: 'an OrderPlaced is lost', stack: true },
-            { type: 'item', id: 'd-new', icon: 'sqs', title: 'new queue made', stack: true },
-          ],
-        },
-        {
-          type: 'group', id: 'create-first', title: '+/- create_before_destroy', tone: 'ingest', children: [
-            { type: 'item', id: 'c-new', icon: 'sqs', title: 'new queue made', stack: true },
-            { type: 'item', id: 'c-both', icon: 'sns', title: 'both subscribed', sub: 'a copy may come twice', stack: true },
-            { type: 'item', id: 'c-old', icon: 'sqs', title: 'old queue removed', stack: true },
-          ],
-        },
+      type: 'group', id: 'diagram', bare: true, children: [
+      {
+        type: 'group', id: 'orders', bare: true, dir: 'row', children: [
+          {
+            type: 'group', id: 'destroy-first', title: '-/+ the default', tone: 'consume', children: [
+              { type: 'item', id: 'd-old', icon: 'sqs', title: 'old queue removed' },
+              { type: 'item', id: 'd-gap', icon: 'clock', title: 'nothing there', sub: 'an OrderPlaced is lost' },
+              { type: 'item', id: 'd-new', icon: 'sqs', title: 'new queue made' },
+            ],
+          },
+          {
+            type: 'group', id: 'create-first', title: '+/- create_before_destroy', tone: 'ingest', children: [
+              { type: 'item', id: 'c-new', icon: 'sqs', title: 'new queue made' },
+              { type: 'item', id: 'c-both', icon: 'sns', title: 'both subscribed', sub: 'a copy may come twice' },
+              { type: 'item', id: 'c-old', icon: 'sqs', title: 'old queue removed' },
+            ],
+          },
+        ],
+      },
+        { type: 'item', id: 'protected', icon: 'lock', title: refused ? 'plan -replace on the orders DB: refused' : '?', sub: 'prevent_destroy stops it before anything changes', tone: 'consume' },
       ],
     },
     {
       type: 'table', id: 'ran', title: 'The order this apply ran in', tone: 'ingest', columns: ['', 'step'],
       rows: order.map((step, i) => [String(i + 1), step]),
-    },
-    {
-      type: 'note', id: 'protected', tone: 'consume',
-      text: refused ? 'plan -replace on the orders database: refused by prevent_destroy, before anything changed.' : '?',
     },
   ],
   edges: [

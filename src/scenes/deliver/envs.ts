@@ -21,19 +21,23 @@ export const deliverEnvs: SceneModel = ideFrame({
   keep: ['Apply complete! Resources: 3 added', 'Apply complete! Resources: 27 added',
     ['$ aws ec2 describe-vpcs', '444455556666\t10.20'], ['$ aws ec2 describe-vpcs', '111122223333\t10.40']],
   side: [
-    { type: 'item', id: 'module', icon: 'terraform', title: 'modules/network', sub: 'one module, written once', stack: true },
     {
-      type: 'group', id: 'accounts', bare: true, dir: 'row', children: [
+      type: 'group', id: 'diagram', bare: true, children: [
+        { type: 'item', id: 'module', icon: 'terraform', title: 'modules/network', sub: 'one module, written once', stack: true },
         {
-          type: 'group', id: 'dev', title: 'dev · infra/', tone: 'ingest', children: [
-            { type: 'item', id: 'dev-acct', icon: 'account', title: vpcs[0]?.[0] ?? '?', sub: `VPC ${vpcs[0]?.[1] ?? '?'}`, stack: true },
-            { type: 'item', id: 'dev-state', icon: 's3', title: 'its own state', sub: 'book-shop-tfstate-444455556666', stack: true },
-          ],
-        },
-        {
-          type: 'group', id: 'prod', title: 'prod · infra/envs/prod', tone: 'serve', children: [
-            { type: 'item', id: 'prod-acct', icon: 'account', title: vpcs[1]?.[0] ?? '?', sub: `VPC ${vpcs[1]?.[1] ?? '?'}`, stack: true },
-            { type: 'item', id: 'prod-state', icon: 's3', title: 'its own state', sub: 'book-shop-tfstate-111122223333', stack: true },
+          type: 'group', id: 'accounts', bare: true, dir: 'row', children: [
+            {
+              type: 'group', id: 'dev', title: 'dev · infra/', tone: 'ingest', children: [
+                { type: 'item', id: 'dev-acct', icon: 'account', title: vpcs[0]?.[0] ?? '?', sub: `VPC ${vpcs[0]?.[1] ?? '?'}`, stack: true },
+                { type: 'item', id: 'dev-state', icon: 's3', title: 'its own state', sub: 'book-shop-tfstate-444455556666', stack: true },
+              ],
+            },
+            {
+              type: 'group', id: 'prod', title: 'prod · infra/envs/prod', tone: 'serve', children: [
+                { type: 'item', id: 'prod-acct', icon: 'account', title: vpcs[1]?.[0] ?? '?', sub: `VPC ${vpcs[1]?.[1] ?? '?'}`, stack: true },
+                { type: 'item', id: 'prod-state', icon: 's3', title: 'its own state', sub: 'book-shop-tfstate-111122223333', stack: true },
+              ],
+            },
           ],
         },
       ],
@@ -43,7 +47,7 @@ export const deliverEnvs: SceneModel = ideFrame({
         ['the code', 'modules/network', 'modules/network'],
         ['inputs', 'cidr 10.20.0.0/16', 'cidr 10.40.0.0/16'],
         ['account, state', '4444…, its bucket', '1111…, its bucket'],
-        ['reached through', 'BookShopDeveloper', 'OrganizationAccountAccessRole'],
+        ['reached through', 'BookShopDeveloper', 'OrganizationAccount…'],
         ['a mistake reaches', 'dev only', 'prod only'],
       ],
     },

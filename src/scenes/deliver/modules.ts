@@ -22,8 +22,8 @@ export const deliverModules: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'graph', title: 'The root, and the module it calls', tone: 'source', children: [
-        { type: 'item', id: 'root', icon: 'terraform', title: 'infra/ (the root)', sub: 'the shop: service, data, checkout …', stack: true },
-        { type: 'item', id: 'module', icon: 'terraform', title: 'module "network"', sub: 'name = "book-shop", cidr = "10.20.0.0/16"', stack: true },
+        { type: 'item', id: 'root', icon: 'terraform', title: 'infra/ (the root)', sub: 'the shop: service, data, checkout …' },
+        { type: 'item', id: 'module', icon: 'terraform', title: 'module "network"', sub: 'name = "book-shop", cidr = "10.20.0.0/16"' },
         {
           type: 'group', id: 'inside', bare: true, dir: 'row', children: [
             { type: 'item', id: 'vpc', icon: 'vpc', title: 'VPC', sub: '1', stack: true },
@@ -31,16 +31,16 @@ export const deliverModules: SceneModel = ideFrame({
             { type: 'item', id: 'routing', icon: 'router', title: 'routes, gateways', sub: 'IGW, NAT, S3 endpoint', stack: true },
           ],
         },
+        { type: 'item', id: 'result', icon: 'check', title: `${moved} resources moved in the state`, sub: `${plan.replace(/\.$/, '')}: nothing destroyed, nothing made`, tone: 'ingest' },
       ],
     },
     {
-      type: 'table', id: 'addresses', title: 'Same things, new addresses', tone: 'ingest', columns: ['before', 'after'], rows: [
-        ['aws_vpc.shop', 'module.network.aws_vpc.this'],
-        ['aws_subnet.this["app-a"]', 'module.network.aws_subnet.this["app-a"]'],
-        ['aws_nat_gateway.a', 'module.network.aws_nat_gateway.a'],
+      type: 'table', id: 'addresses', title: 'Same things, new addresses', tone: 'ingest', columns: ['before', 'after: module.network.…'], rows: [
+        ['aws_vpc.shop', 'aws_vpc.this'],
+        ['aws_subnet.this["app-a"]', 'aws_subnet.this["app-a"]'],
+        ['aws_nat_gateway.a', 'aws_nat_gateway.a'],
       ],
     },
-    { type: 'note', id: 'result', tone: 'ingest', text: `${moved} resources moved in the state. ${plan.replace(/\.$/, '')}: nothing destroyed, nothing made.` },
   ],
   edges: [
     { from: 'root', to: 'module', label: 'source = ./modules/network' },

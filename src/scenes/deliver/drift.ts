@@ -30,21 +30,20 @@ export const deliverDrift: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'versions', title: 'Three versions of the shop', tone: 'source', children: [
-        { type: 'item', id: 'real', icon: 'account', title: 'the account', sub: 'what sam changed by hand', stack: true },
-        { type: 'item', id: 'state', icon: 's3', title: 'the state', sub: 'refreshed from the account', stack: true },
-        { type: 'item', id: 'code', icon: 'terraform', title: 'the code', sub: 'what the shop should be', stack: true },
-        { type: 'item', id: 'apply', icon: 'check', title: 'plan, then apply', sub: 'the account made to match the code', stack: true, tone: 'ingest' },
+        { type: 'item', id: 'real', icon: 'account', title: 'the account', sub: 'what sam changed by hand' },
+        { type: 'item', id: 'state', icon: 's3', title: 'the state', sub: 'refreshed from the account' },
+        { type: 'item', id: 'code', icon: 'terraform', title: 'the code', sub: 'what the shop should be' },
+        { type: 'item', id: 'apply', icon: 'check', title: 'plan, then apply', sub: 'the account made to match the code', tone: 'ingest' },
       ],
     },
     {
-      type: 'table', id: 'differences', title: 'What the plan found, and what it does', tone: 'ingest',
-      columns: ['', 'account', 'code', 'after apply'], rows: [
-        ['fulfilment timeout', `${visWas} s`, `${visNow} s`, `${read} s (read back)`],
-        ['returns queue', 'made by hand', 'import block', 'in the state'],
-        { cells: ['returns max size', kib(sizeWas), `${kib(sizeNow)} (default)`, kib(sizeNow)], tone: 'consume' },
+      type: 'table', id: 'differences', title: `${plan.replace(/\.$/, '')}: nothing destroyed`, tone: 'ingest',
+      columns: ['', 'account', 'code', 'after'], rows: [
+        ['visibility', `${visWas} s`, `${visNow} s`, `${read} s`],
+        ['returns queue', 'by hand', 'import', 'in state'],
+        { cells: ['max size', kib(sizeWas), kib(sizeNow), kib(sizeNow)], tone: 'consume' },
       ],
     },
-    { type: 'note', id: 'result', tone: 'ingest', text: `${plan.replace(/\.$/, '')}. Nothing destroyed: drift is put back, a hand-made queue adopted.` },
   ],
   edges: [
     { from: 'real', to: 'state', label: 'refresh' },
