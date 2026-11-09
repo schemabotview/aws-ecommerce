@@ -1,3 +1,4 @@
+import { SIDE_PLOT_W } from '../grid'
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { ideFrame, lineOf } from '../ide'
 import { reportTree } from './files'
@@ -25,21 +26,24 @@ export const reportClicks: SceneModel = ideFrame({
   keep: ['Apply complete!', ['$ python -m tools.clicks', 'read shardId-000000000001']],
   side: [
     {
-      type: 'group', id: 'stream', title: 'One key, one shard, in order', tone: 'source', dir: 'row', children: [
-        { type: 'item', id: 'pages', icon: 'fargate', title: 'shop pages', sub: 'key = the session', stack: true },
+      type: 'group', id: 'diagram', bare: true, children: [
         {
-          type: 'group', id: 'shards', title: 'book-shop-clicks', tone: 'ingest', children: shards.map((s) => (
-            { type: 'item' as const, id: s.id, icon: 'kinesis', title: short(s.id), sub: `${s.clicks} clicks, ${s.sessions} sessions`, stack: true })),
+          type: 'group', id: 'stream', title: 'One key, one shard, in order', tone: 'source', dir: 'row', children: [
+            { type: 'item', id: 'pages', icon: 'fargate', title: 'shop pages', sub: 'key = the session', stack: true },
+            {
+              type: 'group', id: 'shards', title: 'book-shop-clicks', tone: 'ingest', dir: 'row', children: shards.map((s) => (
+                { type: 'item' as const, id: s.id, icon: 'kinesis', title: short(s.id), sub: `${s.clicks} clicks`, stack: true })),
+            },
+            { type: 'item', id: 'reader', icon: 'lambda', title: 'a consumer', sub: 'one per shard', stack: true },
+          ],
         },
-        { type: 'item', id: 'reader', icon: 'lambda', title: 'a consumer', sub: 'one per shard', stack: true },
+        {
+          type: 'plot', id: 'lag-plot', compact: true, w: SIDE_PLOT_W, title: `Lag (a model): 2 shards; 4 shards stay at ${Math.max(...four.map(([, s]) => s))} s`,
+          x: { min: 17, max: 20, step: 0.5, label: 'evening (hours)' }, y: { min: 0, max: 400, step: 100, label: 'lag, s' },
+          series: [{ kind: 'line', points: two, label: '2 shards', tone: 'consume' }],
+        },
       ],
     },
-    {
-      type: 'plot', id: 'lag-plot', compact: true, title: 'How far behind the consumer falls (a model)',
-      x: { min: 17, max: 20, step: 0.5, label: 'evening (hours)' }, y: { min: 0, max: 400, step: 100, label: 'lag, s' },
-      series: [{ kind: 'line', points: two, label: '2 shards', tone: 'consume' }],
-    },
-    { type: 'note', id: 'four', tone: 'ingest', text: `With 4 shards, each gets a quarter of the peak: the model's lag stays at ${Math.max(...four.map(([, s]) => s))} s all evening.` },
   ],
   edges: [
     { from: 'pages', to: 'shards', label: 'PutRecords' },

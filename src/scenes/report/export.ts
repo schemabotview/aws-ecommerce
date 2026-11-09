@@ -26,8 +26,8 @@ export const reportExport: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'path', title: 'Every night, yesterday leaves the database', tone: 'source', children: [
-        { type: 'item', id: 'db', icon: 'rds', title: 'orders database', sub: 'one day\'s order lines, by placed', stack: true },
-        { type: 'item', id: 'job', icon: 'python', title: 'jobs/export_orders.py', sub: 'one Parquet file per day', stack: true },
+        { type: 'item', id: 'db', icon: 'rds', title: 'orders database', sub: 'one day\'s order lines, by placed' },
+        { type: 'item', id: 'job', icon: 'python', title: 'jobs/export_orders.py', sub: 'one Parquet file per day' },
         {
           type: 'tree', id: 'layout', title: 'book-shop-lake-444455556666', entries: [
             { name: 'order_history', children: [

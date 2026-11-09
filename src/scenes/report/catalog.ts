@@ -22,9 +22,9 @@ export const reportCatalog: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'lookup', title: 'How a query finds a day\'s files', tone: 'source', children: [
-        { type: 'item', id: 'query', icon: 'athena', title: 'WHERE dt = \'2026-09-30\'', sub: 'a query names a day', stack: true },
-        { type: 'item', id: 'table', icon: 'glue', title: 'book_shop_lake.order_history', sub: 'columns; dt is a projected partition', stack: true },
-        { type: 'item', id: 'folder', icon: 's3', title: 'order_history/dt=2026-09-30/', sub: 'worked out from the template: no lookup', stack: true, tone: 'ingest' },
+        { type: 'item', id: 'query', icon: 'athena', title: 'WHERE dt = \'2026-09-30\'', sub: 'a query names a day' },
+        { type: 'item', id: 'table', icon: 'glue', title: 'book_shop_lake.order_history', sub: 'columns; dt is a projected partition' },
+        { type: 'item', id: 'folder', icon: 's3', title: 'order_history/dt=2026-09-30/', sub: 'worked out from the template: no lookup', tone: 'ingest' },
       ],
     },
     {

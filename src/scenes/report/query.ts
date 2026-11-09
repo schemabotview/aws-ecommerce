@@ -34,19 +34,18 @@ export const reportQuery: SceneModel = ideFrame({
   keep: [['$ aws athena start-query-execution', 'files read:']],
   side: [
     {
-      type: 'group', id: 'lake', title: `order_history: ${of} day folders, ${read} read`, tone: 'source', dir: 'grid', cols: 6, children: days,
+      type: 'group', id: 'diagram', bare: true, children: [
+        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: Athena accepted the query and gave it an id; the emulator does not run it. DuckDB ran the same SQL over the same files.' },
+        {
+          type: 'group', id: 'lake', title: `order_history: ${of} day folders, ${read} read`, tone: 'source', dir: 'grid', cols: 6, children: [...days,
+        { type: 'item', id: 'saved', icon: 'filter', title: `dt = one day: ${read} file, ${kb(dayBytes)} of ${monthKib} KiB`, sub: `${Math.round((100 * dayBytes) / (monthKib * 1024))}% of the month's bytes read, and billed`, tone: 'ingest', span: 'all' }],
+        },
+      ],
     },
     {
       type: 'table', id: 'answer', title: `What sold on September ${Number(day)} (DuckDB, the same SQL)`, tone: 'ingest',
       columns: ['book', 'copies', 'sales'], rows: top.map(([book, copies, sales]) => [book, copies.replace(' copies', ''), sales]),
     },
-    {
-      type: 'table', id: 'saved', title: 'What the filter on dt saves', tone: 'source', columns: ['', 'read', 'billed as'], rows: [
-        ['without it: the month', `${of} files, ${monthKib} KiB`, 'every byte'],
-        { cells: [`with it: ${read} day`, `${read} file, ${kb(dayBytes)}`, `${Math.round((100 * dayBytes) / (monthKib * 1024))}% of that`], tone: 'ingest' },
-      ],
-    },
-    { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: Athena accepted the query and gave it an id; the emulator does not run it. DuckDB ran the same SQL over the same files.' },
   ],
   edges: [{ from: `day-${day}`, to: 'answer' }],
 })
