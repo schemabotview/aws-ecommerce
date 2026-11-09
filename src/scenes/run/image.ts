@@ -38,8 +38,8 @@ export const runImage: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'frozen', title: 'What the image freezes', tone: 'ingest', columns: ['in the image', 'not in it'], rows: [
-        ['the OS and Python, by digest', 'which bucket: CATALOG_BUCKET'],
-        ['every package, by version', 'credentials: from the role'],
+        ['OS, Python: by digest', 'bucket: CATALOG_BUCKET'],
+        ['packages: by version', 'keys: from the role'],
         ['the code', 'the data: in S3'],
       ],
     },

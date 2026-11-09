@@ -1,3 +1,4 @@
+import { SIDE_PLOT_W } from '../grid'
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { ideFrame, lineOf, linesFrom } from '../ide'
 import { runTree } from './files'
@@ -32,7 +33,7 @@ export const runScaling: SceneModel = ideFrame({
           ],
         },
         {
-          type: 'plot', id: 'cpu-plot', compact: true, title: `The evening peak (a model): CPU, and ${tasks.at(-1)![1]} tasks by the end`, x: span, y: { min: 0, max: 100, step: 20, label: '% CPU' },
+          type: 'plot', id: 'cpu-plot', compact: true, w: SIDE_PLOT_W, title: `The evening peak (a model): CPU, and ${tasks.at(-1)![1]} tasks by the end`, x: span, y: { min: 0, max: 100, step: 20, label: '% CPU' },
           series: [{ kind: 'line', points: cpu, label: 'CPU', tone: 'consume' }, { kind: 'segment', from: [span.min, 60], to: [span.max, 60], label: 'target' }],
         },
       ],

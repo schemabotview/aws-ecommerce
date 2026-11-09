@@ -29,8 +29,8 @@ export const runTests: SceneModel = ideFrame({
     {
       type: 'table', id: 'kinds', title: 'Emulator or mock', tone: 'ingest', columns: ['', 'emulator', 'mock_aws'], rows: [
         ['runs', 'a server, port 5000', 'inside the test'],
-        ['state', 'kept between commands', 'fresh for every test'],
-        ['for', 'the course\'s terminal', 'the app\'s tests'],
+        ['state', 'kept between runs', 'fresh per test'],
+        ['for', 'our terminal', 'the app\'s tests'],
       ],
     },
   ],
