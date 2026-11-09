@@ -17,10 +17,10 @@ export const dataUploads: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'steps', title: 'A photo, straight to S3', tone: 'source', children: [
-        { type: 'item', id: 's1', icon: 'screen', title: '1 · the browser asks the app', sub: 'POST …/reviews/r-77/photo', stack: true },
-        { type: 'item', id: 's2', icon: 'python', title: '2 · the app signs a URL', sub: 'with its role; nothing is sent to S3', stack: true },
-        { type: 'item', id: 's3', icon: 'screen', title: '3 · the browser PUTs the photo', sub: 'to the URL; it holds no credential', stack: true },
-        { type: 'item', id: 's4', icon: 's3', title: '4 · S3 checks, then stores', sub: 'signature, expiry, the signer\'s permission', stack: true },
+        { type: 'item', id: 's1', icon: 'screen', title: '1 · the browser asks the app', sub: 'POST …/reviews/r-77/photo' },
+        { type: 'item', id: 's2', icon: 'python', title: '2 · the app signs a URL', sub: 'with its role; nothing is sent to S3' },
+        { type: 'item', id: 's3', icon: 'screen', title: '3 · the browser PUTs the photo', sub: 'to the URL; it holds no credential' },
+        { type: 'item', id: 's4', icon: 's3', title: '4 · S3 checks, then stores', sub: 'signature, expiry, the signer\'s permission' },
       ],
     },
     {

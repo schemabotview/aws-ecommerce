@@ -14,7 +14,7 @@ const versions = session.split('\n').filter((l) => /^(True|False)\t/.test(l)).ma
 
 export const dataCatalog: SceneModel = ideFrame({
   tree: dataTree(2, { active: 'infra/s3.tf' }),
-  editor: { file: 'infra/s3.tf', code, show: [[lineOf(code, 'resource "aws_s3_bucket_versioning"'), lineOf(code, 'depends_on') + 1]] },
+  editor: { file: 'infra/s3.tf', code, show: [[lineOf(code, 'resource "aws_s3_bucket_versioning"'), lineOf(code, 'resource "aws_s3_bucket_versioning"') + 6]] },
   session,
   keep: ['Apply complete!', ['$ aws s3 cp', '1001.json'], ['$ aws s3api list-object-versions', 'null']],
   side: [
@@ -37,7 +37,6 @@ export const dataCatalog: SceneModel = ideFrame({
         ['HttpsOnly', 'plain HTTP is denied (AWS\'s documentation)'],
       ],
     },
-    { type: 'note', id: 'undo', tone: 'source', text: 'To undo a bad edit: copy the older version back over the key. It becomes the latest; nothing is lost.' },
   ],
   edges: [
     { from: 'key', to: 'v0', label: 'reads' },

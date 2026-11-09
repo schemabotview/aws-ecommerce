@@ -13,22 +13,26 @@ const customers = [...new Set(items.map(([c]) => c))]
 
 export const dataCarts: SceneModel = ideFrame({
   tree: dataTree(7, { active: 'book_shop/cart.py', fresh: ['infra/tables.tf', 'book_shop/cart.py', 'tools/carts.py'] }),
-  editor: { file: 'book_shop/cart.py', code, show: [[lineOf(code, 'def add'), code.trimEnd().split('\n').length]] },
+  editor: { file: 'book_shop/cart.py', code, show: [[lineOf(code, 'def add'), lineOf(code, 'def add') + 8]] },
   session,
   keep: ['Apply complete!', ['$ python -m tools.carts', 'c-18 {'], ['$ aws dynamodb scan', 'c-18\tbk-1002']],
   side: [
     {
-      type: 'group', id: 'table', icon: 'dynamodb', title: 'book-shop-carts', tone: 'source', children: customers.map((customer) => ({
-        type: 'group' as const, id: `p-${customer}`, title: `customer = ${customer}`, sub: 'one item collection', dir: 'row' as const, children: items
-          .filter(([c]) => c === customer).map(([, book, quantity]) => ({
-            type: 'item' as const, id: `i-${customer}-${book}`, icon: 'file', title: `book = ${book}`, sub: `quantity ${quantity}` })),
-      })),
-    },
-    {
-      type: 'group', id: 'how', title: 'Reading a cart', tone: 'ingest', children: [
-        { type: 'item', id: 'key', icon: 'key', title: 'customer = c-17', sub: 'the partition key', stack: true },
-        { type: 'item', id: 'hash', icon: 'layers', title: 'one partition', sub: 'chosen by hashing the key', stack: true },
-        { type: 'item', id: 'query', icon: 'search', title: 'one Query', sub: 'every book, sorted', stack: true },
+      type: 'group', id: 'diagram', bare: true, children: [
+        {
+          type: 'group', id: 'table', icon: 'dynamodb', title: 'book-shop-carts', tone: 'source', children: customers.map((customer) => ({
+            type: 'group' as const, id: `p-${customer}`, title: `customer = ${customer}`, sub: 'one item collection', dir: 'row' as const, children: items
+              .filter(([c]) => c === customer).map(([, book, quantity]) => ({
+                type: 'item' as const, id: `i-${customer}-${book}`, icon: 'file', title: `book = ${book}`, sub: `quantity ${quantity}` })),
+          })),
+        },
+        {
+          type: 'group', id: 'how', title: 'Reading a cart', tone: 'ingest', dir: 'row', children: [
+            { type: 'item', id: 'key', icon: 'key', title: 'customer = c-17', sub: 'partition key', stack: true },
+            { type: 'item', id: 'hash', icon: 'layers', title: 'one partition', sub: 'by hashing it', stack: true },
+            { type: 'item', id: 'query', icon: 'search', title: 'one Query', sub: 'every book', stack: true },
+          ],
+        },
       ],
     },
     {

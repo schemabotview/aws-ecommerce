@@ -25,26 +25,30 @@ export const dataLastUnit: SceneModel = ideFrame({
     ['$ aws dynamodb scan --table-name book-shop-carts', 'bk-1002\t1']],
   side: [
     {
-      type: 'group', id: 'race', title: 'Two checkouts, one copy of bk-1002', tone: 'source', children: [
+      type: 'group', id: 'diagram', bare: true, children: [
         {
-          type: 'group', id: 'buyers', bare: true, dir: 'row', children: [
-            { type: 'item', id: 'b1', icon: 'user', title: winner, sub: '3 × bk-1001, 1 × bk-1002', stack: true },
-            { type: 'item', id: 'b2', icon: 'user', title: loser, sub: 'the same cart, the same moment', stack: true },
+          type: 'group', id: 'race', title: 'Two checkouts, one copy of bk-1002', tone: 'source', children: [
+            {
+              type: 'group', id: 'buyers', bare: true, dir: 'row', children: [
+                { type: 'item', id: 'b1', icon: 'user', title: winner, sub: '3 × bk-1001, 1 × bk-1002', stack: true },
+                { type: 'item', id: 'b2', icon: 'user', title: loser, sub: 'the same cart, the same moment', stack: true },
+              ],
+            },
+            { type: 'item', id: 'tx', icon: 'dynamodb', title: 'TransactWriteItems, twice', sub: 'each: stock >= n per book, delete the cart' },
+            {
+              type: 'group', id: 'results', bare: true, dir: 'row', children: [
+                { type: 'item', id: 'won', icon: 'check', title: 'transaction committed', sub: 'stock 1 → 0, cart emptied', stack: true, tone: 'ingest' },
+                { type: 'item', id: 'lost', icon: 'lock', title: 'TransactionCanceled', sub: 'stock >= 1 is false: nothing taken, cart kept', stack: true, tone: 'consume' },
+              ],
+            },
           ],
         },
-        { type: 'item', id: 'tx', icon: 'dynamodb', title: 'TransactWriteItems, twice', sub: 'each: stock >= n per book, delete the cart', stack: true },
         {
-          type: 'group', id: 'results', bare: true, dir: 'row', children: [
-            { type: 'item', id: 'won', icon: 'check', title: 'transaction committed', sub: 'stock 1 → 0, cart emptied', stack: true, tone: 'ingest' },
-            { type: 'item', id: 'lost', icon: 'lock', title: 'TransactionCanceled', sub: 'stock >= 1 is false: nothing taken, cart kept', stack: true, tone: 'consume' },
+          type: 'group', id: 'after', bare: true, dir: 'row', children: [
+            { type: 'table', id: 'stock-left', title: 'Stock after', tone: 'ingest', columns: ['book', 'copies'], rows: stockLeft },
+            { type: 'table', id: 'cart-left', title: 'Carts after', tone: 'ingest', columns: ['customer', 'book', 'qty'], rows: cartLeft },
           ],
         },
-      ],
-    },
-    {
-      type: 'group', id: 'after', bare: true, dir: 'row', children: [
-        { type: 'table', id: 'stock-left', title: 'Stock after', tone: 'ingest', columns: ['book', 'copies'], rows: stockLeft },
-        { type: 'table', id: 'cart-left', title: 'Carts after', tone: 'ingest', columns: ['customer', 'book', 'qty'], rows: cartLeft },
       ],
     },
     {
@@ -54,7 +58,6 @@ export const dataLastUnit: SceneModel = ideFrame({
         ['no lock held', 'the loser fails at once, and can try again'],
       ],
     },
-    { type: 'note', id: 'winner', tone: 'source', text: `Who won is the race's: this run, ${winner}. Run it again and it may be ${loser}; the numbers come out the same.` },
   ],
   edges: [
     { from: 'b1', to: 'tx' },

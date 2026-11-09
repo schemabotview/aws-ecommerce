@@ -12,17 +12,17 @@ import session from '../../../spine/data/05-orders/session.txt?raw'
 export const dataOrders: SceneModel = ideFrame({
   tree: dataTree(5, { active: 'book_shop/orders.py', fresh: ['db/migrations/001_orders.sql', 'book_shop/orders.py', 'tools/place_orders.py'] }),
   editor: { file: 'book_shop/orders.py', code, show: [[lineOf(code, 'def place_order'), code.trimEnd().split('\n').length]],
-    highlight: linesFrom(code, 'with conn.transaction():', 'return order') },
+    highlight: [lineOf(code, 'with conn.transaction():'), ...linesFrom(code, '# stock >= 0 is a CHECK', 'return order')] },
   session,
-  keep: ['$ createdb book_shop', '$ psql -q -f', ['$ python -m tools.place_orders', 'nothing was written'],
+  keep: [['$ python -m tools.place_orders', 'nothing was written'],
     ['$ psql -c \'SELECT id, stock', '(2 rows)']],
   side: [
     {
       type: 'group', id: 'tx', title: 'c-18\'s order: one transaction', tone: 'source', children: [
-        { type: 'item', id: 'begin', icon: 'database', title: 'BEGIN', sub: 'nothing is visible to others yet', stack: true },
-        { type: 'item', id: 'rows', icon: 'table', title: 'the order and its first line', sub: '1 copy of bk-1001 taken: all pending', stack: true },
-        { type: 'item', id: 'fail', icon: 'lock', title: '2 × bk-1002: 1 in stock', sub: 'CHECK (stock >= 0) fails', stack: true, tone: 'consume' },
-        { type: 'item', id: 'rollback', icon: 'clock', title: 'ROLLBACK', sub: 'every pending change undone', stack: true },
+        { type: 'item', id: 'begin', icon: 'database', title: 'BEGIN', sub: 'nothing is visible to others yet' },
+        { type: 'item', id: 'rows', icon: 'table', title: 'the order and its first line', sub: '1 copy of bk-1001 taken: all pending' },
+        { type: 'item', id: 'fail', icon: 'lock', title: '2 × bk-1002: 1 in stock', sub: 'CHECK (stock >= 0) fails', tone: 'consume' },
+        { type: 'item', id: 'rollback', icon: 'clock', title: 'ROLLBACK', sub: 'every pending change undone' },
       ],
     },
     {

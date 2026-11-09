@@ -18,16 +18,16 @@ export const dataSecrets: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'path', title: 'The password, at connect time', tone: 'source', children: [
-        { type: 'item', id: 'app', icon: 'python', title: 'orders.connect()', sub: 'DB_SECRET_ARN, DB_HOST: no password', stack: true },
-        { type: 'item', id: 'role', icon: 'iamrole', title: 'BookShopApp', sub: 'ReadDatabaseSecret: one ARN', stack: true },
-        { type: 'item', id: 'secret', icon: 'secretsmanager', title: 'rds!db-… secret', sub: 'kept and rotated by RDS', stack: true },
-        { type: 'item', id: 'db', icon: 'rds', title: 'book-shop-orders', sub: 'user shop, over TLS', stack: true },
+        { type: 'item', id: 'app', icon: 'python', title: 'orders.connect()', sub: 'DB_SECRET_ARN, DB_HOST: no password' },
+        { type: 'item', id: 'role', icon: 'iamrole', title: 'BookShopApp', sub: 'ReadDatabaseSecret: one ARN' },
+        { type: 'item', id: 'secret', icon: 'secretsmanager', title: 'rds!db-… secret', sub: 'kept and rotated by RDS' },
+        { type: 'item', id: 'db', icon: 'rds', title: 'book-shop-orders', sub: 'user shop, over TLS' },
       ],
     },
     {
       type: 'table', id: 'reads', title: 'What the role may read', tone: 'ingest', columns: ['secret', 'result'], rows: [
-        { cells: ['the database\'s', 'its username, a 28-character password'], tone: 'ingest' },
-        { cells: ['book-shop/payments-api-key', 'AccessDenied'], tone: 'consume' },
+        { cells: ['the database\'s', 'user, 28-char password'], tone: 'ingest' },
+        { cells: ['…/payments-api-key', 'AccessDenied'], tone: 'consume' },
       ],
     },
   ],
