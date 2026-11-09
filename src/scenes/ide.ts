@@ -178,8 +178,10 @@ export function terminalRows(session: string, keep?: Keep[]): { rows: string; tl
     const mark = markOf(recorded[i])
     let text = bodyOf(recorded[i])
     let j = i
+    // (a row that starts with two spaces is a new line that happens to follow an 80-wide one: columnar
+    // output; a row the spine wrapped almost never continues with two spaces)
     while (bodyOf(recorded[j]).length === EDITOR_COLS && j + 1 < recorded.length && markOf(recorded[j + 1]) === mark
-      && !recorded[j + 1].startsWith('$ ')) text += bodyOf(recorded[++j])
+      && !recorded[j + 1].startsWith('$ ') && !bodyOf(recorded[j + 1]).startsWith('  ')) text += bodyOf(recorded[++j])
     // a tab the pane draws 8 wide would push a row past COLS: draw it as one space, as terminal() does at 80
     if (text.replace(/\t/g, '        ').length > COLS) text = text.replace(/\t/g, ' ')
     const start = drawn.length + 1
