@@ -430,4 +430,7 @@ graphl-flow 0.10's shared grid (1344 × 756 at a 1% margin, ≈ 2.8× at 4K); th
 - **Map frames are unchanged for now** (the map is a fixed 1150 × 1040 diagram with an 80-column side;
   a larger map needs a redesign — owner's decision).
 
-Piloted on Course 5 `network` (owner review pending). Narration edited for v2: none.
+Piloted on Course 5 `network`, then every course's IDE sections (2026-11-09; owner review pending).
+Making the side panes strict dropped their non-emulated notes and some second tables; every
+"Emulated:" / "Walked locally:" note was kept, inside the diagram. Narration edited for v2: none.
+Every course is re-recorded, because the frame changed.

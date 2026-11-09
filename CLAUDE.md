@@ -157,14 +157,15 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 
 ## Frames
 
-- **2026-11-08: frame v2, piloted on Course 5 `network`**; the other courses are NOT yet ported and fail
-  check-content (strict side pane, editors that do not fit). `node scripts/check-render.mjs <course>`.
+- **2026-11-08/09: frame v2 on every IDE section** (Course 5 `network` piloted, the rest ported); map
+  frames are NOT yet redesigned. `node scripts/check-render.mjs <course>`. The recordings are v1.
 - **IDE frame v2** (`src/scenes/ide.ts`, `grid.ts`): editor over an 80-column terminal (760) | side pane 574,
   no explorer, on the shared 1344 × 756 grid. Side pane STRICT (≤ 2 parts; with two, one a group or plot).
   Formerly: python-expense-tracker's template. Fixed columns; the
   terminal shows ≤ `TERMINAL_ROWS` rows — fold with `keep` (lines found by TEXT, never numbers).
-  **Every side pane is a diagram** (an edge, plot or table; check-content fails a list) and fills
-  ≥ 2/3 of its height (check-render).
+  **Every side pane is a diagram** (an edge, plot or table; check-content fails a list), its parts
+  in ONE group, and stays inside its column (check-render). An emulated pane's note sits INSIDE the
+  diagram group, so the strict rule never costs the disclaimer.
 - **Map frame** (`src/scenes/map.ts`): the shop's WHOLE final architecture, drawn the AWS way
   (Region dashed, VPC, three dashed AZs, subnets, services, the account's controls). A part not
   built yet is `muted` in place; `BUILT[course]` is what exists; what a section adds is ringed by
