@@ -1,6 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { keepLines, terminal } from '../ide'
-import { BUILT, mapFrame } from '../map'
+import { terminalRows } from '../ide'
+import { BUILT, mapFrame2 } from '../map'
 import session from '../../../spine/intro/01-order/session.txt?raw'
 
 // §1.1 — the finished shop takes an order (map frame). Recorded at the END of the chain (intro/01-order,
@@ -10,17 +10,16 @@ import session from '../../../spine/intro/01-order/session.txt?raw'
 // fixes a real bug: the tool still named the loyalty queue by its old name (renamed in §9.7). Every
 // value is read from the transcript.
 // source: https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html
-const rows = terminal(session)
+const term = terminalRows(session, [['$ curl -s', 'currency'], ['$ python -m tools.checkout', 'fraud-check']])
 const placed = session.match(/^order (\d+) placed, total ([\d.]+)/m)?.slice(1) ?? ['?', '?']
 const heard = Object.fromEntries(session.split('\n').map((l) => l.match(/^(fulfilment|points|fraud-check)\s+(.+)$/)).filter((m) => m !== null)
   .map((m) => [m[1], m[2]]))
 
-export const introOrder: SceneModel = mapFrame({
+export const introOrder: SceneModel = mapFrame2({
   built: BUILT.evolve,
   side: [
     {
-      type: 'code', id: 'terminal', terminal: true, filename: 'terminal — book-shop · emulated', code: rows, fill: true,
-      show: keepLines(rows, [['$ curl -s', 'currency'], ['$ python -m tools.checkout', 'fraud-check']]),
+      type: 'code', id: 'terminal', terminal: true, filename: 'terminal — book-shop · emulated', code: term.rows, show: term.tshow, fill: true,
     },
     {
       type: 'group', id: 'path', title: `One order, end to end: order ${placed[0]}, ${placed[1]} GBP`, tone: 'source', dir: 'row', children: [

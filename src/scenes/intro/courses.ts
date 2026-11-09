@@ -1,10 +1,10 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { BUILT, mapFrame } from '../map'
+import { BUILT, mapFrame2 } from '../map'
 
 // §1.3 — what we'll build, course by course (map frame). The finished map, and what each course adds
 // to it — the outcome column of COURSE-PLAN.md's course table, one row per course. Courses 1 and 2
 // build nothing: they are the why and the how of AWS itself.
-export const introCourses: SceneModel = mapFrame({
+export const introCourses: SceneModel = mapFrame2({
   built: BUILT.evolve,
   side: [
     {

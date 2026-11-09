@@ -443,8 +443,12 @@ narration was edited, and every "Emulated:" note was kept.
 text small and the screen under-used (v1: 1947 × 1040 natural, median text 28 px at 4K, smallest 22, 80%
 of the frame). v2 puts them on the IDE grid: map 619 | side 715 (median 42 px, smallest 34, 96%). The
 map stands upright and folds the areas a section does not touch into one line each ("1 of 3 built");
-the VPC and the areas a section adds are open. §5.2, §5.5 and §5.8 use it; every other map frame is v1
-until the pilot is approved. No narration edited (§5.2's "on the right" and "under it" still hold).
+the VPC and the areas a section adds are open. Piloted on §5.2, §5.5 and §5.8; **approved and rolled out
+to all 11 map sections (2026-11-09)**. Side panes trimmed to the terminal and one diagram: §7.x's note
+moved inside its diagram; §8.4 lost its subscriptions table and raw-delivery note, §12.2 its behaviours
+table (neither narration walks them); §12.6's table now stands above the next steps, as its narration
+says. Two narrations edited (wavs to regenerate): §3.8 ("the account's controls along the bottom" → on
+the left) and §7.x orders database ("lights up along the bottom" → "on the left, in the account").
 
 Piloted on Course 5 `network`, then every course's IDE sections (2026-11-09; owner review pending).
 Making the side panes strict dropped their non-emulated notes and some second tables; every

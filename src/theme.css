@@ -16,6 +16,6 @@
 /* §11.5's verdict quotes the alarm times tools/burn.py printed */
 .gf-table[data-id='verdict'] :is(td, th) { padding-inline: 5px; }
 
-/* Map frame v2 (map.ts mapFrame2): the side column's first part (the terminal or the editor) takes the
+/* Map frame v2 (map.ts mapFrame2): a side column that starts with a terminal or an editor gives it the
    height its diagram leaves, as a terminal window does, so the column is filled without a gap. */
-[data-id='map-side'] > .gf-body { grid-template-rows: 1fr; grid-auto-rows: auto; height: 100%; }
+[data-id='map-side'] > .gf-body:has(> .gf-code:first-child) { grid-template-rows: 1fr; grid-auto-rows: auto; height: 100%; }

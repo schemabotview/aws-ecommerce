@@ -3,13 +3,14 @@ import { FRAME_H, FULL_W, GAP, WORK_W as SIDE2_W } from './grid'
 
 // THE BOOK SHOP'S MAP — one architecture diagram, drawn the way AWS draws its own: the Region a
 // dashed boundary, the VPC inside it, three dashed Availability Zones, each with a public, an app
-// and a data subnet; the Regional services beside the VPC; the account's controls along the bottom;
-// the shoppers and the edge on the left.
+// and a data subnet; the Regional services under the VPC; the shoppers, the edge and the account's
+// controls on the left.
 //
-// It is the WHOLE finished shop from its first appearance (Course 3) to the end. A part the shop
-// does not have yet is drawn — same size, same place — greyed (graphl-flow's `muted`). So the map
-// never moves, a viewer always knows where a part will be, and a section
-// shows what it ADDS by colour, not by layout. check-render asserts every map frame lands on one fit.
+// It is the WHOLE finished shop from its first appearance (Course 3) to the end, every area in its
+// place: an area a section works in is OPEN (every part), the others FOLDED to one line that says how
+// much of it exists. A part the shop does not have yet is greyed (graphl-flow's `muted`), and a
+// section shows what it ADDS by colour and its focus ring, not by layout. check-render asserts every
+// map frame lands on the IDE frames' fit.
 //
 // `BUILT[n]` is what the shop has at the END of course n — extend it as courses are authored, and
 // never rename a part: section focus and later scenes name these ids.
@@ -65,68 +66,12 @@ function item(part: Part, state: State): Item {
   return { type: 'item', id: part.id, title: part.title, sub: part.sub, icon: part.icon, muted: state === 'later' || undefined }
 }
 
-/** The map, for a section of course `course` (what earlier courses built) adding `fresh`. */
-export function shopMap(built: string[], fresh: string[] = []): SceneNode {
-  const st = (id: string): State => (fresh.includes(id) ? 'new' : built.includes(id) ? 'built' : 'later')
-  const it = (part: Part) => item(part, st(part.id))
-  // The VPC and its subnets are parts too: a muted outline until Course 5 builds them.
-  const muted = (id: string) => st(id) === 'later' || undefined
-  const az = (a: string): Group => ({
-    type: 'group', id: `az-${a}`, title: `AZ eu-west-2${a}`, dashed: true, children: [
-      { type: 'group', id: `public-${a}`, icon: 'publicsubnet', title: 'Public', muted: muted(`public-${a}`), children: [it(TIER.public(a))] },
-      { type: 'group', id: `app-${a}`, icon: 'privatesubnet', title: 'App', muted: muted(`app-${a}`), children: [it(TIER.app(a))] },
-      { type: 'group', id: `data-${a}`, icon: 'privatesubnet', title: 'Data', muted: muted(`data-${a}`), children: [it(TIER.data(a))] },
-    ],
-  })
-  const vpc: Group = {
-    type: 'group', id: 'vpc', icon: 'vpc', title: 'VPC 10.20.0.0/16', tone: 'infra', dir: 'grid', cols: 3, muted: muted('vpc'),
-    children: [
-      { type: 'group', id: 'vpc-edge', bare: true, dir: 'row', span: 'all', children: [it(ALB), it(IGW), it(ENDPOINT)] },
-      ...AZS.map(az),
-    ],
-  }
-  const services: Group = {
-    type: 'group', id: 'services', bare: true, children: SERVICES.map(([id, title, parts]) => (
-      { type: 'group', id, title, dir: 'grid', cols: id === 'checkout' ? 2 : 1, children: parts.map(it) } as Group)),
-  }
-  const region: Group = {
-    type: 'group', id: 'region', icon: 'region', title: 'Region eu-west-2 (London)', dashed: true, dir: 'row', children: [vpc, services],
-  }
-  const controls: Group = {
-    type: 'group', id: 'controls', icon: 'account', title: 'Account 444455556666 (dev)', dir: 'grid', cols: 10, span: 'all',
-    children: CONTROLS.map(it),
-  }
-  const edge: Group = { type: 'group', id: 'edge', bare: true, children: EDGE.map(it) }
-  return {
-    type: 'group', id: 'map', bare: true, dir: 'grid', cols: 2,
-    children: [edge, region, controls],
-  }
-}
-
 /** The request path, always drawn — an edge to a part not built yet is still where it will run. */
 export const MAP_EDGES: Edge[] = [
   { from: 'shoppers', to: 'dns' },
   { from: 'dns', to: 'cdn' },
   { from: 'cdn', to: 'alb' },
 ]
-
-/** A full-frame map (Course 1's "what we'll build", and the pilot's measure). */
-export function mapScene(built: string[], fresh: string[] = []): SceneModel {
-  return { nodes: [shopMap(built, fresh)], edges: MAP_EDGES }
-}
-
-// ── the map frame ─────────────────────────────────────────────────────────────────────────────────
-//
-//   the map (MAP_W × MAP_H, fixed)  |  side pane (SIDE_W): a terminal of 80 columns, and a diagram
-//
-// Both columns are FIXED, width AND height (a side pane that grows past MAP_H would change the zoom of
-// that one frame: 5.2's code-and-terminal pane did), so every map frame has the same natural box and the same fit (check-render
-// asserts it), and the map's parts sit at the same pixels in every section of every course.
-// The side terminal is the IDE terminal's width — the 80 columns scripts/spine.py wraps at.
-
-export const MAP_W = 1150
-export const MAP_H = 1040
-export const MAP_SIDE_W = 787
 
 export interface MapFrame {
   /** What the shop has before this section (BUILT of the previous course, plus this course's so far). */
@@ -139,18 +84,7 @@ export interface MapFrame {
   edges?: Edge[]
 }
 
-export function mapFrame({ built, fresh = [], side, edges = [] }: MapFrame): SceneModel {
-  return {
-    dir: 'row',
-    nodes: [
-      { type: 'group', id: 'map-pane', bare: true, w: MAP_W, h: MAP_H, children: [shopMap(built, fresh)] },
-      { type: 'group', id: 'map-side', bare: true, w: MAP_SIDE_W, h: MAP_H, children: side },
-    ],
-    edges: [...MAP_EDGES, ...edges],
-  }
-}
-
-// ── map frame v2 (pilot: Course 5) ────────────────────────────────────────────────────────────────
+// ── the map frame (v2, 2026-11-09) ───────────────────────────────────────────────────────────────
 //
 //   the map (MAP2_W × FRAME_H)  |  side pane (SIDE2_W = the IDE workbench's 715): terminal, diagram
 //
@@ -158,8 +92,8 @@ export function mapFrame({ built, fresh = [], side, edges = [] }: MapFrame): Sce
 // a map frame's text is as large as an IDE frame's. The side column is the IDE workbench's width, so
 // its terminal draws the same 72 columns (ide.ts `terminalRows`). The map is the same parts with the
 // same ids, drawn upright: the Region holds the VPC (its three AZs side by side) over the Regional
-// services; the account's controls run along the bottom; the edge stands to the left. Everything
-// not built yet stays in place, greyed.
+// services; the edge and the account stand in the left column. Everything not built yet stays in
+// place, greyed. (v1, 2026-10: map 1150 × 1040 | side 787, every area open, ≈ 2× at 4K — too small.)
 export const MAP2_W = FULL_W - SIDE2_W - GAP
 
 /** The map's areas: each is drawn OPEN (every part) or FOLDED (one line saying what it holds). */
@@ -211,19 +145,24 @@ function shopMap2(built: string[], fresh: string[], open: Area[]): SceneNode {
   // the account's controls stand under the edge, in the left column the Region leaves free
   const controls: Group = {
     type: 'group', id: 'controls', title: 'Account (dev)',
-    children: open.includes('controls') ? CONTROLS.map(it) : [{ ...folded('controls', 'iam', ''), stack: true }],
+    // never all ten: the part a section adds stands over the folded line that counts the rest
+    children: [...CONTROLS.filter((x) => fresh.includes(x.id) || open.includes('controls') && st(x.id) !== 'later').map((x) => ({ ...it(x), stack: true })),
+      { ...folded('controls', 'iam', ''), stack: true }],
   }
   const edge: Group = { type: 'group', id: 'edge', bare: true, children: EDGE.map((part) => ({ ...it(part), stack: true })) }
   const left: Group = { type: 'group', id: 'left', bare: true, children: [edge, controls] }
   return { type: 'group', id: 'map', bare: true, dir: 'row', children: [left, region] }
 }
 
-/** The areas a frame opens by default: those holding a part the section adds, and the VPC once it exists. */
-const openFor = (built: string[], fresh: string[]): Area[] =>
-  (Object.keys(AREA_PARTS) as Area[]).filter((a) => AREA_PARTS[a].some((id) => fresh.includes(id)) || (a === 'vpc' && built.includes('vpc')))
+/** The areas a frame opens by default: those holding a part the section adds (at this zoom about two
+ *  fit); a frame that adds none to an area opens the VPC, once it exists. The controls never open whole. */
+const openFor = (built: string[], fresh: string[]): Area[] => {
+  const areas = (Object.keys(AREA_PARTS) as Area[]).filter((a) => a !== 'controls' && AREA_PARTS[a].some((id) => fresh.includes(id)))
+  return areas.length || !built.includes('vpc') ? areas : ['vpc']
+}
 
 export interface MapFrame2 extends MapFrame {
-  /** Areas drawn open; default: those holding a part the section adds, and the VPC once it exists. */
+  /** Areas drawn open; default: those holding a part the section adds, else the VPC once it exists. */
   open?: Area[]
 }
 
@@ -235,7 +174,8 @@ export function mapFrame2({ built, fresh = [], open, side, edges = [] }: MapFram
       { type: 'group', id: 'map-pane', bare: true, spread: true, w: MAP2_W, h: FRAME_H, children: [shopMap2(built, fresh, areas)] },
       { type: 'group', id: 'map-side', bare: true, w: SIDE2_W, h: FRAME_H, children: side },
     ],
-    edges: [...MAP_EDGES, ...edges],
+    // the edge reaches the load balancer, or the VPC that holds it when the VPC is folded
+    edges: [...MAP_EDGES.map((e) => (e.to === 'alb' && !areas.includes('vpc') ? { ...e, to: 'vpc' } : e)), ...edges],
   }
 }
 

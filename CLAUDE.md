@@ -85,9 +85,8 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   file only where `masked()` allows leaves the file alone. `--replay` re-runs everything from scratch
   and compares: use it after upgrading moto, Terraform, the CLI or the patch layer, not to author.
   One recording at a time (port 5000, a machine lock).
-- The spine records 80 columns (`spine.py` wraps there); the IDE frame's terminal draws 72: `ide.ts` joins
-  each row the spine wrapped and wraps the line again at 72, so the spine is untouched. The map frame's
-  terminal still draws 80.
+- The spine records 80 columns (`spine.py` wraps there); every frame's terminal draws 72: `ide.ts`
+  `terminalRows` joins each row the spine wrapped and wraps the line again at 72, so the spine is untouched.
 
 ## The machine (all in `scripts/`, all in SPIKE.md)
 
@@ -159,8 +158,9 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 
 ## Frames
 
-- **2026-11-08/09: frame v2 on every IDE section** (Course 5 `network` piloted, the rest ported); map
-  frames are NOT yet redesigned. `node scripts/check-render.mjs <course>`. The recordings are v1.
+- **2026-11-08/09: frame v2 on every IDE section** (Course 5 `network` piloted, the rest ported), and
+  **map frame v2 on all 11 map sections** (piloted on Course 5, approved, rolled out 2026-11-09).
+  `node scripts/check-render.mjs <course>`. The recordings are v1.
 - **IDE frame v2** (`src/scenes/ide.ts`, `grid.ts`): compact explorer 175 | editor over a 72-column
   terminal 715 | side pane 434, on the shared 1344 × 756 grid (python-expense-tracker's columns; the
   explorer restored 2026-11-09, owner's option A). Side pane STRICT (≤ 2 parts; with two, one a group or
@@ -173,20 +173,22 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   **Every side pane is a diagram** (an edge, plot or table; check-content fails a list), its parts
   in ONE group, and stays inside its column (check-render). An emulated pane's note sits INSIDE the
   diagram group, so the strict rule never costs the disclaimer.
-- **Map frame v2 — PILOT on Course 5 only, owner review pending** (`map.ts` `mapFrame2`): map 619 | side 715
+- **Map frame v2** (`map.ts` `mapFrame2`, every map section): map 619 | side 715
   on the IDE grid (1344 × 756, padding 0.01), so a map frame has the IDE frames' zoom (median text 42 px
   at 4K, was 28). The side column is the IDE workbench's width: its terminal is `terminalRows` (72
   columns), and its first part takes the height its diagram leaves (`theme.css`). The map stands
   upright: the edge and the account (folded: "3 of 10 built") on the left, the Region with the VPC (AZs
   side by side) over the Regional services. AREAS (`vpc`, `books`, `checkout`, `reports`, `controls`)
-  are OPEN (every part) or FOLDED (one line, "1 of 3 built"); a frame opens those holding a part it
-  adds, and the VPC once it exists (`open` overrides). The whole shop cannot be open at once at this
-  zoom: about two areas fit. Inside a subnet a part's title is short (NAT, Task, Orders). check-render
-  holds v1 and v2 maps to one fit each, v2 to the IDE fit, and fails a part outside either column.
-- **Map frame** (`src/scenes/map.ts`): the shop's WHOLE final architecture, drawn the AWS way
-  (Region dashed, VPC, three dashed AZs, subnets, services, the account's controls). A part not
-  built yet is `muted` in place; `BUILT[course]` is what exists; what a section adds is ringed by
-  the section's `focus`. Never rename a part. Every map frame shares one fit (check-render).
+  are OPEN (every part) or FOLDED (one line, "1 of 3 built"); a frame opens the areas holding a part it
+  adds, else the VPC once it exists (`open` overrides: §3.8 and §8.4 open the three service areas, the
+  VPC being folded). The controls never open whole: the part a section adds stands over the folded
+  line. The open VPC plus one service area is the most that fits; with the VPC folded, all three
+  service areas fit. Inside a subnet a part's title is short (NAT, Task, Orders). The edge's arrow
+  reaches the load balancer, or the folded VPC. The map is the shop's WHOLE final architecture, drawn
+  the AWS way; a part not built yet is `muted` in place; `BUILT[course]` is what exists; what a section
+  adds is ringed by its `focus`. Never rename a part (ids). The side pane holds the terminal and ONE
+  diagram (an emulated note inside it). check-render holds every map frame to the IDE fit and fails a
+  part outside either column.
 - **◆ full scene**: a canonical big picture that cannot fit a side pane at ≥ 24px; it carries real
   output (a lab) inside it.
 - **Canonical diagrams, not list boxes.** Flows run one direction, centred (`stack: true` items),
