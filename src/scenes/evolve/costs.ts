@@ -1,3 +1,4 @@
+import { SIDE_PLOT_W } from '../grid'
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { ideFrame, lineOf } from '../ide'
 import { evolveTree } from './files'
@@ -24,7 +25,7 @@ export const evolveCosts: SceneModel = ideFrame({
     {
       type: 'group', id: 'diagram', bare: true, children: [
         {
-          type: 'plot', id: 'by-env', compact: true, title: 'October by env tag (made up)',
+          type: 'plot', id: 'by-env', compact: true, w: SIDE_PLOT_W, title: 'October by env tag (made up)',
           x: { labels: envs.map((m) => m[1]), label: 'env' }, y: { min: 0, max: 250, step: 50, label: 'USD' },
           series: [{ kind: 'bar', points: envs.map((m, i) => [i, Number(m[2])]), tone: 'store' }],
         },
@@ -32,10 +33,9 @@ export const evolveCosts: SceneModel = ideFrame({
       ],
     },
     {
-      type: 'table', id: 'found', title: 'What the tags made visible', tone: 'ingest', columns: ['day', 'what', 'cost'], rows: [
-        ['October', 'split by env', envs.map((m) => `${m[1]} ${m[2]}`).join(', ')],
-        { cells: [passed[1], `dev > ${passed[0]} USD budget`, 'email to alex'], tone: 'consume' },
-        ...unusual.map((m) => ({ cells: [m[1], `${m[2]}, ${m[3]}`, `${m[4]} (${m[6]}×)`], tone: 'consume' as const })),
+      type: 'table', id: 'found', title: 'What the tags made visible (October)', tone: 'ingest', columns: ['day', 'what', 'cost'], rows: [
+        { cells: [passed[1].slice(5), `dev > ${passed[0]} USD`, 'email to alex'], tone: 'consume' },
+        ...unusual.map((m) => ({ cells: [m[1].slice(5), `${m[2]}, ${m[3]}`, `${m[4]} (${m[6]}×)`], tone: 'consume' as const })),
       ],
     },
   ],
