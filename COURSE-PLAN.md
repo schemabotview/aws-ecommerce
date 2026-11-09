@@ -439,6 +439,13 @@ drops a note that does not fit. Every side pane was refitted to 434 by shortenin
 captions (never a value read from the spine; a few quoted tables take tighter padding instead); no
 narration was edited, and every "Emulated:" note was kept.
 
+**Map frame v2, piloted on Course 5 (2026-11-09; owner review pending).** The owner found the map frames'
+text small and the screen under-used (v1: 1947 × 1040 natural, median text 28 px at 4K, smallest 22, 80%
+of the frame). v2 puts them on the IDE grid: map 619 | side 715 (median 42 px, smallest 34, 96%). The
+map stands upright and folds the areas a section does not touch into one line each ("1 of 3 built");
+the VPC and the areas a section adds are open. §5.2, §5.5 and §5.8 use it; every other map frame is v1
+until the pilot is approved. No narration edited (§5.2's "on the right" and "under it" still hold).
+
 Piloted on Course 5 `network`, then every course's IDE sections (2026-11-09; owner review pending).
 Making the side panes strict dropped their non-emulated notes and some second tables; every
 "Emulated:" / "Walked locally:" note was kept, inside the diagram. Narration edited for v2: none.

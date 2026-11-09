@@ -222,7 +222,17 @@ try {
     if (found.panes) ide.push({ slug, panes: found.panes, fit: before })
     if (nodesOf(scene).some(({ node }) => node.id === 'map-pane')) {
       const box = await page.$eval('[data-id="map-pane"]', (e) => { const r = e.getBoundingClientRect(); return [r.x, r.y, r.width, r.height].map(Math.round) })
-      maps.push({ slug, box, fit: before })
+      // map frame v2 (map.ts mapFrame2) is on the IDE grid; v1 keeps its own fit until every course moves
+      const v2 = scene.padding === 0.01
+      if (v2) {
+        const over = await page.evaluate(() => ['map-pane', 'map-side'].flatMap((id) => {
+          const pane = document.querySelector(`[data-id="${id}"]`).getBoundingClientRect()
+          return [...document.querySelectorAll(`[data-id="${id}"] [data-id]`)].map((e) => ({ id: e.dataset.id, r: e.getBoundingClientRect() }))
+            .filter(({ r }) => r.bottom > pane.bottom + 1 || r.right > pane.right + 1).slice(0, 1).map(({ id: part }) => `${part} runs outside the ${id} column`)
+        }))
+        for (const o of over) problems.push(`${slug}  ${o} — cut it to fit`)
+      }
+      maps.push({ slug, box, fit: before, v2 })
     }
   }
 } finally {
@@ -240,15 +250,20 @@ for (const { slug, panes, fit } of ide.slice(1)) {
   }
 }
 
-const [mapRef] = maps
-for (const { slug, box, fit } of maps.slice(1)) {
-  if (fit !== mapRef.fit) problems.push(`${slug}  fit ${fit} differs from ${mapRef.slug}'s — a map frame must not change the zoom`)
-  if (box.some((v, i) => v !== mapRef.box[i])) problems.push(`${slug}  the map is at [${box}], not [${mapRef.box}] as in ${mapRef.slug}`)
+for (const family of [maps.filter((m) => !m.v2), maps.filter((m) => m.v2)]) {
+  const [mapRef] = family
+  for (const { slug, box, fit } of family.slice(1)) {
+    if (fit !== mapRef.fit) problems.push(`${slug}  fit ${fit} differs from ${mapRef.slug}'s — a map frame must not change the zoom`)
+    if (box.some((v, i) => v !== mapRef.box[i])) problems.push(`${slug}  the map is at [${box}], not [${mapRef.box}] as in ${mapRef.slug}`)
+  }
 }
+// a v2 map frame shares the IDE frames' zoom
+for (const { slug, fit } of maps.filter((m) => m.v2))
+  if (ref && fit !== ref.fit) problems.push(`${slug}  fit ${fit} differs from the IDE frames' ${ref.fit} — map frame v2 is on the IDE grid`)
 
 if (problems.length) {
   console.error(`\n✗ ${problems.length} render problem(s) at 3840×2160:`)
   for (const p of problems) console.error('  ' + p)
   process.exit(1)
 }
-console.log(`✓ ${sections.length} section(s) render cleanly at 3840×2160; ${ide.length} IDE frame(s) share one fit and one layout; ${maps.length} map frame(s) share one fit`)
+console.log(`✓ ${sections.length} section(s) render cleanly at 3840×2160; ${ide.length} IDE frame(s) share one fit and one layout; ${maps.length} map frame(s) share one fit per kind (${maps.filter((m) => m.v2).length} on the IDE grid)`)

@@ -173,6 +173,16 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   **Every side pane is a diagram** (an edge, plot or table; check-content fails a list), its parts
   in ONE group, and stays inside its column (check-render). An emulated pane's note sits INSIDE the
   diagram group, so the strict rule never costs the disclaimer.
+- **Map frame v2 — PILOT on Course 5 only, owner review pending** (`map.ts` `mapFrame2`): map 619 | side 715
+  on the IDE grid (1344 × 756, padding 0.01), so a map frame has the IDE frames' zoom (median text 42 px
+  at 4K, was 28). The side column is the IDE workbench's width: its terminal is `terminalRows` (72
+  columns), and its first part takes the height its diagram leaves (`theme.css`). The map stands
+  upright: the edge and the account (folded: "3 of 10 built") on the left, the Region with the VPC (AZs
+  side by side) over the Regional services. AREAS (`vpc`, `books`, `checkout`, `reports`, `controls`)
+  are OPEN (every part) or FOLDED (one line, "1 of 3 built"); a frame opens those holding a part it
+  adds, and the VPC once it exists (`open` overrides). The whole shop cannot be open at once at this
+  zoom: about two areas fit. Inside a subnet a part's title is short (NAT, Task, Orders). check-render
+  holds v1 and v2 maps to one fit each, v2 to the IDE fit, and fails a part outside either column.
 - **Map frame** (`src/scenes/map.ts`): the shop's WHOLE final architecture, drawn the AWS way
   (Region dashed, VPC, three dashed AZs, subnets, services, the account's controls). A part not
   built yet is `muted` in place; `BUILT[course]` is what exists; what a section adds is ringed by

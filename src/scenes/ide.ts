@@ -161,8 +161,11 @@ function grow(code: string, ranges: [number, number][], room: number): [number, 
 /** Frames that could not hold their content; check-content reports every one. */
 export const FRAME_PROBLEMS: string[] = []
 
-export function ideFrame({ tree, editor, session, keep, side, edges = [] }: IdeFrame): SceneModel {
-  const file = editor.file
+/**
+ * A session as the frame's 72-column terminal draws it: `keep` names RECORDED lines; each row the spine
+ * wrapped at 80 is joined back, and the whole line wrapped at COLS. Shared by the IDE and map frames.
+ */
+export function terminalRows(session: string, keep?: Keep[]): { rows: string; tlines: string[]; tshow?: [number, number][] } {
   // keep names RECORDED lines; each recorded line becomes one or more 72-column rows
   const recorded = terminal(session).split('\n')
   const at: number[] = [] // at[i]: the first drawn row (1-based) of recorded line i + 1
@@ -188,6 +191,12 @@ export function ideFrame({ tree, editor, session, keep, side, edges = [] }: IdeF
   const rows = drawn.join('\n')
   const tlines = drawn
   const tshow = keep && keepLines(recorded.join('\n'), keep).map(([a, b]) => [at[a - 1], at[b] - 1] as [number, number])
+  return { rows, tlines, tshow }
+}
+
+export function ideFrame({ tree, editor, session, keep, side, edges = [] }: IdeFrame): SceneModel {
+  const file = editor.file
+  const { rows, tlines, tshow } = terminalRows(session, keep)
   const flat = (_: string[], a: number, b: number) => b - a + 1
   const termRows = tshow ? rowsShown(tlines, tshow, flat) : tlines.length
   if (termRows > ROWS - MIN_EDITOR) FRAME_PROBLEMS.push(`${file}: the terminal shows ${termRows} rows; it holds at most ${ROWS - MIN_EDITOR} — keep fewer lines`)
