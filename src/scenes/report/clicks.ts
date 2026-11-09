@@ -34,7 +34,7 @@ export const reportClicks: SceneModel = ideFrame({
               type: 'group', id: 'shards', title: 'book-shop-clicks', tone: 'ingest', dir: 'row', children: shards.map((s) => (
                 { type: 'item' as const, id: s.id, icon: 'kinesis', title: short(s.id), sub: `${s.clicks} clicks`, stack: true })),
             },
-            { type: 'item', id: 'reader', icon: 'lambda', title: 'a consumer', sub: 'one per shard', stack: true },
+            { type: 'item', id: 'reader', icon: 'lambda', title: 'reader', sub: 'per shard', stack: true },
           ],
         },
         {
@@ -46,7 +46,7 @@ export const reportClicks: SceneModel = ideFrame({
     },
   ],
   edges: [
-    { from: 'pages', to: 'shards', label: 'PutRecords' },
+    { from: 'pages', to: 'shards', label: 'put' },
     { from: 'shards', to: 'reader' },
   ],
 })

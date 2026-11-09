@@ -37,7 +37,7 @@ export const reportQuery: SceneModel = ideFrame({
       type: 'group', id: 'diagram', bare: true, children: [
         { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: Athena accepted the query and gave it an id; the emulator does not run it. DuckDB ran the same SQL over the same files.' },
         {
-          type: 'group', id: 'lake', title: `order_history: ${of} day folders, ${read} read`, tone: 'source', dir: 'grid', cols: 6, children: [...days,
+          type: 'group', id: 'lake', title: `order_history: ${of} day folders, ${read} read`, tone: 'source', dir: 'grid', cols: 5, children: [...days,
         { type: 'item', id: 'saved', icon: 'filter', title: `dt = one day: ${read} file, ${kb(dayBytes)} of ${monthKib} KiB`, sub: `${Math.round((100 * dayBytes) / (monthKib * 1024))}% of the month's bytes read, and billed`, tone: 'ingest', span: 'all' }],
         },
       ],
