@@ -32,9 +32,9 @@ export const dataCatalog: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'rules', title: 'What the bucket now does', tone: 'ingest', columns: ['setting', 'effect'], rows: [
-        ['versioning', 'a write keeps the page it replaced'],
-        ['lifecycle', 'an old version lives 30 days'],
-        ['HttpsOnly', 'plain HTTP is denied (AWS\'s documentation)'],
+        ['versioning', 'a write keeps the old page'],
+        ['lifecycle', 'old versions live 30 days'],
+        ['HttpsOnly', 'plain HTTP denied (AWS docs)'],
       ],
     },
   ],

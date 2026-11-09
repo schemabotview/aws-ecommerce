@@ -26,10 +26,10 @@ export const dataOrders: SceneModel = ideFrame({
       ],
     },
     {
-      type: 'table', id: 'after', title: 'After both orders', tone: 'ingest', columns: ['', 'c-17', 'c-18'], rows: [
-        ['asked for', '2 × bk-1001', '1 × bk-1001, 2 × bk-1002'],
+      type: 'table', id: 'after', title: 'After both orders: bk-1001\'s stock', tone: 'ingest', columns: ['', 'c-17', 'c-18'], rows: [
+        ['cart', '2 bk-1001', '1 bk-1001, 2 bk-1002'],
         { cells: ['result', 'order 1, 21.98', 'out of stock'], tone: 'ingest' },
-        ['bk-1001 stock', '40 → 38', 'still 38'],
+        ['stock', '40 → 38', 'still 38'],
       ],
     },
   ],

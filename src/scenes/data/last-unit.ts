@@ -53,9 +53,9 @@ export const dataLastUnit: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'why', title: 'Why only one wins', tone: 'ingest', columns: ['', ''], rows: [
-        ['the condition', 'checked and written in one step, per item'],
-        ['the transaction', 'every item of a checkout, or none'],
-        ['no lock held', 'the loser fails at once, and can try again'],
+        ['condition', 'checked, written in one step'],
+        ['transaction', 'every item, or none'],
+        ['no lock held', 'the loser fails fast, retries'],
       ],
     },
   ],
