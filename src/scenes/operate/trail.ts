@@ -22,9 +22,10 @@ export const operateTrail: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'path', title: 'Every API call, kept', tone: 'source', children: [
-        { type: 'item', id: 'caller', icon: 'user', title: 'sam, in the console', sub: 'SetQueueAttributes', stack: true },
-        { type: 'item', id: 'trail', icon: 'cloudtrail', title: trail[0], sub: logging ? 'logging, every Region' : '?', stack: true },
-        { type: 'item', id: 'bucket', icon: 's3', title: 'book-shop-trail-…', sub: 'records + signed digests', stack: true, tone: 'ingest' },
+        { type: 'item', id: 'caller', icon: 'user', title: 'sam, in the console', sub: 'SetQueueAttributes' },
+        { type: 'item', id: 'trail', icon: 'cloudtrail', title: trail[0], sub: logging ? 'logging, every Region' : '?' },
+        { type: 'item', id: 'bucket', icon: 's3', title: 'book-shop-trail-…', sub: 'records + signed digests', tone: 'ingest' },
+        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the emulator records no events. The record is AWS\'s documented shape, filled with §9.6\'s change.' },
       ],
     },
     {
@@ -34,10 +35,9 @@ export const operateTrail: SceneModel = ideFrame({
         ['eventName', 'SetQueueAttributes'],
         ['userIdentity.arn', '…:assumed-role/BookShopDeveloper/sam'],
         ['sourceIPAddress', '203.0.113.24'],
-        ['requestParameters', 'VisibilityTimeout: 60, book-shop-fulfilment'],
+        ['requestParameters', 'VisibilityTimeout: 60, …'],
       ],
     },
-    { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the trail is stored and logging, but the emulator records no events. The record is the documented shape, filled with §9.6\'s console change.' },
   ],
   edges: [
     { from: 'caller', to: 'trail', label: 'recorded' },

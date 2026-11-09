@@ -26,23 +26,23 @@ export const operateBackup: SceneModel = ideFrame({
       type: 'group', id: 'path', title: `Every night at 03:00 (${rule[0]}: ${rule[1]})`, tone: 'source', children: [
         {
           type: 'group', id: 'chosen', title: 'selected', tone: 'serve', dir: 'row', children: [
-            { type: 'item', id: 'db', icon: 'rds', title: 'orders database', stack: true, muted: !chosen.includes('db:book-shop-orders') || undefined },
-            { type: 'item', id: 'carts', icon: 'dynamodb', title: 'carts, stock', stack: true, muted: !chosen.includes('book-shop-stock') || undefined },
+            { type: 'item', id: 'db', icon: 'rds', title: 'orders database', muted: !chosen.includes('db:book-shop-orders') || undefined },
+            { type: 'item', id: 'carts', icon: 'dynamodb', title: 'carts, stock', muted: !chosen.includes('book-shop-stock') || undefined },
           ],
         },
-        { type: 'item', id: 'vault', icon: 'backup', title: 'vault book-shop', sub: 'kept 35 days, our key', stack: true },
-        { type: 'item', id: 'copy', icon: 'account', title: 'audit 7777…', sub: 'a copy, kept 90 days', stack: true, tone: 'ingest' },
+        { type: 'item', id: 'vault', icon: 'backup', title: 'vault book-shop', sub: 'kept 35 days, our key' },
+        { type: 'item', id: 'copy', icon: 'account', title: 'audit 7777…', sub: 'a copy, kept 90 days', tone: 'ingest' },
+        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the plan and selection are stored and read back; the emulator takes no backups.' },
       ],
     },
     {
       type: 'table', id: 'drill', title: 'The restore drill, every quarter (AWS\'s steps)', tone: 'ingest', columns: ['step', 'proves'], rows: [
-        ['pick last night\'s recovery point', 'a backup exists'],
-        ['restore it as a NEW instance', 'it restores, and how long it takes'],
-        ['run the app\'s checks against it', 'the data is whole'],
-        ['write down the time taken', 'the real recovery time'],
+        ['last night\'s point', 'a backup exists'],
+        ['restore as NEW', 'it restores, and how fast'],
+        ['run the app\'s checks', 'the data is whole'],
+        ['note the time', 'the real recovery time'],
       ],
     },
-    { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the plan and selection are stored and read back; the emulator takes no backups.' },
   ],
   edges: [
     { from: 'chosen', to: 'vault' },

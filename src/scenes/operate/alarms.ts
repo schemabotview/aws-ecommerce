@@ -24,18 +24,22 @@ export const operateAlarms: SceneModel = ideFrame({
   keep: [['$ aws cloudwatch describe-alarms', 'book-shop-burn-slow'], '$ python -m tools.burn', ['18:20', '18:30'], 'the hour:'],
   side: [
     {
-      type: 'group', id: 'path', title: 'From a burning budget to a person', tone: 'source', dir: 'row', children: [
-        { type: 'item', id: 'rate', icon: 'activity', title: 'errors ÷ requests', sub: 'metric math', stack: true },
-        { type: 'item', id: 'alarm', icon: 'bell', title: 'burn alarms', sub: 'fast 7.2%, slow 3%', stack: true },
-        { type: 'item', id: 'topic', icon: 'sns', title: 'book-shop-alerts', sub: 'an email to alex', stack: true, tone: 'consume' },
-      ],
-    },
-    {
-      type: 'plot', id: 'burn-plot', compact: true, title: 'Last night\'s burn rate (dashed: the fast alarm, 14.4×)',
-      x: { labels: rows.map((m) => m[1].slice(3)), label: 'minutes after 18:00, 1 November' }, y: { min: 0, max: 30, step: 10, label: 'burn (×)' },
-      series: [
-        { kind: 'bar', points: rows.map((m, i) => [i, Number(m[4])]), tone: 'consume' },
-        { kind: 'segment', from: [-0.5, 14.4], to: [rows.length - 0.5, 14.4] },
+      type: 'group', id: 'diagram', bare: true, children: [
+        {
+          type: 'group', id: 'path', title: 'From a burning budget to a person', tone: 'source', dir: 'row', children: [
+            { type: 'item', id: 'rate', icon: 'activity', title: 'errors ÷ requests', sub: 'metric math', stack: true },
+            { type: 'item', id: 'alarm', icon: 'bell', title: 'burn alarms', sub: 'fast 7.2%, slow 3%', stack: true },
+            { type: 'item', id: 'topic', icon: 'sns', title: 'book-shop-alerts', sub: 'an email to alex', stack: true, tone: 'consume' },
+          ],
+        },
+        {
+          type: 'plot', id: 'burn-plot', compact: true, title: 'Last night\'s burn rate (dashed: the fast alarm, 14.4×)',
+          x: { labels: rows.map((m) => m[1].slice(3)), label: 'minutes after 18:00, 1 November' }, y: { min: 0, max: 30, step: 10, label: 'burn (×)' },
+          series: [
+            { kind: 'bar', points: rows.map((m, i) => [i, Number(m[4])]), tone: 'consume' },
+            { kind: 'segment', from: [-0.5, 14.4], to: [rows.length - 0.5, 14.4] },
+          ],
+        },
       ],
     },
     {

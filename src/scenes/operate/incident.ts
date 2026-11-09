@@ -24,10 +24,10 @@ export const operateIncident: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'response', title: 'Detect, contain, eradicate, recover', tone: 'source', children: [
-        { type: 'item', id: 'detect', icon: 'bell', title: '21:14 detect', sub: 'a key seen in a public chat', stack: true },
-        { type: 'item', id: 'contain', icon: 'lock', title: '21:16 contain', sub: `deny sessions before ${cutoff}`, stack: true, tone: 'consume' },
-        { type: 'item', id: 'eradicate', icon: 'search', title: 'eradicate', sub: 'how did it leak? the trail says', stack: true },
-        { type: 'item', id: 'recover', icon: 'check', title: 'recover', sub: 'new sessions work; write it up', stack: true, tone: 'ingest' },
+        { type: 'item', id: 'detect', icon: 'bell', title: '21:14 detect', sub: 'a key seen in a public chat' },
+        { type: 'item', id: 'contain', icon: 'lock', title: '21:16 contain', sub: `deny sessions before ${cutoff}`, tone: 'consume' },
+        { type: 'item', id: 'eradicate', icon: 'search', title: 'eradicate', sub: 'how did it leak? the trail says' },
+        { type: 'item', id: 'recover', icon: 'check', title: 'recover', sub: 'new sessions work; write it up', tone: 'ingest' },
       ],
     },
     {

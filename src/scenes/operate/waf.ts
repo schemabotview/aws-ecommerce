@@ -22,21 +22,21 @@ export const operateWaf: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'layers', title: 'A request passes four layers', tone: 'source', children: [
-        { type: 'item', id: 'waf', icon: 'waf', title: 'WAF: book-shop', sub: rules.map((m) => m[2]).join(', '), stack: true, tone: 'ingest' },
-        { type: 'item', id: 'alb', icon: 'alb', title: 'load balancer', sub: 'HTTPS only; 80 redirects', stack: true },
-        { type: 'item', id: 'sg', icon: 'lock', title: 'security group app', sub: '8080 from the load balancer only', stack: true },
-        { type: 'item', id: 'app', icon: 'fargate', title: 'the app', sub: 'checks every input itself', stack: true },
+        { type: 'item', id: 'waf', icon: 'waf', title: 'WAF: book-shop', sub: rules.map((m) => m[2]).join(', '), tone: 'ingest' },
+        { type: 'item', id: 'alb', icon: 'alb', title: 'load balancer', sub: 'HTTPS only; 80 redirects' },
+        { type: 'item', id: 'sg', icon: 'lock', title: 'security group app', sub: '8080 from the load balancer only' },
+        { type: 'item', id: 'app', icon: 'fargate', title: 'the app', sub: 'checks every input itself' },
+        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the ACL and its association are stored and read back; the emulator inspects no requests.' },
       ],
     },
     {
       type: 'table', id: 'stops', title: 'What each one stops', tone: 'ingest', columns: ['layer', 'stops'], rows: [
-        ['WAF', 'SQL injection, bad bots, a flood from one address'],
+        ['WAF', 'SQL injection, bots, floods'],
         ['load balancer', 'plain HTTP, old TLS'],
-        ['security group', 'anything not from the load balancer'],
-        ['the app', 'what only the shop knows is wrong'],
+        ['security group', 'all but the load balancer'],
+        ['the app', 'what only the shop knows'],
       ],
     },
-    { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the ACL and its association are stored and read back; the emulator inspects no requests.' },
   ],
   edges: [
     { from: 'waf', to: 'alb' },
