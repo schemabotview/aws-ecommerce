@@ -167,11 +167,22 @@ export function ideFrame({ tree, editor, session, keep, side, edges = [] }: IdeF
   const recorded = terminal(session).split('\n')
   const at: number[] = [] // at[i]: the first drawn row (1-based) of recorded line i + 1
   const drawn: string[] = []
-  for (const line of recorded) {
-    at.push(drawn.length + 1)
-    const mark = line.startsWith('! ') ? '! ' : ''
-    const body = mark ? line.slice(2) : line
-    drawn.push(...(body.match(new RegExp(`.{1,${COLS}}`, 'g')) ?? ['']).map((piece) => mark + piece))
+  const markOf = (line: string) => (line.startsWith('! ') ? '! ' : '')
+  const bodyOf = (line: string) => line.slice(markOf(line).length)
+  for (let i = 0; i < recorded.length;) {
+    // a row exactly EDITOR_COLS wide is one the spine wrapped: join it with the rows it ran on to, then
+    // wrap the whole line at COLS (cutting each recorded row in two would split words twice)
+    const mark = markOf(recorded[i])
+    let text = bodyOf(recorded[i])
+    let j = i
+    while (bodyOf(recorded[j]).length === EDITOR_COLS && j + 1 < recorded.length && markOf(recorded[j + 1]) === mark
+      && !recorded[j + 1].startsWith('$ ')) text += bodyOf(recorded[++j])
+    // a tab the pane draws 8 wide would push a row past COLS: draw it as one space, as terminal() does at 80
+    if (text.replace(/\t/g, '        ').length > COLS) text = text.replace(/\t/g, ' ')
+    const start = drawn.length + 1
+    for (let k = i; k <= j; k++) at.push(start + Math.floor(((k - i) * EDITOR_COLS) / COLS))
+    drawn.push(...(text.match(new RegExp(`.{1,${COLS}}`, 'g')) ?? ['']).map((piece) => mark + piece))
+    i = j + 1
   }
   at.push(drawn.length + 1)
   const rows = drawn.join('\n')

@@ -85,7 +85,9 @@ badly (tangled arrows, a half-empty side pane): capture and look.
   file only where `masked()` allows leaves the file alone. `--replay` re-runs everything from scratch
   and compares: use it after upgrading moto, Terraform, the CLI or the patch layer, not to author.
   One recording at a time (port 5000, a machine lock).
-- Every terminal is 80 columns: `spine.py` wraps at 80, `ide.ts` draws 80.
+- The spine records 80 columns (`spine.py` wraps there); the IDE frame's terminal draws 72: `ide.ts` joins
+  each row the spine wrapped and wraps the line again at 72, so the spine is untouched. The map frame's
+  terminal still draws 80.
 
 ## The machine (all in `scripts/`, all in SPIKE.md)
 
@@ -159,9 +161,14 @@ badly (tangled arrows, a half-empty side pane): capture and look.
 
 - **2026-11-08/09: frame v2 on every IDE section** (Course 5 `network` piloted, the rest ported); map
   frames are NOT yet redesigned. `node scripts/check-render.mjs <course>`. The recordings are v1.
-- **IDE frame v2** (`src/scenes/ide.ts`, `grid.ts`): editor over an 80-column terminal (760) | side pane 574,
-  no explorer, on the shared 1344 × 756 grid. Side pane STRICT (≤ 2 parts; with two, one a group or plot).
-  Formerly: python-expense-tracker's template. Fixed columns; the
+- **IDE frame v2** (`src/scenes/ide.ts`, `grid.ts`): compact explorer 175 | editor over a 72-column
+  terminal 715 | side pane 434, on the shared 1344 × 756 grid (python-expense-tracker's columns; the
+  explorer restored 2026-11-09, owner's option A). Side pane STRICT (≤ 2 parts; with two, one a group or
+  plot). The explorer (`tree.ts`) clips a name past its row with `…`, drops a note that does not fit
+  beside the name, and trims its biggest open folder (`… N more files`) past 23 rows. Fitting a side
+  pane to 434: a table column is as wide as its widest cell (~43 monospace characters for 2 columns,
+  41 for 3); one long edge label widens EVERY gap in its row; a table that quotes values as recorded
+  takes tighter padding in `theme.css` instead. Fixed columns; the
   terminal shows ≤ `TERMINAL_ROWS` rows — fold with `keep` (lines found by TEXT, never numbers).
   **Every side pane is a diagram** (an edge, plot or table; check-content fails a list), its parts
   in ONE group, and stays inside its column (check-render). An emulated pane's note sits INSIDE the

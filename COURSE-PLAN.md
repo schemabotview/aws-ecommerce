@@ -430,6 +430,15 @@ graphl-flow 0.10's shared grid (1344 × 756 at a 1% margin, ≈ 2.8× at 4K); th
 - **Map frames are unchanged for now** (the map is a fixed 1150 × 1040 diagram with an 80-column side;
   a larger map needs a redesign — owner's decision).
 
+**Revised (owner, 2026-11-09): the explorer comes back** (option A, as in azure-trade-finance): compact
+explorer 175 | editor over terminal 715 | side pane 434, python-expense-tracker's columns, because the
+explorer is where a viewer sees the project's Terraform files and which one a section adds. The
+terminal draws 72 columns: the spine still records 80, and `ide.ts` joins each wrapped row and wraps
+the line again at 72 (`keep` still names recorded lines). The explorer clips a long name with `…` and
+drops a note that does not fit. Every side pane was refitted to 434 by shortening literal cells and
+captions (never a value read from the spine; a few quoted tables take tighter padding instead); no
+narration was edited, and every "Emulated:" note was kept.
+
 Piloted on Course 5 `network`, then every course's IDE sections (2026-11-09; owner review pending).
 Making the side panes strict dropped their non-emulated notes and some second tables; every
 "Emulated:" / "Walked locally:" note was kept, inside the diagram. Narration edited for v2: none.

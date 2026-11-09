@@ -8,7 +8,7 @@ Read this first in a new session. Branch everywhere: `claude/friendly-sagan-ptl0
 |---|---|
 | linux-admin, data-science-house-prices | frame v2, merged to `main` earlier. Not affected by this change |
 | **azure-trade-finance** | **DONE on the branch, not merged.** IDE frame v2 WITH the explorer (175 \| 715 \| 434) on all 62 IDE frames; maps unchanged. tsc, build, `npm run check` (88 sections), `check:spine` (72 steps) all green; every frame looked at. Docs: COURSE-PLAN Decision 6, CLAUDE.md "Frames". Waiting on the owner's review, then merge to `main` |
-| **aws-ecommerce** | **TO DO.** `main` = this branch = frame v2 WITHOUT an explorer (760 \| 574), merged on 2026-11-09. The owner reviewed it and wants the explorer back (option A below), same as azure |
+| **aws-ecommerce** | **DONE on branch `claude/vibrant-bardeen-qplxcd`, not merged** (2026-11-09). Explorer restored (175 \| 715 \| 434) on all 53 IDE frames; maps and ◆ scenes unchanged. tsc, build, `npm run check` (92 sections), `check:spine` (78 steps) green; every frame shot and looked at. No narration edited. Docs: CLAUDE.md "Frames", COURSE-PLAN "Decided (2026-11-08)". Waiting on the owner's review |
 
 ## The decision (owner, 2026-11-09): option A
 
@@ -83,3 +83,14 @@ reports "no remote branch", run
 
 Tell the owner both repos are ready for review: azure's routes, then aws's. Every course in both needs
 re-recording, because the frame changed (the wavs are unaffected: no narration edits).
+
+## Found while porting to aws (2026-11-09): back-port to azure
+
+- **The terminal cut each recorded 80-column row into 72 + 8**, so a long line read `…when calling t` /
+  `he Creat` / `eBucket operation…`. aws's `ideFrame` now joins a run of rows the spine wrapped (a row
+  exactly 80 wide, same `! ` mark, the next not a `$ ` command) and wraps the whole line at 72; `at[]`
+  maps each recorded row to its drawn row proportionally, so `keep` is unchanged. azure's `ide.ts` has
+  the 72 + 8 cut: port this block (and the tab rule after it) there.
+- **Explorer notes**: aws's notes (`boto3, pytest, psycopg`, `moved to S3`) overflowed 175px. `tree.ts`
+  now exports `fitEntry`: the name is clipped first (NAME_ROOM 21, measured), and a note is drawn only
+  when name and note fit the row together. azure had no long notes, so it is unaffected.
