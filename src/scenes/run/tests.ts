@@ -15,9 +15,9 @@ export const runTests: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'where', title: 'Where a test\'s S3 call goes', tone: 'source', children: [
-        { type: 'item', id: 'test', icon: 'check', title: 'a test', sub: 'pytest', stack: true },
-        { type: 'item', id: 'app', icon: 'python', title: 'the app\'s code', sub: 'unchanged', stack: true },
-        { type: 'item', id: 'boto', icon: 'python', title: 'boto3', sub: 'the real client', stack: true },
+        { type: 'item', id: 'test', icon: 'check', title: 'a test', sub: 'pytest' },
+        { type: 'item', id: 'app', icon: 'python', title: 'the app\'s code', sub: 'unchanged' },
+        { type: 'item', id: 'boto', icon: 'python', title: 'boto3', sub: 'the real client' },
         {
           type: 'group', id: 'targets', bare: true, dir: 'row', children: [
             { type: 'item', id: 'mock', icon: 'layers', title: 'mock_aws', sub: 'in the test process', stack: true, tone: 'ingest' },

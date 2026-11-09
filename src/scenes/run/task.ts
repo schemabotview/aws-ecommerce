@@ -40,7 +40,6 @@ export const runTask: SceneModel = ideFrame({
         { cells: ['read books/bk-1001.json', 'the app', 'task'], tone: 'ingest' },
       ],
     },
-    { type: 'note', id: 'why', tone: 'source', text: 'Two roles, so the app\'s credentials can read books and nothing else: they can neither pull images nor write to the logs.' },
   ],
   edges: [
     { from: 'taskdef', to: 'exec' },

@@ -23,19 +23,19 @@ export const runScaling: SceneModel = ideFrame({
   keep: ['Apply complete!', ['$ aws application-autoscaling describe-scalable-targets', '3\t12'], ['$ POLICY=', '60\t60\t300']],
   side: [
     {
-      type: 'group', id: 'loop', title: 'The loop, once a minute', tone: 'source', dir: 'row', children: [
-        { type: 'item', id: 'metric', icon: 'cloudwatch', title: 'average CPU', sub: 'of the service', stack: true },
-        { type: 'item', id: 'alarm', icon: 'bell', title: 'alarm', sub: '3 minutes above 60%', stack: true },
-        { type: 'item', id: 'desired', icon: 'ecsservice', title: 'desired count', sub: 'tasks × CPU ÷ 60', stack: true },
+      type: 'group', id: 'diagram', bare: true, children: [
+        {
+          type: 'group', id: 'loop', title: 'The loop, once a minute', tone: 'source', dir: 'row', children: [
+            { type: 'item', id: 'metric', icon: 'cloudwatch', title: 'average CPU', sub: 'of the service', stack: true },
+            { type: 'item', id: 'alarm', icon: 'bell', title: 'alarm', sub: '3 minutes above 60%', stack: true },
+            { type: 'item', id: 'desired', icon: 'ecsservice', title: 'desired count', sub: 'tasks × CPU ÷ 60', stack: true },
+          ],
+        },
+        {
+          type: 'plot', id: 'cpu-plot', compact: true, title: `The evening peak (a model): CPU, and ${tasks.at(-1)![1]} tasks by the end`, x: span, y: { min: 0, max: 100, step: 20, label: '% CPU' },
+          series: [{ kind: 'line', points: cpu, label: 'CPU', tone: 'consume' }, { kind: 'segment', from: [span.min, 60], to: [span.max, 60], label: 'target' }],
+        },
       ],
-    },
-    {
-      type: 'plot', id: 'cpu-plot', compact: true, title: 'The evening peak: average CPU (a model)', x: span, y: { min: 0, max: 100, step: 20, label: '% CPU' },
-      series: [{ kind: 'line', points: cpu, label: 'CPU', tone: 'consume' }, { kind: 'segment', from: [span.min, 60], to: [span.max, 60], label: 'target' }],
-    },
-    {
-      type: 'plot', id: 'tasks-plot', compact: true, title: 'Tasks in service', x: span, y: { min: 0, max: 8, step: 2, label: 'tasks' },
-      series: [{ kind: 'line', points: tasks, label: 'tasks', tone: 'serve' }],
     },
   ],
   edges: [

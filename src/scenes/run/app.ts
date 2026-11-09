@@ -14,10 +14,10 @@ export const runApp: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'path', title: 'GET /books/bk-1001, through the code', tone: 'source', children: [
-        { type: 'item', id: 'curl', icon: 'terminal', title: 'curl', sub: '127.0.0.1:8080', stack: true },
-        { type: 'item', id: 'handler', icon: 'python', title: 'web.py: Shop.do_GET', sub: 'matches /books/<id>', stack: true },
-        { type: 'item', id: 'catalog', icon: 'python', title: 'catalog.py: get_book', sub: 'boto3 S3 client', stack: true },
-        { type: 'item', id: 's3', icon: 's3', title: 'books/bk-1001.json', sub: 'the catalog bucket · emulated', stack: true },
+        { type: 'item', id: 'curl', icon: 'terminal', title: 'curl', sub: '127.0.0.1:8080' },
+        { type: 'item', id: 'handler', icon: 'python', title: 'web.py: Shop.do_GET', sub: 'matches /books/<id>' },
+        { type: 'item', id: 'catalog', icon: 'python', title: 'catalog.py: get_book', sub: 'boto3 S3 client' },
+        { type: 'item', id: 's3', icon: 's3', title: 'books/bk-1001.json', sub: 'the catalog bucket · emulated' },
       ],
     },
     {

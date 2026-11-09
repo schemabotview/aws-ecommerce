@@ -23,13 +23,17 @@ export const runImage: SceneModel = ideFrame({
   keep: ['$ docker build', ['$ docker run', 'book-shop:1.0.0'], ['$ curl', '"title"'], ['$ python tools/push_image.py', 'sha256:']],
   side: [
     {
-      type: 'group', id: 'image', icon: 'docker', title: 'book-shop:1.0.0, layer by layer', tone: 'source', children: layers.map(([id, icon, title, size]) => (
-        { type: 'item', id, icon, title, sub: size, tone: id === 'l-app' ? 'serve' : undefined })),
-    },
-    {
-      type: 'group', id: 'goes', bare: true, dir: 'row', children: [
-        { type: 'item', id: 'run', icon: 'container', title: 'a container', sub: 'docker run: the image, started', stack: true },
-        { type: 'item', id: 'ecr', icon: 'ecr', title: 'ECR: book-shop', sub: 'its manifest · emulated', stack: true },
+      type: 'group', id: 'diagram', bare: true, children: [
+        {
+          type: 'group', id: 'image', icon: 'docker', title: 'book-shop:1.0.0, layer by layer', tone: 'source', children: layers.map(([id, icon, title, size]) => (
+            { type: 'item', id, icon, title, sub: size, tone: id === 'l-app' ? 'serve' : undefined })),
+        },
+        {
+          type: 'group', id: 'goes', bare: true, dir: 'row', children: [
+            { type: 'item', id: 'run', icon: 'container', title: 'a container', sub: 'docker run: the image, started', stack: true },
+            { type: 'item', id: 'ecr', icon: 'ecr', title: 'ECR: book-shop', sub: 'its manifest · emulated', stack: true },
+          ],
+        },
       ],
     },
     {

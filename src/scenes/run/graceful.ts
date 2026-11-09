@@ -20,9 +20,9 @@ export const runGraceful: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'stop', title: 'Removing a task, in order', tone: 'source', children: [
-        { type: 'item', id: 'drain', icon: 'alb', title: '1 · the target drains', sub: 'no new requests; 30 s for those in flight', stack: true },
-        { type: 'item', id: 'term', icon: 'zap', title: '2 · ECS sends SIGTERM', sub: 'the app stops accepting, finishes, exits 0', stack: true },
-        { type: 'item', id: 'kill', icon: 'lock', title: '3 · SIGKILL, if still running', sub: 'stopTimeout: 30 s after SIGTERM', stack: true, tone: 'consume' },
+        { type: 'item', id: 'drain', icon: 'alb', title: '1 · the target drains', sub: 'no new requests; 30 s for those in flight' },
+        { type: 'item', id: 'term', icon: 'zap', title: '2 · ECS sends SIGTERM', sub: 'the app stops accepting, finishes, exits 0' },
+        { type: 'item', id: 'kill', icon: 'lock', title: '3 · SIGKILL, if still running', sub: 'stopTimeout: 30 s after SIGTERM', tone: 'consume' },
       ],
     },
     {
