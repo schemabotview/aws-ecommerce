@@ -4,3 +4,10 @@
 :root {
   --brand: #ff9900;
 }
+
+/* Frame v2's 434px side pane: a table that quotes values as they are (account ids, role names, a
+   tag) takes tighter cell padding instead of a shortened value. */
+.gf-table[data-id='profiles'] td { padding-inline: 4px; }
+[data-id='three'] .gf-table td { padding-inline: 1px; }
+.gf-table[data-id='rt-public'] :is(td, th),
+.gf-table[data-id='rt-private'] :is(td, th) { padding-inline: 3px; }

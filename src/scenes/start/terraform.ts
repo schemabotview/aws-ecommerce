@@ -36,8 +36,8 @@ export const startTerraform: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'commands', title: 'Three commands', tone: 'source', columns: ['command', 'does'], rows: [
-        ['init', 'downloads the provider, writes the lock file'],
-        ['plan', 'compares the three, saves the difference'],
+        ['init', 'gets the provider, writes the lock'],
+        ['plan', 'compares the three, saves the diff'],
         ['apply', 'makes the calls, records the result'],
       ],
     },

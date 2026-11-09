@@ -19,9 +19,9 @@ export const startState: SceneModel = ideFrame({
         { type: 'item', id: 'sam', icon: 'user', title: 'sam, in the console', sub: 'adds a tag: owner = sam', tone: 'consume' },
         {
           type: 'group', id: 'three', title: 'Three places a tag can be', tone: 'source', dir: 'row', children: [
-            { type: 'table', id: 'cfg', title: 'the code', columns: ['tag'], rows: [['app = book-shop']] },
-            { type: 'table', id: 'st', title: 'the state', columns: ['tag'], rows: [['app = book-shop']] },
-            { type: 'table', id: 'live', title: 'the bucket', columns: ['tag'], rows: [['app = book-shop'], { id: 'owner', cells: ['owner = sam'], tone: 'consume' }] },
+            { type: 'table', id: 'cfg', title: 'the code', columns: ['tag'], rows: [['app=book-shop']] },
+            { type: 'table', id: 'st', title: 'the state', columns: ['tag'], rows: [['app=book-shop']] },
+            { type: 'table', id: 'live', title: 'the bucket', columns: ['tag'], rows: [['app=book-shop'], { id: 'owner', cells: ['owner=sam'], tone: 'consume' }] },
           ],
         },
         { type: 'item', id: 'refresh', icon: 'search', title: 'plan refreshes', sub: 'reads the bucket, compares with the code', tone: 'ingest' },
@@ -32,7 +32,7 @@ export const startState: SceneModel = ideFrame({
       type: 'table', id: 'rules', title: 'Drift', tone: 'source', columns: ['', ''], rows: [
         ['who made it', 'sam, in the console'],
         ['who noticed', 'terraform plan'],
-        ['the cure', 'change the code, or let apply put it back'],
+        ['the cure', 'change the code, or let apply'],
       ],
     },
   ],

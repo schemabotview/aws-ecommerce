@@ -31,10 +31,10 @@ export const startEmulator: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'shows', title: 'What the emulator can show', tone: 'ingest', columns: ['', 'emulated'], rows: [
-        ['every API call and its answer', 'yes'],
-        ['state: what exists, with its ids', 'yes'],
-        ['IAM allowing or denying a request', 'yes, when on'],
-        { cells: ['packets, latency, a failing AZ', 'no: a model'], tone: 'consume' },
+        ['every API call, its answer', 'yes'],
+        ['state: what exists, its ids', 'yes'],
+        ['IAM: allow or deny a call', 'yes, when on'],
+        { cells: ['packets, latency, a lost AZ', 'no: a model'], tone: 'consume' },
         { cells: ['a bill', 'no: a rate card'], tone: 'consume' },
       ],
     },

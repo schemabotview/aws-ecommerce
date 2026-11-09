@@ -27,17 +27,17 @@ export const startRemoteState: SceneModel = ideFrame({
             },
             {
               type: 'group', id: 'bucket', icon: 's3', title: 'the state bucket', sub: 'book-shop-tfstate-444455556666', tone: 'ingest', spread: true, children: [
-                { type: 'item', id: 'lock', icon: 'lock', title: 'terraform.tfstate.tflock', sub: 'written by the run that starts first', tone: 'consume' },
-                { type: 'item', id: 'object', icon: 'file', title: 'book-shop/terraform.tfstate', sub: 'one state: versioned, every write kept' },
+                { type: 'item', id: 'lock', icon: 'lock', title: 'terraform.tfstate\u200b.tflock', sub: 'written by the first run', tone: 'consume' },
+                { type: 'item', id: 'object', icon: 'file', title: 'book-shop/\u200bterraform.tfstate', sub: 'versioned: every write kept' },
               ],
             },
           ],
         },
         {
           type: 'group', id: 'egg', title: 'Who keeps whose state', tone: 'source', dir: 'row', children: [
-            { type: 'item', id: 'boot', icon: 'terraform', title: 'infra/bootstrap', sub: 'its state: a local file', stack: true },
-            { type: 'item', id: 'state-bucket', icon: 's3', title: 'the state bucket', sub: 'made once, kept forever', stack: true },
-            { type: 'item', id: 'main', icon: 'terraform', title: 'infra', sub: 'its state: in the bucket', stack: true },
+            { type: 'item', id: 'boot', icon: 'terraform', title: 'bootstrap', sub: 'local state', stack: true },
+            { type: 'item', id: 'state-bucket', icon: 's3', title: 'the bucket', sub: 'made once', stack: true },
+            { type: 'item', id: 'main', icon: 'terraform', title: 'infra', sub: 'state in S3', stack: true },
           ],
         },
       ],

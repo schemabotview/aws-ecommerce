@@ -26,7 +26,7 @@ export const startScript: SceneModel = ideFrame({
             {
               type: 'group', id: 'run2', title: 'Run 2', tone: 'consume', children: [
                 { type: 'item', id: 'r2-create', icon: 'zap', title: 'CreateBucket', sub: 'already yours', stack: true },
-                { type: 'item', id: 'r2-tag', icon: 'check', title: 'PutBucketTagging', sub: 'never ran: set -e', stack: true, muted: true },
+                { type: 'item', id: 'r2-tag', icon: 'check', title: 'PutBucket\u200bTagging', sub: 'never ran: set -e', stack: true, muted: true },
               ],
             },
           ],
@@ -42,9 +42,9 @@ export const startScript: SceneModel = ideFrame({
     {
       type: 'table', id: 'compare', title: 'A script says what to DO, not what should EXIST', tone: 'consume', columns: ['when…', 'the script'], rows: [
         ['you run it twice', 'fails on its own work'],
-        ['someone changes the bucket', 'never knows'],
-        ['you want it gone', 'needs another script'],
-        ['you review a change', 'reads commands, not results'],
+        ['someone edits it', 'never knows'],
+        ['you want it gone', 'another script'],
+        ['you review it', 'commands, not results'],
       ],
     },
   ],
