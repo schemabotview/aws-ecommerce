@@ -196,7 +196,7 @@ try {
       // --- the IDE template -----------------------------------------------------------------------------
       let panes = null
       if (ide) {
-        panes = Object.fromEntries(['workbench', 'side'] /* frame v2: the editor/terminal divider moves with the transcript */.map((p) => [p, node(p) && Object.values(R(node(p))).map((v) => Math.round(v))]))
+        panes = Object.fromEntries(['explorer', 'workbench', 'side'] /* frame v2: the editor/terminal divider moves with the transcript */.map((p) => [p, node(p) && Object.values(R(node(p))).map((v) => Math.round(v))]))
         const pane = R(node('side'))
         const leaves = [...node('side').querySelectorAll(LEAVES)].map(R)
         const top = Math.min(...leaves.map((r) => r.y)), bottom = Math.max(...leaves.map((r) => r.y + r.h))
@@ -204,8 +204,11 @@ try {
         if (fill < limits.fill) out.push(`the side pane's content spans ${Math.round(fill * 100)}% of its height (< ${Math.round(limits.fill * 100)}%) — fill the column with the diagram`)
         // ...and stays INSIDE it: the pane has a fixed height, and frame v2's first build of §5.6 and §5.10
         // pushed a table off the frame's bottom with every other check green (linux-admin found the same).
-        const inside = [...node('side').querySelectorAll('[data-id]')].map(R)
-        if (inside.some((r) => r.y + r.h > pane.y + pane.h + 1 || r.x + r.w > pane.x + pane.w + 1)) out.push('the side pane runs outside its column — cut it to fit')
+        const over = [...node('side').querySelectorAll('[data-id]')].map((e) => ({ id: e.dataset.id, r: R(e) }))
+          .map(({ id, r }) => ({ id, down: r.y + r.h - pane.y - pane.h, right: r.x + r.w - pane.x - pane.w }))
+          .filter(({ down, right }) => down > 1 || right > 1)
+        // name the outermost parts that stick out, and by how much (natural px), so the cut can be sized
+        if (over.length) out.push(`the side pane runs outside its column — cut it to fit (${over.slice(0, 3).map(({ id, down, right }) => `${id}: ${down > 1 ? `${Math.round(down)}px down` : ''}${down > 1 && right > 1 ? ', ' : ''}${right > 1 ? `${Math.round(right)}px right` : ''}`).join('; ')})`)
         for (const id of ['editor', 'terminal']) {
           const e = node(id), r = e && R(e)
           if (r && e.scrollHeight > e.clientHeight + 1) out.push(`the ${id} holds more rows than it shows`)
@@ -231,7 +234,7 @@ try {
 const [ref] = ide
 for (const { slug, panes, fit } of ide.slice(1)) {
   if (fit !== ref.fit) problems.push(`${slug}  fit ${fit} differs from ${ref.slug}'s ${ref.fit} — an IDE frame must not change the zoom`)
-  for (const pane of ['workbench', 'side'] /* frame v2: the editor/terminal divider moves with the transcript */) {
+  for (const pane of ['explorer', 'workbench', 'side'] /* frame v2: the editor/terminal divider moves with the transcript */) {
     const a = ref.panes[pane], b = panes[pane]
     if (!a || !b || a.some((v, i) => v !== b[i])) problems.push(`${slug}  the ${pane} pane is at [${b}], not [${a}] as in ${ref.slug}`)
   }

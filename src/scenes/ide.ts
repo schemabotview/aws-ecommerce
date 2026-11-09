@@ -1,24 +1,25 @@
-import type { Code, Edge, Group, SceneModel, SceneNode, TreeEntry } from '@graphlearning/graphl-flow'
-import { FRAME_H, GAP, SIDE_W, WORK_W } from './grid'
+import type { Code, Edge, Group, SceneModel, SceneNode, Tree, TreeEntry } from '@graphlearning/graphl-flow'
+import { EXPLORER_W, FRAME_H, GAP, SIDE_W, WORK_W } from './grid'
 
 // IDE frame v2 (python-expense-tracker's frame v2 on graphl-flow 0.10's shared grid, grid.ts):
 //
-//   editor (the rows the terminal leaves)   | side pane 574 (STRICT: one diagram, at most one table)
-//   terminal docked under it (its rows)     |
+//   explorer 175 | editor (the rows the terminal leaves)   | side pane 434 (STRICT: one diagram,
+//                | terminal docked under it (its rows)     |   at most one table)
 //
-// No explorer (grid.ts says why); `tree` is kept in the call so a scene still names its files.
-//
-// 1344 × 756 at a 1% margin. The editor and terminal share ROWS rows: the terminal takes exactly the
-// rows it shows (kept lines plus one row per fold, at least MIN_TERMINAL), the editor the rest, so only
-// the divider moves. The terminal is 80 columns, as the spine recorded it; the editor soft-wraps past
-// ~77. A terminal or a shown range that does not fit is RECORDED in FRAME_PROBLEMS (check-content fails
+// 1344 × 756 at a 1% margin, python-expense-tracker's columns. The editor and terminal share ROWS rows:
+// the terminal takes exactly the rows it shows (kept lines, their wrapped pieces, one row per fold, at
+// least MIN_TERMINAL), the editor the rest, so only the divider moves. The spine records 80 columns; the
+// terminal draws 72, wrapping each longer row as a 72-column terminal would (`keep` still names the
+// recorded lines). The editor soft-wraps past ~70. A terminal or a shown range that does not fit is RECORDED in FRAME_PROBLEMS (check-content fails
 // it, naming the file) and drawn anyway: a throw would take the whole app down with one section.
 
 const ROW = 24
 const CHROME = 51
-export { FRAME_H, SIDE_W, WORK_W }
+export { EXPLORER_W, FRAME_H, SIDE_W, WORK_W }
+/** The width the spine records at (scripts/spine.py), and the width the terminal draws. */
 export const EDITOR_COLS = 80
-const EDITOR_WRAP = 74 // measured: 760 − borders, gutter and padding leaves ~74 columns of 9px
+export const COLS = 72
+const EDITOR_WRAP = 70 // 715 − borders, gutter and padding: ~70 columns of 9px
 export const ROWS = Math.floor((FRAME_H - GAP - 2 * CHROME) / ROW)
 export const MIN_TERMINAL = 6
 export const MIN_EDITOR = 8
@@ -160,11 +161,22 @@ function grow(code: string, ranges: [number, number][], room: number): [number, 
 /** Frames that could not hold their content; check-content reports every one. */
 export const FRAME_PROBLEMS: string[] = []
 
-export function ideFrame({ editor, session, keep, side, edges = [] }: IdeFrame): SceneModel {
+export function ideFrame({ tree, editor, session, keep, side, edges = [] }: IdeFrame): SceneModel {
   const file = editor.file
-  const rows = terminal(session)
-  const tlines = rows.split('\n')
-  const tshow = keep && keepLines(rows, keep)
+  // keep names RECORDED lines; each recorded line becomes one or more 72-column rows
+  const recorded = terminal(session).split('\n')
+  const at: number[] = [] // at[i]: the first drawn row (1-based) of recorded line i + 1
+  const drawn: string[] = []
+  for (const line of recorded) {
+    at.push(drawn.length + 1)
+    const mark = line.startsWith('! ') ? '! ' : ''
+    const body = mark ? line.slice(2) : line
+    drawn.push(...(body.match(new RegExp(`.{1,${COLS}}`, 'g')) ?? ['']).map((piece) => mark + piece))
+  }
+  at.push(drawn.length + 1)
+  const rows = drawn.join('\n')
+  const tlines = drawn
+  const tshow = keep && keepLines(recorded.join('\n'), keep).map(([a, b]) => [at[a - 1], at[b] - 1] as [number, number])
   const flat = (_: string[], a: number, b: number) => b - a + 1
   const termRows = tshow ? rowsShown(tlines, tshow, flat) : tlines.length
   if (termRows > ROWS - MIN_EDITOR) FRAME_PROBLEMS.push(`${file}: the terminal shows ${termRows} rows; it holds at most ${ROWS - MIN_EDITOR} — keep fewer lines`)
@@ -195,8 +207,9 @@ export function ideFrame({ editor, session, keep, side, edges = [] }: IdeFrame):
     type: 'code', id: IDE_IDS.terminal, terminal: true, filename: `terminal — ${PROJECT}`, code: rows,
     show: tshow, fill: true, w: WORK_W, minH: FRAME_H - GAP - editorH(editorRows),
   }
+  const explorer: Tree = { type: 'tree', id: IDE_IDS.explorer, title: PROJECT, entries: tree, compact: true, fill: true, w: EXPLORER_W, minH: FRAME_H }
   const pane: Group = { type: 'group', id: IDE_IDS.side, bare: true, spread: true, w: SIDE_W, h: FRAME_H, children: side }
-  return { dir: 'row', padding: 0.01, nodes: [{ type: 'group', id: 'workbench', bare: true, children: [ed, term] }, pane], edges }
+  return { dir: 'row', padding: 0.01, nodes: [explorer, { type: 'group', id: 'workbench', bare: true, children: [ed, term] }, pane], edges }
 }
 
 /** The 1-based number of the first line of `code` containing `text`, searching from line `from`. */

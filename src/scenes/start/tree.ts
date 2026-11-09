@@ -1,11 +1,13 @@
 import type { TreeEntry } from '@graphlearning/graphl-flow'
+import { fitEntry } from '../tree'
 
 // The explorer through Course 3, step by step: what the project holds after each section, the open
 // file `active`, what this section added `new`. Generated files (.terraform/, local state, the saved
 // plan) show muted, as an editor greys out what .gitignore covers.
 
 type Mark = 'active' | 'new' | undefined
-const f = (name: string, state?: Mark | 'muted', note?: string): TreeEntry => ({ name, state, note })
+// every file here sits at the top level or in infra/ (depth 1); bootstrap/'s are one deeper
+const f = (name: string, state?: Mark | 'muted', note?: string, depth = 1): TreeEntry => ({ ...fitEntry(name, depth, note), state })
 
 export interface Files {
   /** The path of the open file. */
@@ -21,7 +23,7 @@ const mark = (path: string, { active, fresh = [] }: Files): Mark =>
 export function startTree(n: number, files: Files): TreeEntry[] {
   const m = (path: string) => mark(path, files)
   const infra: TreeEntry[] = []
-  if (n >= 7) infra.push({ name: 'bootstrap', state: m('infra/bootstrap/main.tf'), children: [({ name: '.terraform', folder: true, state: 'muted' } as TreeEntry), f('.terraform.lock.hcl'), f('main.tf', m('infra/bootstrap/main.tf')), f('terraform.tfstate', 'muted', 'local')] })
+  if (n >= 7) infra.push({ name: 'bootstrap', state: m('infra/bootstrap/main.tf'), children: [({ name: '.terraform', folder: true, state: 'muted' } as TreeEntry), f('.terraform.lock.hcl', undefined, undefined, 2), f('main.tf', m('infra/bootstrap/main.tf'), undefined, 2), f('terraform.tfstate', 'muted', 'local', 2)] })
   if (n >= 5) infra.push(({ name: '.terraform', folder: true, state: 'muted' } as TreeEntry))
   if (n >= 5) infra.push(f('.terraform.lock.hcl', n === 5 ? 'new' : undefined))
   if (n >= 7) infra.push(f('backend.tf', m('infra/backend.tf')))
