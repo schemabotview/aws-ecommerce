@@ -15,11 +15,11 @@ export const startProfile: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'flow', title: 'aws … --profile book-shop-dev', tone: 'source', children: [
-        { type: 'item', id: 'cli', icon: 'terminal', title: 'the CLI', sub: 'reads the profile', stack: true },
-        { type: 'item', id: 'session-cfg', icon: 'file', title: 'sso-session book-shop', sub: 'the portal and its Region', stack: true },
-        { type: 'item', id: 'portal', icon: 'identitycenter', title: 'the access portal', sub: 'alex signs in, in a browser', stack: true },
-        { type: 'item', id: 'token', icon: 'key', title: 'a token, cached', sub: 'none yet: the CLI stops here', tone: 'consume', stack: true },
-        { type: 'item', id: 'creds', icon: 'sts', title: 'role credentials', sub: 'BookShopDeveloper, for hours', stack: true },
+        { type: 'item', id: 'cli', icon: 'terminal', title: 'the CLI', sub: 'reads the profile' },
+        { type: 'item', id: 'session-cfg', icon: 'file', title: 'sso-session book-shop', sub: 'the portal and its Region' },
+        { type: 'item', id: 'portal', icon: 'identitycenter', title: 'the access portal', sub: 'alex signs in, in a browser' },
+        { type: 'item', id: 'token', icon: 'key', title: 'a token, cached', sub: 'none yet: the CLI stops here', tone: 'consume' },
+        { type: 'item', id: 'creds', icon: 'sts', title: 'role credentials', sub: 'BookShopDeveloper, for hours' },
       ],
     },
     {
@@ -28,7 +28,6 @@ export const startProfile: SceneModel = ideFrame({
         ['book-shop-prod', '111122223333', 'BookShopReadOnly'],
       ],
     },
-    { type: 'note', id: 'refused', tone: 'consume', text: 'No token yet, so the CLI stops before it calls AWS at all: nothing was sent, nothing was denied.' },
   ],
   edges: [
     { from: 'cli', to: 'session-cfg' },

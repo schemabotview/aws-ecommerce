@@ -16,18 +16,22 @@ export const startTerraform: SceneModel = ideFrame({
     '$ terraform apply tfplan', 'Apply complete!'],
   side: [
     {
-      type: 'group', id: 'inputs', title: 'plan compares three things', tone: 'source', dir: 'row', children: [
-        { type: 'item', id: 'desired', icon: 'terraform', title: 'the code', sub: 'infra/*.tf', stack: true },
-        { type: 'item', id: 'known', icon: 'file', title: 'the state', sub: 'what it made', stack: true },
-        { type: 'item', id: 'real', icon: 'cloud', title: 'the account', sub: 'what is there', stack: true },
-      ],
-    },
-    { type: 'item', id: 'plan', icon: 'search', title: 'plan: + 1 bucket', sub: 'the difference, saved to tfplan', tone: 'ingest', stack: true },
-    { type: 'item', id: 'apply', icon: 'zap', title: 'apply tfplan', sub: 'only what the plan showed', tone: 'ingest', stack: true },
-    {
-      type: 'group', id: 'outputs', tone: 'ingest', dir: 'row', children: [
-        { type: 'item', id: 'made', icon: 's3', title: 'the account', sub: 'gets the bucket', stack: true },
-        { type: 'item', id: 'recorded', icon: 'file', title: 'the state', sub: 'records it', stack: true },
+      type: 'group', id: 'diagram', bare: true, children: [
+        {
+          type: 'group', id: 'inputs', title: 'plan compares three things', tone: 'source', dir: 'row', children: [
+            { type: 'item', id: 'desired', icon: 'terraform', title: 'the code', sub: 'infra/*.tf', stack: true },
+            { type: 'item', id: 'known', icon: 'file', title: 'the state', sub: 'what it made', stack: true },
+            { type: 'item', id: 'real', icon: 'cloud', title: 'the account', sub: 'what is there', stack: true },
+          ],
+        },
+        { type: 'item', id: 'plan', icon: 'search', title: 'plan: + 1 bucket', sub: 'the difference, saved to tfplan', tone: 'ingest' },
+        { type: 'item', id: 'apply', icon: 'zap', title: 'apply tfplan', sub: 'only what the plan showed', tone: 'ingest' },
+        {
+          type: 'group', id: 'outputs', tone: 'ingest', dir: 'row', children: [
+            { type: 'item', id: 'made', icon: 's3', title: 'the account', sub: 'gets the bucket', stack: true },
+            { type: 'item', id: 'recorded', icon: 'file', title: 'the state', sub: 'records it', stack: true },
+          ],
+        },
       ],
     },
     {

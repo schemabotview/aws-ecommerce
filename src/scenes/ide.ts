@@ -169,7 +169,12 @@ export function ideFrame({ editor, session, keep, side, edges = [] }: IdeFrame):
   const hl = editor.highlight ?? []
   const want: [number, number][] = editor.show ?? (hl.length ? [[Math.min(...hl), Math.max(...hl)]] : [[1, 1]])
   let show: [number, number][] | undefined
-  try { show = grow(code, want, editorRows) } catch (e) { FRAME_PROBLEMS.push(`${file}: ${(e as Error).message}`); show = want }
+  try { show = grow(code, want, editorRows) } catch (e) {
+    // v1's hand-picked ranges were sized for a 23-row editor: when they do not fit, fall back to a window
+    // around the highlighted lines (the part the section is about); report only if even that cannot fit.
+    try { show = hl.length ? grow(code, [[Math.min(...hl), Math.max(...hl)]], editorRows) : grow(code, [want[0]], editorRows) }
+    catch { FRAME_PROBLEMS.push(`${file} (highlight ${hl.length ? `${Math.min(...hl)}–${Math.max(...hl)}` : 'none'}): ${(e as Error).message}`); show = want }
+  }
   const ed: Code = {
     type: 'code', id: IDE_IDS.editor, filename: file, lang: editor.lang ?? langOf(file), code, highlight: hl, wrap: true,
     tone: 'ingest', fill: true, w: WORK_W, minH: editorH(editorRows), ...(show && { show }),

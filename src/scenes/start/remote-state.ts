@@ -16,17 +16,28 @@ export const startRemoteState: SceneModel = ideFrame({
     '$ terraform init -migrate-state', 'Successfully configured the backend "s3"', '$ aws s3 ls', 'book-shop/terraform.tfstate'],
   side: [
     {
-      type: 'group', id: 'shared', bare: true, dir: 'row', children: [
+      type: 'group', id: 'diagram', bare: true, children: [
         {
-          type: 'group', id: 'people', title: 'Two runs', tone: 'source', spread: true, children: [
-            { type: 'item', id: 'alex', icon: 'user', title: 'alex', sub: 'terraform apply', stack: true },
-            { type: 'item', id: 'ci', icon: 'githubactions', title: 'the pipeline', sub: 'terraform apply', stack: true },
+          type: 'group', id: 'shared', bare: true, dir: 'row', children: [
+            {
+              type: 'group', id: 'people', title: 'Two runs', tone: 'source', spread: true, children: [
+                { type: 'item', id: 'alex', icon: 'user', title: 'alex', sub: 'terraform apply', stack: true },
+                { type: 'item', id: 'ci', icon: 'githubactions', title: 'the pipeline', sub: 'terraform apply', stack: true },
+              ],
+            },
+            {
+              type: 'group', id: 'bucket', icon: 's3', title: 'the state bucket', sub: 'book-shop-tfstate-444455556666', tone: 'ingest', spread: true, children: [
+                { type: 'item', id: 'lock', icon: 'lock', title: 'terraform.tfstate.tflock', sub: 'written by the run that starts first', tone: 'consume' },
+                { type: 'item', id: 'object', icon: 'file', title: 'book-shop/terraform.tfstate', sub: 'one state: versioned, every write kept' },
+              ],
+            },
           ],
         },
         {
-          type: 'group', id: 'bucket', icon: 's3', title: 'the state bucket', sub: 'book-shop-tfstate-444455556666', tone: 'ingest', spread: true, children: [
-            { type: 'item', id: 'lock', icon: 'lock', title: 'terraform.tfstate.tflock', sub: 'written by the run that starts first', tone: 'consume' },
-            { type: 'item', id: 'object', icon: 'file', title: 'book-shop/terraform.tfstate', sub: 'one state: versioned, every write kept' },
+          type: 'group', id: 'egg', title: 'Who keeps whose state', tone: 'source', dir: 'row', children: [
+            { type: 'item', id: 'boot', icon: 'terraform', title: 'infra/bootstrap', sub: 'its state: a local file', stack: true },
+            { type: 'item', id: 'state-bucket', icon: 's3', title: 'the state bucket', sub: 'made once, kept forever', stack: true },
+            { type: 'item', id: 'main', icon: 'terraform', title: 'infra', sub: 'its state: in the bucket', stack: true },
           ],
         },
       ],
@@ -39,14 +50,6 @@ export const startRemoteState: SceneModel = ideFrame({
         ['4', '', 'locks, plans the NEW state'],
       ],
     },
-    {
-      type: 'group', id: 'egg', title: 'Who keeps whose state', tone: 'source', dir: 'row', children: [
-        { type: 'item', id: 'boot', icon: 'terraform', title: 'infra/bootstrap', sub: 'its state: a local file', stack: true },
-        { type: 'item', id: 'state-bucket', icon: 's3', title: 'the state bucket', sub: 'made once, kept forever', stack: true },
-        { type: 'item', id: 'main', icon: 'terraform', title: 'infra', sub: 'its state: in the bucket', stack: true },
-      ],
-    },
-    { type: 'note', id: 'keep', tone: 'consume', text: 'Bootstrap\'s local state is the only record of the state bucket, and .gitignore keeps every state file out of git: keep a copy somewhere safe.' },
   ],
   edges: [
     { from: 'alex', to: 'lock', label: 'holds' },

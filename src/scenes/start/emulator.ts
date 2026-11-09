@@ -12,17 +12,21 @@ export const startEmulator: SceneModel = ideFrame({
   session,
   side: [
     {
-      type: 'group', id: 'clients', title: 'The real tools', tone: 'source', dir: 'row', children: [
-        { type: 'item', id: 'cli', icon: 'terminal', title: 'AWS CLI', stack: true },
-        { type: 'item', id: 'sdk', icon: 'python', title: 'boto3', stack: true },
-        { type: 'item', id: 'tf', icon: 'terraform', title: 'Terraform', stack: true },
-      ],
-    },
-    { type: 'item', id: 'decide', icon: 'settings', title: 'AWS_ENDPOINT_URL', sub: 'set by env.sh?', stack: true },
-    {
-      type: 'group', id: 'targets', bare: true, dir: 'row', children: [
-        { type: 'item', id: 'moto', icon: 'server', title: 'localhost:5000', sub: 'set: moto, emulated', tone: 'ingest', stack: true },
-        { type: 'item', id: 'aws', icon: 'cloud', title: 'sts.eu-west-2.amazonaws.com', sub: 'unset: AWS itself', stack: true },
+      type: 'group', id: 'diagram', bare: true, children: [
+        {
+          type: 'group', id: 'clients', title: 'The real tools', tone: 'source', dir: 'row', children: [
+            { type: 'item', id: 'cli', icon: 'terminal', title: 'AWS CLI', stack: true },
+            { type: 'item', id: 'sdk', icon: 'python', title: 'boto3', stack: true },
+            { type: 'item', id: 'tf', icon: 'terraform', title: 'Terraform', stack: true },
+          ],
+        },
+        { type: 'item', id: 'decide', icon: 'settings', title: 'AWS_ENDPOINT_URL', sub: 'set by env.sh?', stack: true },
+        {
+          type: 'group', id: 'targets', bare: true, dir: 'row', children: [
+            { type: 'item', id: 'moto', icon: 'server', title: 'localhost:5000', sub: 'set: moto, emulated', tone: 'ingest', stack: true },
+            { type: 'item', id: 'aws', icon: 'cloud', title: 'sts.eu-west-2.amazonaws.com', sub: 'unset: AWS itself', stack: true },
+          ],
+        },
       ],
     },
     {
@@ -34,7 +38,6 @@ export const startEmulator: SceneModel = ideFrame({
         { cells: ['a bill', 'no: a rate card'], tone: 'consume' },
       ],
     },
-    { type: 'note', id: 'label', tone: 'source', text: 'Every pane that talks to the emulator says so. Its account is 444455556666: the course builds in the development account.' },
   ],
   edges: [
     { from: 'clients', to: 'decide' },
