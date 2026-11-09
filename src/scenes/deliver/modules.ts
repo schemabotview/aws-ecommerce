@@ -37,7 +37,7 @@ export const deliverModules: SceneModel = ideFrame({
     {
       type: 'table', id: 'addresses', title: 'Same things, new addresses', tone: 'ingest', columns: ['before', 'after: module.network.…'], rows: [
         ['aws_vpc.shop', 'aws_vpc.this'],
-        ['aws_subnet.this["app-a"]', 'aws_subnet.this["app-a"]'],
+        ['aws_subnet.this[…]', 'aws_subnet.this[…]'],
         ['aws_nat_gateway.a', 'aws_nat_gateway.a'],
       ],
     },

@@ -45,10 +45,10 @@ export const deliverEnvs: SceneModel = ideFrame({
     {
       type: 'table', id: 'differs', title: 'What differs, and what does not', tone: 'source', columns: ['', 'dev', 'prod'], rows: [
         ['the code', 'modules/network', 'modules/network'],
-        ['inputs', 'cidr 10.20.0.0/16', 'cidr 10.40.0.0/16'],
-        ['account, state', '4444…, its bucket', '1111…, its bucket'],
-        ['reached through', 'BookShopDeveloper', 'OrganizationAccount…'],
-        ['a mistake reaches', 'dev only', 'prod only'],
+        ['cidr', '10.20.0.0/16', '10.40.0.0/16'],
+        ['account', '444455556666', '111122223333'],
+        ['state', 'its own bucket', 'its own bucket'],
+        ['a mistake', 'stays in dev', 'stays in prod'],
       ],
     },
   ],

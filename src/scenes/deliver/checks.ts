@@ -29,9 +29,9 @@ export const deliverChecks: SceneModel = ideFrame({
     {
       type: 'table', id: 'checks', title: 'What each check answered here', tone: 'ingest', columns: ['check', 'result'], rows: [
         ['fmt -check', 'formatted (exit 0)'],
-        ['validate', 'the configuration is valid'],
-        ['plan -detailed-exitcode', '0: no changes pending'],
-        { cells: ['fmt -check, scratch.tf', 'exit 3: blocks the merge'], tone: 'consume' },
+        ['validate', 'configuration valid'],
+        ['plan -detailed-exitcode', '0: no changes'],
+        { cells: ['fmt -check, scratch.tf', 'exit 3: blocks merge'], tone: 'consume' },
       ],
     },
   ],

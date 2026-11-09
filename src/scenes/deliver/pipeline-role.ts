@@ -32,8 +32,8 @@ export const deliverPipelineRole: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'who', title: 'Who may assume which role', tone: 'ingest', columns: ['account', 'trusts a run from'], rows: [
-        ['dev 444455556666', 'main, or a pull request (plan only)'],
-        { cells: ['prod 111122223333', 'the production environment only'], tone: 'consume' },
+        ['dev 444455556666', 'main; PRs (plan only)'],
+        { cells: ['prod 111122223333', 'environment: production'], tone: 'consume' },
       ],
     },
   ],
