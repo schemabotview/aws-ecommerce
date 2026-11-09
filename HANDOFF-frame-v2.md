@@ -90,7 +90,8 @@ re-recording, because the frame changed (the wavs are unaffected: no narration e
   `he Creat` / `eBucket operation…`. aws's `ideFrame` now joins a run of rows the spine wrapped (a row
   exactly 80 wide, same `! ` mark, the next not a `$ ` command) and wraps the whole line at 72; `at[]`
   maps each recorded row to its drawn row proportionally, so `keep` is unchanged. azure's `ide.ts` has
-  the 72 + 8 cut: port this block (and the tab rule after it) there.
+  the 72 + 8 cut: port this block (and the tab rule after it) there. **Done 2026-11-09** on
+  azure's `claude/vibrant-bardeen-qplxcd` (built on `claude/friendly-sagan-ptl0lo`).
 - **Explorer notes**: aws's notes (`boto3, pytest, psycopg`, `moved to S3`) overflowed 175px. `tree.ts`
   now exports `fitEntry`: the name is clipped first (NAME_ROOM 21, measured), and a note is drawn only
   when name and note fit the row together. azure had no long notes, so it is unaffected.
