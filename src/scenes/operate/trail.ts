@@ -25,7 +25,7 @@ export const operateTrail: SceneModel = ideFrame({
         { type: 'item', id: 'caller', icon: 'user', title: 'sam, in the console', sub: 'SetQueueAttributes' },
         { type: 'item', id: 'trail', icon: 'cloudtrail', title: trail[0], sub: logging ? 'logging, every Region' : '?' },
         { type: 'item', id: 'bucket', icon: 's3', title: 'book-shop-trail-…', sub: 'records + signed digests', tone: 'ingest' },
-        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the emulator records no events. The record is AWS\'s documented shape, filled with §9.6\'s change.' },
+        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: no events are recorded. This is AWS\'s documented shape, with §9.6\'s change.' },
       ],
     },
     {
@@ -33,7 +33,7 @@ export const operateTrail: SceneModel = ideFrame({
         ['eventTime', '2026-10-31T19:02:11Z'],
         ['eventSource', 'sqs.amazonaws.com'],
         ['eventName', 'SetQueueAttributes'],
-        ['userIdentity.arn', '…:assumed-role/BookShopDeveloper/sam'],
+        ['userIdentity.arn', '…/BookShopDeveloper/sam'],
         ['sourceIPAddress', '203.0.113.24'],
         ['requestParameters', 'VisibilityTimeout: 60, …'],
       ],

@@ -1,3 +1,4 @@
+import { SIDE_PLOT_W } from '../grid'
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { ideFrame, lineOf } from '../ide'
 import { operateTree } from './files'
@@ -28,13 +29,13 @@ export const operateLogs: SceneModel = ideFrame({
         {
           type: 'group', id: 'path', title: 'From a log line to a number', tone: 'source', dir: 'row', children: [
             { type: 'item', id: 'app', icon: 'fargate', title: 'the app', sub: '{"status": 503, …}', stack: true },
-            { type: 'item', id: 'group', icon: 'cloudwatch', title: '/book-shop/app', sub: 'every line, 30 days', stack: true },
+            { type: 'item', id: 'group', icon: 'cloudwatch', title: '/book-shop/app', sub: '30 days', stack: true },
             { type: 'item', id: 'filter', icon: 'filter', title: 'metric filters', sub: 'status >= 500', stack: true },
-            { type: 'item', id: 'metric', icon: 'activity', title: 'BookShop/Errors5xx', sub: 'a count a minute', stack: true, tone: 'ingest' },
+            { type: 'item', id: 'metric', icon: 'activity', title: 'BookShop/\u200bErrors5xx', sub: 'a count a minute', stack: true, tone: 'ingest' },
           ],
         },
         {
-          type: 'plot', id: 'errors-plot', compact: true, title: `Errors per 10 min: ${errors} of ${total}; worst minute ${worst[0]}, ${worst[1]} of ${worst[2]}`,
+          type: 'plot', id: 'errors-plot', compact: true, w: SIDE_PLOT_W, title: `Errors per 10 min: ${errors} of ${total}; worst minute ${worst[0]}, ${worst[1]} of ${worst[2]}`,
           x: { labels: sums.map((m) => m[1]), label: '1 November' }, y: { min: 0, max: 300, step: 100, label: 'errors' },
           series: [{ kind: 'bar', points: sums.map((m, i) => [i, Number(m[2])]), tone: 'consume' }],
         },

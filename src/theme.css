@@ -13,3 +13,5 @@
 .gf-table[data-id='rt-private'] :is(td, th) { padding-inline: 3px; }
 /* §8.6's run quotes the workflow's states and its failure as recorded */
 .gf-table[data-id='run11'] :is(td, th) { padding-inline: 3px; }
+/* §11.5's verdict quotes the alarm times tools/burn.py printed */
+.gf-table[data-id='verdict'] :is(td, th) { padding-inline: 5px; }

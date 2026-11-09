@@ -1,3 +1,4 @@
+import { SIDE_PLOT_W } from '../grid'
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import burn from '../../../spine/operate/03-alarms/session.txt?raw'
 
@@ -22,7 +23,7 @@ export const operateEvening: SceneModel = {
     {
       type: 'group', id: 'three', bare: true, dir: 'row', children: [
         {
-          type: 'plot', id: 'metric', compact: true, title: 'A metric: when, and how much',
+          type: 'plot', id: 'metric', compact: true, w: SIDE_PLOT_W, title: 'A metric: when, and how much',
           x: { labels: rows.map((m) => m[1].slice(3)), label: 'minutes after 18:00, 1 November' }, y: { min: 0, max: 16, step: 4, label: 'errors, %' },
           series: [{ kind: 'bar', points: rows.map((m, i) => [i, Number(m[3])]), tone: 'consume' }],
         },

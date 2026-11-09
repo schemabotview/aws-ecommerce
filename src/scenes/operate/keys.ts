@@ -42,10 +42,10 @@ export const operateKeys: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'sizes', title: 'What tools/envelope.py stored', tone: 'ingest', columns: ['', 'bytes'], rows: [
-        ['the order, encrypted (AES-GCM)', stored[0]],
-        ['its data key, encrypted by KMS', stored[1]],
-        ['the KMS key itself', 'none: it never leaves KMS'],
-        ['the plaintext data key', /^the plaintext data key: dropped$/m.test(session) ? 'none: dropped' : '?'],
+        ['the order (AES-GCM)', stored[0]],
+        ['its data key (KMS)', stored[1]],
+        ['the KMS key', 'none: stays in KMS'],
+        ['plaintext data key', /^the plaintext data key: dropped$/m.test(session) ? 'none: dropped' : '?'],
       ],
     },
   ],

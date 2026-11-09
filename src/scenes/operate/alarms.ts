@@ -1,3 +1,4 @@
+import { SIDE_PLOT_W } from '../grid'
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { ideFrame, lineOf } from '../ide'
 import { operateTree } from './files'
@@ -29,11 +30,11 @@ export const operateAlarms: SceneModel = ideFrame({
           type: 'group', id: 'path', title: 'From a burning budget to a person', tone: 'source', dir: 'row', children: [
             { type: 'item', id: 'rate', icon: 'activity', title: 'errors ÷ requests', sub: 'metric math', stack: true },
             { type: 'item', id: 'alarm', icon: 'bell', title: 'burn alarms', sub: 'fast 7.2%, slow 3%', stack: true },
-            { type: 'item', id: 'topic', icon: 'sns', title: 'book-shop-alerts', sub: 'an email to alex', stack: true, tone: 'consume' },
+            { type: 'item', id: 'topic', icon: 'sns', title: 'book-shop-alerts', sub: 'email to alex', stack: true, tone: 'consume' },
           ],
         },
         {
-          type: 'plot', id: 'burn-plot', compact: true, title: 'Last night\'s burn rate (dashed: the fast alarm, 14.4×)',
+          type: 'plot', id: 'burn-plot', compact: true, w: SIDE_PLOT_W, title: 'Last night\'s burn rate (dashed: 14.4×, the fast alarm)',
           x: { labels: rows.map((m) => m[1].slice(3)), label: 'minutes after 18:00, 1 November' }, y: { min: 0, max: 30, step: 10, label: 'burn (×)' },
           series: [
             { kind: 'bar', points: rows.map((m, i) => [i, Number(m[4])]), tone: 'consume' },
@@ -43,10 +44,10 @@ export const operateAlarms: SceneModel = ideFrame({
       ],
     },
     {
-      type: 'table', id: 'verdict', title: 'What the alarms would have said (tools/burn.py)', tone: 'ingest', columns: ['alarm', 'window', 'last night'], rows: [
-        ['fast: 14.4×', '5 minutes', `ALARM ${firing.map((m) => m[1]).join(', ')}`],
-        ['slow: 6×', 'the hour', `${hour[2]}: ${hour[0]}%, ${hour[1]}×`],
-        ['the budget', '30 days', '0.5% of requests may fail'],
+      type: 'table', id: 'verdict', title: 'The alarms, replayed (tools/burn.py)', tone: 'ingest', columns: ['alarm', 'window', 'last night'], rows: [
+        ['fast 14.4×', '5 min', `ALARM ${firing.map((m) => m[1]).join(', ')}`],
+        ['slow 6×', '1 hour', `${hour[2]}: ${hour[0]}%, ${hour[1]}×`],
+        ['budget', '30 days', '0.5% may fail'],
       ],
     },
   ],

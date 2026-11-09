@@ -38,7 +38,7 @@ export const operateBackup: SceneModel = ideFrame({
     {
       type: 'table', id: 'drill', title: 'The restore drill, every quarter (AWS\'s steps)', tone: 'ingest', columns: ['step', 'proves'], rows: [
         ['last night\'s point', 'a backup exists'],
-        ['restore as NEW', 'it restores, and how fast'],
+        ['restore as NEW', 'restores, how fast'],
         ['run the app\'s checks', 'the data is whole'],
         ['note the time', 'the real recovery time'],
       ],

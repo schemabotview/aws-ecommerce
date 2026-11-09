@@ -32,9 +32,9 @@ export const operateIncident: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'timeline', title: 'What the terminal showed', tone: 'ingest', columns: ['time', 'who', 'result'], rows: [
-        ['21:14', 'the leaked session', lists >= 1 ? 'lists the catalog' : '?'],
+        ['21:14', 'leaked task-1', lists >= 1 ? 'lists the catalog' : '?'],
         ['21:16', 'Terraform', `the Deny on BookShopApp`],
-        { cells: ['21:16', 'the leaked session', denied ? 'AccessDenied' : '?'], tone: 'consume' },
+        { cells: ['21:16', 'leaked task-1', denied ? 'AccessDenied' : '?'], tone: 'consume' },
         ['21:16', 'a new session', lists >= 2 ? 'lists the catalog' : '?'],
       ],
     },
