@@ -21,10 +21,10 @@ export const decoupleDeadLetters: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'tries', title: 'Order 999: received, never deleted', tone: 'source', children: [
-        { type: 'item', id: 'r1', icon: 'sqs', title: 'receive 1', sub: 'cannot pack: no delete', stack: true },
-        { type: 'item', id: 'r2', icon: 'sqs', title: 'receive 2', sub: 'the same, 31 s later', stack: true },
-        { type: 'item', id: 'r3', icon: 'sqs', title: 'receive 3', sub: 'maxReceiveCount reached', stack: true },
-        { type: 'item', id: 'dlq', icon: 'sqs', title: 'book-shop-fulfilment-dlq', sub: 'moved on the 4th receive', stack: true, tone: 'consume' },
+        { type: 'item', id: 'r1', icon: 'sqs', title: 'receive 1', sub: 'cannot pack: no delete' },
+        { type: 'item', id: 'r2', icon: 'sqs', title: 'receive 2', sub: 'the same, 31 s later' },
+        { type: 'item', id: 'r3', icon: 'sqs', title: 'receive 3', sub: 'maxReceiveCount reached' },
+        { type: 'item', id: 'dlq', icon: 'sqs', title: 'book-shop-fulfilment-dlq', sub: 'moved on the 4th receive', tone: 'consume' },
       ],
     },
     {

@@ -29,7 +29,7 @@ export const decoupleEvents: SceneModel = ideFrame({
             { type: 'item', id: 'e-ref', icon: 'file', title: 'RefundRequested', sub: 'order 4, returns', stack: true },
           ],
         },
-        { type: 'item', id: 'bus', icon: 'eventbridge', title: 'bus book-shop', sub: 'every rule sees every event', stack: true },
+        { type: 'item', id: 'bus', icon: 'eventbridge', title: 'bus book-shop', sub: 'every rule sees every event' },
         {
           type: 'group', id: 'rules', bare: true, dir: 'row', children: [
             { type: 'item', id: 'r-vat', icon: 'filter', title: 'rule uk-vat', sub: 'OrderPlaced, country GB', stack: true },
@@ -47,8 +47,8 @@ export const decoupleEvents: SceneModel = ideFrame({
     {
       type: 'table', id: 'vs', title: 'A topic, or a bus', tone: 'ingest', columns: ['', 'SNS topic', 'EventBridge bus'], rows: [
         ['who sends', 'one producer', 'many sources'],
-        ['who gets it', 'every subscriber', 'whoever a rule matches'],
-        ['matching on', 'a filter per subscription', 'any field, in a rule'],
+        ['who gets it', 'every subscriber', 'what a rule matches'],
+        ['matching', 'a subscription filter', 'any field, a rule'],
       ],
     },
   ],

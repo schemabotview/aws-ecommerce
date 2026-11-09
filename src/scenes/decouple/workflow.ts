@@ -29,27 +29,29 @@ export const decoupleWorkflow: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'machine', title: 'book-shop-checkout, as Step Functions runs it', tone: 'source', children: [
-        { type: 'item', id: 's-reserve', icon: 'lambda', title: 'ReserveStock', sub: 'take the copies', stack: true },
-        { type: 'item', id: 's-charge', icon: 'lambda', title: 'ChargePayment', sub: 'timeout: retry at 2 s, then 4 s', stack: true },
+        { type: 'group', id: 'start', bare: true, dir: 'row', children: [
+          { type: 'item', id: 's-reserve', icon: 'lambda', title: 'ReserveStock', sub: 'take the copies', stack: true },
+          { type: 'item', id: 's-charge', icon: 'lambda', title: 'ChargePayment', sub: 'timeout: retry at 2 s, then 4 s', stack: true },
+        ] },
         {
           type: 'group', id: 'ends', bare: true, dir: 'row', children: [
-            { type: 'item', id: 's-ship', icon: 'package', title: 'ShipOrder', sub: 'succeeded', stack: true, tone: 'ingest' },
-            { type: 'item', id: 's-release', icon: 'lambda', title: 'ReleaseStock', sub: 'give the copies back', stack: true, tone: 'consume' },
-            { type: 'item', id: 's-failed', icon: 'lock', title: 'OrderFailed', sub: 'the execution fails', stack: true, tone: 'consume' },
+            { type: 'item', id: 's-ship', icon: 'package', title: 'ShipOrder', sub: 'succeeded', tone: 'ingest', stack: true },
+            { type: 'item', id: 's-release', icon: 'lambda', title: 'ReleaseStock', sub: 'on catch: copies back', tone: 'consume', stack: true },
+            { type: 'item', id: 's-failed', icon: 'lock', title: 'OrderFailed', sub: 'the execution fails', tone: 'consume', stack: true },
           ],
         },
+        { type: 'note', id: 'walked', tone: 'consume', text: 'Walked locally: the emulator runs no step. The stock changes are real; the payment answers are stand-ins.' },
       ],
     },
     {
       type: 'table', id: 'run11', title: 'Order 11: the card is declined', tone: 'consume', columns: ['at', 'state', 'result'],
       rows: runs['11'] ?? [],
     },
-    { type: 'note', id: 'walked', tone: 'consume', text: 'Walked locally: the emulator records the state machine and runs no step. The stock changes are real; the payment answers are stand-ins.' },
   ],
   edges: [
     { from: 's-reserve', to: 's-charge' },
-    { from: 's-charge', to: 's-ship', label: 'paid' },
-    { from: 's-charge', to: 's-release', label: 'catch' },
+    { from: 's-charge', to: 's-ship' },
+    { from: 's-charge', to: 's-release', dashed: true },
     { from: 's-release', to: 's-failed' },
   ],
 })

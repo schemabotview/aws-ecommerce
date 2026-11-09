@@ -22,15 +22,18 @@ export const decoupleFunction: SceneModel = ideFrame({
   side: [
     {
       type: 'group', id: 'poller', title: 'The event source mapping: Lambda polls for you', tone: 'source', children: [
-        { type: 'item', id: 'queue', icon: 'sqs', title: 'book-shop-fulfilment', sub: `${batch} messages waiting`, stack: true },
-        { type: 'item', id: 'esm', icon: 'lambda', title: 'the poller', sub: 'up to 10 messages, or 5 s', stack: true },
-        { type: 'item', id: 'fn', icon: 'lambda', title: 'book-shop-fulfil', sub: 'one call per batch', stack: true },
+        { type: 'group', id: 'chain', bare: true, dir: 'row', children: [
+          { type: 'item', id: 'queue', icon: 'sqs', title: 'the queue', sub: `${batch} waiting`, stack: true },
+          { type: 'item', id: 'esm', icon: 'lambda', title: 'the poller', sub: '≤ 10, or 5 s', stack: true },
+          { type: 'item', id: 'fn', icon: 'lambda', title: 'book-shop-fulfil', sub: 'one call a batch', stack: true },
+        ] },
         {
           type: 'group', id: 'after', bare: true, dir: 'row', children: [
             { type: 'item', id: 'ok', icon: 'check', title: `${result?.[1] ?? '?'} deleted`, sub: 'packed', stack: true, tone: 'ingest' },
             { type: 'item', id: 'back', icon: 'clock', title: `${result?.[2] ?? '?'} left`, sub: 'reported failed: retried', stack: true, tone: 'consume' },
           ],
         },
+        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the emulator records the function and the mapping and runs neither. tools/poll.py plays the poller, with the real handler.' },
       ],
     },
     {
@@ -40,7 +43,6 @@ export const decoupleFunction: SceneModel = ideFrame({
         ['one bad message', 'your code', 'batchItemFailures'],
       ],
     },
-    { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the emulator records the function and the mapping and runs neither. tools/poll.py plays the poller, with the real handler.' },
   ],
   edges: [
     { from: 'queue', to: 'esm', label: 'receive' },

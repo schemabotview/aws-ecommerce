@@ -48,7 +48,6 @@ export const decoupleOnce: SceneModel = ideFrame({
         ['a skipped copy', 'reported done: deleted, not retried'],
       ],
     },
-    { type: 'note', id: 'atomic', tone: 'source', text: 'The condition is checked and the key written in one step: two copies arriving at the same moment cannot both win.' },
   ],
   edges: [
     { from: 'd1', to: 'claim' },

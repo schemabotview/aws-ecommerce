@@ -20,17 +20,21 @@ export const decoupleQueue: SceneModel = ideFrame({
   keep: [['$ python -m tools.checkout', 'OrderPlaced sent'], ['received order', 'crashed before the delete'], ['$ sleep 31', 'deleted: done']],
   side: [
     {
-      type: 'group', id: 'path', title: 'Checkout no longer waits for packing', tone: 'source', dir: 'row', children: [
-        { type: 'item', id: 'producer', icon: 'fargate', title: 'checkout', sub: 'records, sends, answers', stack: true },
-        { type: 'item', id: 'queue', icon: 'sqs', title: 'book-shop-fulfilment', sub: 'kept up to 4 days', stack: true },
-        { type: 'item', id: 'consumer', icon: 'package', title: 'a worker', sub: 'receive, pack, delete', stack: true },
-      ],
-    },
-    {
-      type: 'group', id: 'clock', title: `Order ${order}'s message, by the clock`, tone: 'ingest', children: [
-        { type: 'item', id: 't0', icon: 'clock', title: `0 s · receive, count ${counts[0] ?? '?'}`, sub: 'the worker crashes: no delete', stack: true },
-        { type: 'item', id: 'hidden', icon: 'lock', title: '0–30 s · hidden', sub: 'in flight: a receive finds nothing', stack: true },
-        { type: 'item', id: 't31', icon: 'check', title: `31 s · receive, count ${counts[1] ?? '?'}`, sub: 'packed, then deleted', stack: true, tone: 'ingest' },
+      type: 'group', id: 'diagram', bare: true, children: [
+        {
+          type: 'group', id: 'path', title: 'Checkout no longer waits for packing', tone: 'source', dir: 'row', children: [
+            { type: 'item', id: 'producer', icon: 'fargate', title: 'checkout', sub: 'records, sends, answers', stack: true },
+            { type: 'item', id: 'queue', icon: 'sqs', title: 'book-shop-fulfilment', sub: 'kept up to 4 days', stack: true },
+            { type: 'item', id: 'consumer', icon: 'package', title: 'a worker', sub: 'receive, pack, delete', stack: true },
+          ],
+        },
+        {
+          type: 'group', id: 'clock', title: `Order ${order}'s message, by the clock`, tone: 'ingest', children: [
+            { type: 'item', id: 't0', icon: 'clock', title: `0 s · receive, count ${counts[0] ?? '?'}`, sub: 'the worker crashes: no delete' },
+            { type: 'item', id: 'hidden', icon: 'lock', title: '0–30 s · hidden', sub: 'in flight: a receive finds nothing' },
+            { type: 'item', id: 't31', icon: 'check', title: `31 s · receive, count ${counts[1] ?? '?'}`, sub: 'packed, then deleted', tone: 'ingest' },
+          ],
+        },
       ],
     },
     {
