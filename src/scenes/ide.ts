@@ -44,7 +44,11 @@ export function terminal(session: string): string {
     else if (line === 'Traceback (most recent call last):') mode = 'python'
     // an AWS CLI error is one line, wrapped: it goes on while the row before it filled the pane
     else if (mode === 'aws' && previous.length !== EDITOR_COLS) mode = 'none'
-    out.push(mode === 'none' ? line : `! ${line}`)
+    // spine.py wraps at 80 counting a tab as ONE column, and the pane draws it 8 wide: a row with tabs
+    // that would overflow draws each tab as the one space the wrap assumed (§11.8's ARN list).
+    const width = line.replace(/\t/g, '        ').length
+    const drawn = width > EDITOR_COLS ? line.replace(/\t/g, ' ') : line
+    out.push(mode === 'none' ? drawn : `! ${drawn}`)
     if (mode === 'python' && /^[A-Za-z_][\w.]*(Error|Exception)\b/.test(line)) mode = 'none'
     previous = line
   }
@@ -172,9 +176,17 @@ export function ideFrame({ editor, session, keep, side, edges = [] }: IdeFrame):
   try { show = grow(code, want, editorRows) } catch (e) {
     // v1's hand-picked ranges were sized for a 23-row editor: when they do not fit, fall back to a window
     // around the highlighted lines (the part the section is about); report only if even that cannot fit.
+    const runs = hl.length ? [...hl].sort((x, y) => x - y).reduce<[number, number][]>((out, n) => {
+      const last = out[out.length - 1]
+      if (last && n === last[1] + 1) last[1] = n; else out.push([n, n])
+      return out
+    }, []) : []
     try { show = hl.length ? grow(code, [[Math.min(...hl), Math.max(...hl)]], editorRows) : grow(code, [want[0]], editorRows) }
+    catch {
+    // the highlighted lines alone, folds between their runs
+    try { if (runs.length < 2) throw 0; show = grow(code, runs, editorRows) }
     catch { FRAME_PROBLEMS.push(`${file} (highlight ${hl.length ? `${Math.min(...hl)}–${Math.max(...hl)}` : 'none'}): ${(e as Error).message}`); show = want }
-  }
+  } }
   const ed: Code = {
     type: 'code', id: IDE_IDS.editor, filename: file, lang: editor.lang ?? langOf(file), code, highlight: hl, wrap: true,
     tone: 'ingest', fill: true, w: WORK_W, minH: editorH(editorRows), ...(show && { show }),
