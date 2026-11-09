@@ -46,9 +46,9 @@ export const decoupleEvents: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'vs', title: 'A topic, or a bus', tone: 'ingest', columns: ['', 'SNS topic', 'EventBridge bus'], rows: [
-        ['who sends', 'one producer', 'many sources'],
-        ['who gets it', 'every subscriber', 'what a rule matches'],
-        ['matching', 'a subscription filter', 'any field, a rule'],
+        ['sends', 'one producer', 'many sources'],
+        ['gets it', 'every subscriber', 'what rules match'],
+        ['match on', 'a filter policy', 'any field'],
       ],
     },
   ],

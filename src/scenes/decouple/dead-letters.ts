@@ -31,8 +31,8 @@ export const decoupleDeadLetters: SceneModel = ideFrame({
       type: 'table', id: 'policy', title: 'The redrive policy', tone: 'ingest', columns: ['', ''], rows: [
         ['dead-letter queue', 'book-shop-fulfilment-dlq'],
         ['maxReceiveCount', '3: then it moves'],
-        ['kept there', '14 days, for a person to read'],
-        ['after the fix', 'redrive it back to the queue'],
+        ['kept there', '14 days, for a person'],
+        ['after the fix', 'redrive it to the queue'],
       ],
     },
   ],

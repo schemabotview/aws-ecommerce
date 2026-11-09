@@ -11,3 +11,5 @@
 [data-id='three'] .gf-table td { padding-inline: 1px; }
 .gf-table[data-id='rt-public'] :is(td, th),
 .gf-table[data-id='rt-private'] :is(td, th) { padding-inline: 3px; }
+/* §8.6's run quotes the workflow's states and its failure as recorded */
+.gf-table[data-id='run11'] :is(td, th) { padding-inline: 3px; }

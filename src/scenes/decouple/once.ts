@@ -42,10 +42,10 @@ export const decoupleOnce: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'result', title: 'This run', tone: 'ingest', columns: ['', ''], rows: [
-        ['packed', packed.map((o) => `order ${o}`).join(', ')],
-        ['skipped as duplicates', skipped.map((o) => `order ${o}`).join(', ') || '-'],
-        ['keys in the table', keys.join(', ')],
-        ['a skipped copy', 'reported done: deleted, not retried'],
+        ['orders packed', packed.join(', ')],
+        ['skipped copies', skipped.join(', ') || '-'],
+        ['keys', keys.join(', ')],
+        ['a skipped copy', 'done: deleted, not retried'],
       ],
     },
   ],

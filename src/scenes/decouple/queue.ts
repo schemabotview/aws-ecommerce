@@ -23,15 +23,15 @@ export const decoupleQueue: SceneModel = ideFrame({
       type: 'group', id: 'diagram', bare: true, children: [
         {
           type: 'group', id: 'path', title: 'Checkout no longer waits for packing', tone: 'source', dir: 'row', children: [
-            { type: 'item', id: 'producer', icon: 'fargate', title: 'checkout', sub: 'records, sends, answers', stack: true },
+            { type: 'item', id: 'producer', icon: 'fargate', title: 'checkout', sub: 'sends, then answers', stack: true },
             { type: 'item', id: 'queue', icon: 'sqs', title: 'book-shop-fulfilment', sub: 'kept up to 4 days', stack: true },
             { type: 'item', id: 'consumer', icon: 'package', title: 'a worker', sub: 'receive, pack, delete', stack: true },
           ],
         },
         {
           type: 'group', id: 'clock', title: `Order ${order}'s message, by the clock`, tone: 'ingest', children: [
-            { type: 'item', id: 't0', icon: 'clock', title: `0 s · receive, count ${counts[0] ?? '?'}`, sub: 'the worker crashes: no delete' },
-            { type: 'item', id: 'hidden', icon: 'lock', title: '0–30 s · hidden', sub: 'in flight: a receive finds nothing' },
+            { type: 'item', id: 't0', icon: 'clock', title: `0 s · receive, count ${counts[0] ?? '?'}`, sub: 'worker crashes: no delete' },
+            { type: 'item', id: 'hidden', icon: 'lock', title: '0–30 s · hidden', sub: 'a receive finds nothing' },
             { type: 'item', id: 't31', icon: 'check', title: `31 s · receive, count ${counts[1] ?? '?'}`, sub: 'packed, then deleted', tone: 'ingest' },
           ],
         },
@@ -39,15 +39,15 @@ export const decoupleQueue: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'promise', title: 'What the queue promises', tone: 'source', columns: ['', ''], rows: [
-        ['delivery', 'at least once: maybe twice (§8.8)'],
-        ['while a worker works', 'hidden from the others'],
-        ['done', 'only when the worker deletes it'],
+        ['delivery', 'once, maybe twice (§8.8)'],
+        ['in flight', 'hidden from the others'],
+        ['done', 'when the worker deletes it'],
       ],
     },
   ],
   edges: [
     { from: 'producer', to: 'queue', label: 'send' },
-    { from: 'queue', to: 'consumer', label: 'receive' },
+    { from: 'queue', to: 'consumer', label: 'poll' },
     { from: 't0', to: 'hidden' },
     { from: 'hidden', to: 't31', label: 'timeout ends' },
   ],

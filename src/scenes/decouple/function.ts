@@ -39,8 +39,8 @@ export const decoupleFunction: SceneModel = ideFrame({
     {
       type: 'table', id: 'who', title: 'A worker by hand, or a function', tone: 'ingest', columns: ['', 'tools.consume', 'Lambda'], rows: [
         ['who polls', 'your loop', 'the mapping'],
-        ['more messages', 'you start workers', 'more pollers, more calls'],
-        ['one bad message', 'your code', 'batchItemFailures'],
+        ['a backlog', 'start workers', 'more pollers'],
+        ['bad message', 'your code', 'batchItemFailures'],
       ],
     },
   ],
