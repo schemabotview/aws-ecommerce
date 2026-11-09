@@ -22,35 +22,35 @@ export const secureResourcePolicy: SceneModel = ideFrame({
       {
         type: 'group', id: 'accounts', bare: true, dir: 'row', children: [
           {
-            type: 'group', id: 'audit', icon: 'account', title: 'Account 777788889999', sub: 'audit: not the shop\'s', children: [
-              { type: 'item', id: 'people', icon: 'users', title: 'the auditors', sub: 'sign in to their own account' },
+            type: 'group', id: 'audit', icon: 'account', title: 'audit account', sub: '777788889999', children: [
+              { type: 'item', id: 'people', icon: 'users', title: 'auditors', sub: 'people' },
               { type: 'item', id: 'auditor', icon: 'iamrole', title: 'Auditor', sub: 'role' },
-              { type: 'item', id: 'id-policy', icon: 'permissions', title: 'its identity policy', sub: 'must allow reading the catalog' },
+              { type: 'item', id: 'id-policy', icon: 'permissions', title: 'its policy', sub: 'must allow' },
             ],
           },
           {
-            type: 'group', id: 'dev', icon: 'account', title: 'Account 444455556666', sub: 'development: the shop\'s', tone: 'ingest', children: [
-              { type: 'item', id: 'bucket', icon: 'bucket', title: 'the catalog bucket', sub: 'book-shop-catalog-…' },
-              { type: 'item', id: 'bucket-policy', icon: 'permissions', title: 'its bucket policy', sub: 'AuditorReads: applied here' },
+            type: 'group', id: 'dev', icon: 'account', title: 'development', sub: '444455556666', tone: 'ingest', children: [
+              { type: 'item', id: 'bucket', icon: 'bucket', title: 'the catalog', sub: 'the bucket' },
+              { type: 'item', id: 'bucket-policy', icon: 'permissions', title: 'bucket policy', sub: 'AuditorReads' },
             ],
           },
         ],
       },
-        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the emulator stores the bucket policy and returns it, but evaluates neither resource policies nor a second account. The both-sides rule is AWS\'s documented logic.' },
+        { type: 'note', id: 'emulated', tone: 'consume', text: 'Emulated: the bucket policy is stored and returned, never evaluated, and there is no second account. The both-sides rule is AWS\'s documented logic.' },
       ],
     },
     {
       type: 'table', id: 'kinds', title: 'Identity policy or resource policy', tone: 'source', columns: ['', 'identity', 'resource'], rows: [
-        ['attached to', 'a role or user', 'a bucket, a queue'],
-        ['names a principal', 'never', 'always'],
+        ['on', 'a role, user', 'a bucket, queue'],
+        ['a principal', 'never', 'always'],
         ['one account', 'enough alone', 'enough alone'],
-        { cells: ['across accounts', 'must allow', 'must allow too'], tone: 'ingest' },
+        { cells: ['cross-account', 'must allow', 'must allow too'], tone: 'ingest' },
       ],
     },
   ],
   edges: [
     { from: 'people', to: 'auditor', label: 'assume' },
-    { from: 'auditor', to: 'bucket', label: 'both must allow' },
+    { from: 'auditor', to: 'bucket', label: 'both allow' },
     { from: 'auditor', to: 'id-policy', label: 'its own' },
     { from: 'bucket', to: 'bucket-policy', label: 'its own' },
   ],

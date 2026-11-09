@@ -25,7 +25,7 @@ export const secureRole: SceneModel = ideFrame({
     {
       type: 'table', id: 'policies', title: 'Two policies', tone: 'ingest', columns: ['', 'trust', 'permissions'], rows: [
         ['answers', 'who may be it', 'what it may do'],
-        ['names', 'a principal', 'actions, resources'],
+        ['names', 'a principal', 'actions, ARNs'],
         ['how many', 'exactly one', 'any number'],
         { cells: ['BookShopApp', 'ECS tasks', 'none: all denied'], tone: 'consume' },
       ],

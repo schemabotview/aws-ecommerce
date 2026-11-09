@@ -36,9 +36,9 @@ export const secureStatements: SceneModel = ideFrame({
     },
     {
       type: 'table', id: 'matches', title: 'The app\'s three requests', tone: 'ingest', columns: ['request', 'action', 'resource', 'result'], rows: [
-        { cells: ['read books/bk-1001.json', '✓', '✓', 'allowed'], tone: 'ingest' },
-        { cells: ['read orders.csv', '✓', '✗', '403'], tone: 'consume' },
-        { cells: ['write books/bk-1002.json', '✗', '✓', 'AccessDenied'], tone: 'consume' },
+        { cells: ['get bk-1001', '✓', '✓', 'allowed'], tone: 'ingest' },
+        { cells: ['get orders.csv', '✓', '✗', '403'], tone: 'consume' },
+        { cells: ['put bk-1002', '✗', '✓', 'AccessDenied'], tone: 'consume' },
       ],
     },
   ],
